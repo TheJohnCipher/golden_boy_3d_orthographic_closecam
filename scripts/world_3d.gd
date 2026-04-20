@@ -458,7 +458,7 @@ func _configure_material(material, name, color, emissive := false):
 	material.albedo_color = color
 	material.roughness = 0.95
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.cull_mode = BaseMaterial3D.CULL_BACK
 	
 	# Default triplanar
 	material.uv1_triplanar = true
@@ -468,10 +468,10 @@ func _configure_material(material, name, color, emissive := false):
 	var tex_set = _get_surface_texture(lower)
 	if tex_set and tex_set.has("albedo"):
 		material.albedo_texture = tex_set["albedo"]
-	if tex_set and tex_set.has("normal"):
+	if tex_set and tex_set.has("normal") and tex_set["normal"] != null:
 		material.normal_enabled = true
 		material.normal_texture = tex_set["normal"]
-	if tex_set and tex_set.has("roughness"):
+	if tex_set and tex_set.has("roughness") and tex_set["roughness"] != null:
 		material.roughness_texture = tex_set["roughness"]
 		material.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 
@@ -515,9 +515,7 @@ func _configure_material(material, name, color, emissive := false):
 		material.uv1_world_triplanar = false
 		material.uv1_scale = Vector3(1.2, 1.2, 1.2)
 		material.roughness = 0.88
-		material.cull_mode = BaseMaterial3D.CULL_DISABLED  # Double-sided
-		material.no_depth_test = true
-		material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
+		material.cull_mode = BaseMaterial3D.CULL_DISABLED  # Double-sided thin trim
 		return
 
 
@@ -572,7 +570,7 @@ func _configure_material(material, name, color, emissive := false):
 		material.metallic = 0.18
 		material.roughness = 0.78
 		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
-	return
+		return
 
 	if lower.contains("frontageconnectorfloor"):
 		material.albedo_texture = _get_surface_texture("plaza").albedo
@@ -1431,7 +1429,7 @@ func _add_mesh_only(name, pos, size, color, emissive := false):
 		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		mat.disable_receive_shadows = true
-		# no_depth_test only for glass to avoid overwriting front objects
+		# Keep thin trim double-sided, but preserve depth testing to avoid overdraw artifacts.
 	
 	# Simple LOD
 	node.visible = true
@@ -1484,6 +1482,10 @@ func _spawn_level_characters():
 	contact_npcs.append(_spawn_npc("Mara", "contact", "alibi", "day", Vector3(-9.5, 0.0, -15.0), [], 0.0))
 	contact_npcs.append(_spawn_npc("Jules", "contact", "guest_pass", "day", Vector3(-2.5, 0.0, 0.0), [], 0.0))
 	contact_npcs.append(_spawn_npc("Nico", "contact", "route_intel", "day", Vector3(7.0, 0.0, 8.0), [], 0.0))
+	# Day ambience patrols so the block does not feel frozen before night.
+	civilian_npcs.append(_spawn_npc("Day Civilian A", "civilian", "", "day", Vector3(-6.5, 0.0, -10.0), [Vector3(-6.5, 0.0, -10.0), Vector3(-3.5, 0.0, -3.5)], 0.7))
+	civilian_npcs.append(_spawn_npc("Day Civilian B", "civilian", "", "day", Vector3(0.5, 0.0, 5.5), [Vector3(0.5, 0.0, 5.5), Vector3(3.5, 0.0, 11.0)], 0.75))
+	civilian_npcs.append(_spawn_npc("Day Civilian C", "civilian", "", "day", Vector3(9.0, 0.0, -2.0), [Vector3(9.0, 0.0, -2.0), Vector3(6.0, 0.0, 3.0)], 0.72))
 
 # Night guards - 2nd set + night2 ramp (extend patrols/detection)
 	guard_npcs.append(_spawn_npc("Guard One", "guard", "", "night", Vector3(-7.5, 0.0, -8.0), [Vector3(-7.5, 0.0, -8.0), Vector3(-7.5, 0.0, 8.0), Vector3(-3.0, 0.0, 12.0)], 1.6))
