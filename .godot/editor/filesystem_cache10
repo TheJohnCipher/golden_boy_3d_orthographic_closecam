@@ -1,8 +1,8 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1776661630
+::res://::1776665269
 README.md::TextFile::-1::1776654405::0::1::::<><><>0<>0<><>::
-TODO.md::TextFile::-1::1776661409::0::1::::<><><>0<>0<><>::
-::res://art/::1776661211
+TODO.md::TextFile::-1::1776664585::0::1::::<><><>0<>0<><>::
+::res://art/::1776661719
 footstep.ogg::AudioStreamOggVorbis::2236159304427983915::1776661211::1776661719::0::::<><><>0<>0<>1f2b528480d41c6e4840d4052fa3da1b<>::
 icon.svg::CompressedTexture2D::6321872272276534388::1776646993::1776647027::1::::<><><>0<>0<>6a0d82114755f6fa39837a06b9c38186<>res://.godot/imported/icon.svg-2ffe2e9772a318535303737ea3c29287.ctex::
 ::res://art/previews/::1776647027
@@ -11,10 +11,10 @@ level01_blockout_plan.png::CompressedTexture2D::2630198455906108181::1776646993:
 city_block_map.md::TextFile::-1::1776653941::0::1::::<><><>0<>0<><>::
 ::res://scenes/::1776646993
 main.tscn::PackedScene::-1::1776646993::0::1::::<><><>0<>0<><>::res://scripts/world_3d.gd
-::res://scripts/::1776658529
-npc_3d.gd::GDScript::8456359768593886914::1776660331::0::1::::<>CharacterBody3D<><>0<>0<><>::
-player_3d.gd::GDScript::2506876634371823117::1776661223::0::1::::<>CharacterBody3D<><>0<>0<><>::
+::res://scripts/::1776662618
+npc_3d.gd::GDScript::8456359768593886914::1776661831::0::1::::<>CharacterBody3D<><>0<>0<><>::
+player_3d.gd::GDScript::2506876634371823117::1776662618::0::1::::<>CharacterBody3D<><>0<>0<><>::
 shadow_zone_3d.gd::GDScript::1314848994836298714::1776651129::0::1::::<>Area3D<><>0<>0<><>::
-world_3d.gd::GDScript::1163703501691871578::1776661341::0::1::::<>Node3D<><>0<>0<><>::
+world_3d.gd::GDScript::1163703501691871578::1776665226::0::1::::<>Node3D<><>0<>0<><>::
 ::res://shaders/::1776660544
 window.gdshader::Shader::8260964094898799597::1776660342::0::1::::<><><>0<>0<><>::

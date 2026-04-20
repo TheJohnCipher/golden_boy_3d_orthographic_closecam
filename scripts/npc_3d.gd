@@ -106,6 +106,10 @@ func _patrol(delta):
 
 func can_interact(player):
     # Only day contacts use the interaction prompt.
+    if player == null or not is_instance_valid(player):
+        return false
+    if not is_inside_tree() or not player.is_inside_tree():
+        return false
     if not visible:
         return false
     if role != "contact":
@@ -117,6 +121,10 @@ func can_interact(player):
 func is_takedown_reachable(player):
     # The takedown rule is simple on purpose: be close enough and broadly behind
     # the target's current facing direction.
+    if player == null or not is_instance_valid(player):
+        return false
+    if not is_inside_tree() or not player.is_inside_tree():
+        return false
     if role != "target":
         return false
     if not visible:
@@ -136,9 +144,11 @@ func is_takedown_reachable(player):
 func can_detect_player(player):
     # Contacts and civilians should never run this path, but the helper stays
     # generic because the world script asks it off role data.
-    if not visible:
+    if player == null or not is_instance_valid(player):
         return false
-    if player == null:
+    if not is_inside_tree() or not player.is_inside_tree():
+        return false
+    if not visible:
         return false
     var to_player = player.global_position - global_position
     to_player.y = 0.0
@@ -164,7 +174,10 @@ func can_detect_player(player):
     var query = PhysicsRayQueryParameters3D.create(global_position + Vector3.UP * 1.0, player.global_position + Vector3.UP * 0.8)
     query.exclude = [self]
     query.collide_with_areas = false
-    var result = get_viewport().get_world_3d().direct_space_state.intersect_ray(query)
+    var world_3d = get_world_3d()
+    if world_3d == null:
+        return false
+    var result = world_3d.direct_space_state.intersect_ray(query)
     if result.is_empty():
         return true
     return result.get("collider") == player

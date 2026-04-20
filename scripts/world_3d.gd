@@ -408,6 +408,10 @@ func _get_surface_texture(key):
 	match key:
 		"asphalt":
 			tex_set = _create_noise_texture(128, 128, Color("171b24"), Color("30394a"), 11, 0.42, 0.15, 0.07)
+			tex_set = {
+				"albedo": tex_set["albedo"],
+				"normal": null
+			}
 		"concrete":
 			tex_set = {"albedo": _create_tile_texture(128, 128, Color("5a616d"), Color("7a818e"), Color("3d434d"), 6, 6, 21), "normal": null}
 		"plaza":
@@ -418,6 +422,10 @@ func _get_surface_texture(key):
 			tex_set = {"albedo": _create_tile_texture(128, 128, Color("535760"), Color("6d727c"), Color("363b44"), 7, 7, 51), "normal": null}
 		"service_concrete":
 			tex_set = _create_noise_texture(128, 128, Color("2b313c"), Color("46505e"), 61, 0.34, 0.2, 0.05)
+			tex_set = {
+				"albedo": tex_set["albedo"],
+				"normal": null
+			}
 		"brick":
 			tex_set = {"albedo": _create_brick_texture(128, 128, Color("8a8179"), Color("a1968b"), Color("625a54"), 7, 4, 1, 71), "normal": null}
 		"dark_brick":
@@ -426,6 +434,10 @@ func _get_surface_texture(key):
 			tex_set = {"albedo": _create_tile_texture(128, 128, Color("4b5867"), Color("677584"), Color("36414d"), 7, 16, 91), "normal": null}
 		"painted_metal":
 			tex_set = _create_noise_texture(128, 128, Color("4c5564"), Color("6e7889"), 101, 0.28, 0.1, 0.04)
+			tex_set = {
+				"albedo": tex_set["albedo"],
+				"normal": null
+			}
 		"fabric":
 			tex_set = {"albedo": _create_stripe_texture(128, 128, Color("a64033"), Color("d17b51"), 4, 111), "normal": null}
 		"tower_albedo":
@@ -455,12 +467,12 @@ func _configure_material(material, name, color, emissive := false):
 
 	var tex_set = _get_surface_texture(lower)
 	if tex_set and tex_set.has("albedo"):
-		material.albedo_texture = tex_set.albedo
+		material.albedo_texture = tex_set["albedo"]
 	if tex_set and tex_set.has("normal"):
 		material.normal_enabled = true
-		material.normal_texture = tex_set.normal
+		material.normal_texture = tex_set["normal"]
 	if tex_set and tex_set.has("roughness"):
-		material.roughness_texture = tex_set.roughness
+		material.roughness_texture = tex_set["roughness"]
 		material.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
 
 	if emissive:
@@ -476,7 +488,12 @@ func _configure_material(material, name, color, emissive := false):
 		return
 
 	if lower.contains("windowpanel") or lower.contains("glass"):
-		material.shader = load("res://shaders/window.gdshader")
+		# Keep glass setup on StandardMaterial3D to avoid invalid legacy remap warnings.
+		material.albedo_color = Color(color.r, color.g, color.b, 0.28)
+		material.roughness = 0.08
+		material.metallic = 0.12
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		material.uv1_triplanar = false
 		return
 
 	if lower.contains("puddle"):
@@ -505,7 +522,7 @@ func _configure_material(material, name, color, emissive := false):
 
 
 	if lower.contains("lintel") or lower.contains("cornice") or lower.contains("pilaster") or lower.contains("plinth") or lower.contains("awning"):
-		material.albedo_texture = _get_surface_texture("stone")
+		material.albedo_texture = _get_surface_texture("stone").albedo
 		material.roughness = 0.8
 		material.metallic = 0.0
 		material.uv1_triplanar = false
@@ -515,7 +532,7 @@ func _configure_material(material, name, color, emissive := false):
 		return
 
 	if lower.contains("fireescape"):
-		material.albedo_texture = _get_surface_texture("metal")
+		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.8
 		material.roughness = 0.45
 		material.uv1_triplanar = false
@@ -533,7 +550,7 @@ func _configure_material(material, name, color, emissive := false):
 		return
 
 	if lower.contains("doorframe"):
-		material.albedo_texture = _get_surface_texture("stone")
+		material.albedo_texture = _get_surface_texture("stone").albedo
 		material.roughness = 0.82
 		material.uv1_triplanar = false
 		material.uv1_scale = Vector3(0.6, 0.6, 0.6)
@@ -542,117 +559,108 @@ func _configure_material(material, name, color, emissive := false):
 	if lower.contains("tower"):
 		material.uv1_triplanar = false
 		material.uv1_world_triplanar = false
-		material.albedo_texture = _get_surface_texture("tower_albedo")
+		material.albedo_texture = _get_surface_texture("tower_albedo").albedo
 		material.emission_enabled = true
 		material.emission = Color("ffd89d")
-		material.emission_texture = _get_surface_texture("tower_emission")
+		material.emission_texture = _get_surface_texture("tower_emission").albedo
 		material.emission_energy_multiplier = 1.45
 		material.roughness = 0.8
 		return
 
 	if (lower.contains("roof") and not (lower.contains("vent") or lower.contains("mechanical"))) or lower.contains("parapet"):
-		material.albedo_texture = _get_surface_texture("painted_metal")
+		material.albedo_texture = _get_surface_texture("painted_metal").albedo
 		material.metallic = 0.18
 		material.roughness = 0.78
 		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
-		return
-	elif lower.contains("column") or lower.contains("lintel") or lower.contains("cornice") or lower.contains("pilaster"):
-		material.albedo_texture = _get_surface_texture("stone")
-		material.uv1_scale = Vector3(0.62, 0.62, 0.62)
-		return
-	elif lower.contains("doorpanel"):
-		material.albedo_texture = _get_surface_texture("painted_metal")
-		material.metallic = 0.25
-		material.roughness = 0.5
-		material.uv1_scale = Vector3(0.88, 0.88, 0.88)
-		return
+	return
+
 	if lower.contains("frontageconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("plaza")
+		material.albedo_texture = _get_surface_texture("plaza").albedo
 		material.roughness = 1.0
 		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
 	elif lower.contains("galleryhotelconnectorfloor") or lower.contains("hotelofficeconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("stone")
+		material.albedo_texture = _get_surface_texture("stone").albedo
 		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
 	elif lower.contains("officeserviceconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("service_concrete")
+		material.albedo_texture = _get_surface_texture("service_concrete").albedo
 		material.uv1_scale = Vector3(0.42, 0.42, 0.42)
 	elif lower.contains("median") or lower.contains("curb") or lower.contains("dockplatform") or lower.contains("dockstep") or lower.contains("entrystep"):
-		material.albedo_texture = _get_surface_texture("concrete")
+		material.albedo_texture = _get_surface_texture("concrete").albedo
 		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
 	elif lower.contains("avenuefloor"):
-		material.albedo_texture = _get_surface_texture("asphalt")
+		material.albedo_texture = _get_surface_texture("asphalt").albedo
 		material.roughness = 1.0
 		material.uv1_scale = Vector3(0.34, 0.34, 0.34)
 	elif lower.contains("sidewalk"):
-		material.albedo_texture = _get_surface_texture("concrete")
+		material.albedo_texture = _get_surface_texture("concrete").albedo
 		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
 	elif lower.contains("forecourt") or lower.contains("safehousepad"):
-		material.albedo_texture = _get_surface_texture("plaza")
+		material.albedo_texture = _get_surface_texture("plaza").albedo
 		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
 	elif lower.contains("cafefloor"):
-		material.albedo_texture = _get_surface_texture("warm_tile")
+		material.albedo_texture = _get_surface_texture("warm_tile").albedo
 		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
 	elif lower.contains("galleryfloor") or lower.contains("vipfloor") or lower.contains("hotelfloor") or lower.contains("officefloor"):
-		material.albedo_texture = _get_surface_texture("stone")
+		material.albedo_texture = _get_surface_texture("stone").albedo
 		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
 	elif lower.contains("servicefloor") or lower.contains("subwayalleyfloor") or lower.contains("alleyfloor") or lower.contains("servicelane"):
-		material.albedo_texture = _get_surface_texture("service_concrete")
+		material.albedo_texture = _get_surface_texture("service_concrete").albedo
 		material.uv1_scale = Vector3(0.42, 0.42, 0.42)
 	elif lower.contains("massing"):
-		material.albedo_texture = _get_surface_texture("dark_brick")
+		material.albedo_texture = _get_surface_texture("dark_brick").albedo
 		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
 	elif lower.contains("planter"):
-		material.albedo_texture = _get_surface_texture("painted_metal")
+		material.albedo_texture = _get_surface_texture("painted_metal").albedo
 		material.roughness = 0.7
 	elif lower.contains("taxi") or lower.contains("servicevan") or lower.contains("dumpster"):
-		material.albedo_texture = _get_surface_texture("painted_metal")
+		material.albedo_texture = _get_surface_texture("painted_metal").albedo
 		material.metallic = 0.35
 		material.roughness = 0.44
 		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
 	elif lower.contains("metal") or lower.contains("post") or lower.contains("shelter") or lower.contains("cart") or lower.contains("gate") or lower.contains("safe"):
-		material.albedo_texture = _get_surface_texture("metal")
+		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.8
 		material.roughness = 0.42
 		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
 	elif lower.contains("stair") or lower.contains("gate"):
-		material.albedo_texture = _get_surface_texture("metal")
+		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.65
 		material.roughness = 0.5
 		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
 	elif lower.contains("boundary") or lower.contains("subway") or lower.contains("safehouse") or lower.contains("fence") or lower.contains("alley"):
-		material.albedo_texture = _get_surface_texture("dark_brick")
+		material.albedo_texture = _get_surface_texture("dark_brick").albedo
 		material.uv1_scale = Vector3(0.52, 0.52, 0.52)
 	elif lower.contains("west") or lower.contains("north") or lower.contains("south") or lower.contains("east"):
-		material.albedo_texture = _get_surface_texture("brick")
+		material.albedo_texture = _get_surface_texture("brick").albedo
 		material.uv1_scale = Vector3(0.52, 0.52, 0.52)
 	elif lower.contains("awning") or lower.contains("canopy"):
-		material.albedo_texture = _get_surface_texture("fabric")
+		material.albedo_texture = _get_surface_texture("fabric").albedo
 		material.roughness = 0.78
 		material.uv1_scale = Vector3(0.8, 0.8, 0.8)
 	elif lower.contains("runner"):
-		material.albedo_texture = _get_surface_texture("fabric")
+		material.albedo_texture = _get_surface_texture("fabric").albedo
 		material.roughness = 0.82
 		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
 	elif lower.contains("vent") or lower.contains("mechanical"):
-		material.albedo_texture = _get_surface_texture("metal")
+		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.7
 		material.roughness = 0.52
 		material.uv1_scale = Vector3(0.9, 0.9, 0.9)
 	elif lower.contains("bar") or lower.contains("plinth"):
-		material.albedo_texture = _get_surface_texture("stone")
+		material.albedo_texture = _get_surface_texture("stone").albedo
 		material.uv1_scale = Vector3(0.62, 0.62, 0.62)
 	elif lower.contains("counter") or lower.contains("desk") or lower.contains("bench") or lower.contains("newsstand"):
-		material.albedo_texture = _get_surface_texture("warm_tile")
+		material.albedo_texture = _get_surface_texture("warm_tile").albedo
 		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
 	elif lower.contains("crate"):
-		material.albedo_texture = _get_surface_texture("warm_tile")
+		material.albedo_texture = _get_surface_texture("warm_tile").albedo
 		material.uv1_scale = Vector3(0.68, 0.68, 0.68)
 	elif lower.contains("booth") or lower.contains("sofa"):
-		material.albedo_texture = _get_surface_texture("fabric")
+		material.albedo_texture = _get_surface_texture("fabric").albedo
 		material.roughness = 0.84
 		material.uv1_scale = Vector3(0.8, 0.8, 0.8)
 	elif lower.contains("signpanel"):
-		material.albedo_texture = _get_surface_texture("metal")
+		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.35
 		material.roughness = 0.4
 
@@ -970,10 +978,17 @@ func _create_player():
 	camera.current = true
 	camera_pivot.add_child(camera)
 
-	add_child(player)\n\n	var footstep_player = AudioStreamPlayer3D.new()\n	footstep_player.name = "FootstepPlayer"\n	player.add_child(footstep_player)\n\nfunc _build_level_blockout():
+	var footstep_player = AudioStreamPlayer3D.new()
+	footstep_player.name = "FootstepPlayer"
+	player.add_child(footstep_player)
+
+	add_child(player)
+
+func _build_level_blockout():
 	# Clean urban alleyway design - simple, clean, and playable.
 	# Central 40-unit-wide alley with tall buildings on both sides.
 	var palette = {
+
 		"alley": Color("1a1f28"),
 		"sidewalk": Color("2b303a"),
 		"stone": Color("535760"),
@@ -1915,14 +1930,19 @@ func _show_message(text):
 
 func _get_nearest_interactable():
 	# This chooses the closest valid interaction target for the prompt and E key.
-	if player == null:
+	if player == null or not is_instance_valid(player) or not player.is_inside_tree():
 		return null
+	if npc_root == null or not is_instance_valid(npc_root):
+		return null
+	var player_position = player.global_position
 	var best = null
 	var best_distance = 99999.0
 	for npc in npc_root.get_children():
+		if npc == null or not is_instance_valid(npc) or not npc.is_inside_tree():
+			continue
 		if not npc.visible:
 			continue
-		var dist = npc.global_position.distance_to(player.global_position)
+		var dist = npc.global_position.distance_to(player_position)
 		if npc.role == "contact" and npc.can_interact(player):
 			if dist < best_distance:
 				best = npc
