@@ -5,7 +5,7 @@ This project is a **single-level 3D stealth blockout** built directly in code.
 It currently gives you:
 - a perspective third-person camera with mouse look
 - a low-resolution pixel-scaled presentation rendered up to the current monitor
-- a downtown city block built procedurally in `scripts/world_3d.gd`
+- a downtown city block built procedurally from a world controller plus data modules
 - a daytime social setup phase
 - a nighttime assassination phase
 - extraction, fail, restart, and fullscreen flow
@@ -15,8 +15,10 @@ It currently gives you:
 
 - `docs/city_block_map.md`  
   The main layout reference. Use this when moving walls, changing doors, or rebuilding the city.
+- `docs/architecture.md`  
+  The code architecture map. Read this first before making structural changes.
 - `scripts/world_3d.gd`  
-  The code source of truth for geometry placement, mission flow, lighting, and HUD.
+  The orchestration layer for geometry placement, mission flow, lighting, and HUD.
 
 ## Controls
 
@@ -51,7 +53,13 @@ When all three are complete, press `Tab`.
 ## Project structure
 
 - `scripts/world_3d.gd`  
-  Builds the city, spawns the player and NPCs, runs the mission state machine, and creates the HUD.
+  World orchestrator. Builds the city, spawns actors, runs mission state, and creates the HUD.
+- `scripts/world/layout_data.gd`  
+  Declarative coordinates and spawn records (shadow zones, contacts, guards, civilians, target).
+- `scripts/world/intent_catalog.gd`  
+  Object intent documentation catalog used to annotate generated geometry metadata.
+- `scripts/world/material_library.gd`  
+  Procedural texture generation and material mapping rules.
 - `scripts/player_3d.gd`  
   Handles movement, gravity, mouse-look camera control, and shadow state.
 - `scripts/npc_3d.gd`  

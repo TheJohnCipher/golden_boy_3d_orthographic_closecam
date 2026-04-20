@@ -19,115 +19,9 @@ const SHADOW_ZONE_SCRIPT = preload("res://scripts/shadow_zone_3d.gd")
 const PIXEL_VIEWPORT_MIN_HEIGHT = 240
 const PIXEL_VIEWPORT_TARGET_DIVISOR = 3
 const PIXEL_VIEWPORT_MAX_HEIGHT = 420
-
-# ---------------------------------------------------------------------------
-# Object intent catalog
-# ---------------------------------------------------------------------------
-# These tables act as embedded design documentation for the procedural scene.
-# Every generated geometry node is tagged with the matching description so
-# future editors can understand "what this object is" and "why it exists"
-# without reverse-engineering coordinates and sizes.
-#
-# - `OBJECT_INTENT_EXACT` is for hero props or one-off structural elements.
-# - `OBJECT_INTENT_PREFIX` is for repeated families generated in loops.
-const OBJECT_INTENT_EXACT = {
-	"WorldSupportFloor": "Hidden collision safety slab under the whole level. It prevents physics tunneling or accidental fall-through at block seams.",
-	"AlleyFloor": "Primary traversal lane and stealth route. This is the asphalt spine that all mission paths are tuned around.",
-	"WestCurb": "Raised west curb that visually frames the alley and creates subtle elevation contrast against the main lane.",
-	"EastCurb": "Raised east curb mirroring the west side for readable street proportions and route boundaries.",
-	"WestTransitionFloor": "Secondary west floor band between curb and facade. It softens the transition from street to storefront.",
-	"EastTransitionFloor": "Secondary east floor band between curb and facade. It mirrors west side cadence for spatial balance.",
-	"WestWall": "Main west building mass used as the primary occlusion and silhouette wall for the alley canyon.",
-	"EastWall": "Main east building mass used as the mirrored occlusion and silhouette wall for the alley canyon.",
-	"OfficeTower": "Secondary tower volume on the east side used to break the roofline and add skyline hierarchy.",
-	"SouthBoundary": "Hard mission boundary at the south edge. Prevents out-of-bounds traversal and keeps encounters framed.",
-	"NorthBoundary": "Hard mission boundary at the north edge near extraction. Used for gameplay containment.",
-	"WestBoundary": "West hard wall boundary that blocks leaving the play corridor and supports stealth line-of-sight tuning.",
-	"EastBoundary": "East hard wall boundary that blocks leaving the play corridor and supports stealth line-of-sight tuning.",
-	"WestBuildingRail": "Hidden collision rail for west massing to prevent edge clipping into decorative facade meshes.",
-	"EastBuildingRail": "Hidden collision rail for east massing to prevent edge clipping into decorative facade meshes.",
-	"WestBench": "West social prop landmark for daytime contact beats and navigation memory.",
-	"EastBench": "East social prop landmark that mirrors west bench readability and supports route orientation.",
-	"WestPlanter": "West greenery prop introducing material contrast and soft cover reads.",
-	"EastPlanter": "East greenery prop introducing material contrast and soft cover reads.",
-	"WestCounter": "West service counter prop that reads as a cafe/bar frontage at street level.",
-	"EastBar": "East bar counter landmark used as a contact anchor and visual destination cue.",
-	"CenterPodium": "Center landmark pedestal for scene focus and objective readability in the middle corridor.",
-	"Van": "Large parked vehicle prop used as mid-lane obstruction and stealth path shaper.",
-	"Crate1": "Moveable-looking cargo crate prop used as environmental clutter and cover-like silhouette.",
-	"Dumpster": "Heavy utility bin prop that communicates service alley function and adds depth layering.",
-	"WestDoor1": "West utility door prop for facade storytelling and clear ground-floor scale reference.",
-	"EastDoor1": "East utility door prop for facade storytelling and clear ground-floor scale reference.",
-	"TrashBag1": "Soft waste bag clutter prop used to break hard-edge repetition in the alley.",
-	"TrashBag2": "Companion waste bag clutter prop to avoid mirrored repetition in debris placement.",
-	"Pipe": "Vertical service pipe used to suggest practical building infrastructure at street scale.",
-	"Pipe2": "Secondary service pipe to avoid single-prop staging and improve facade credibility.",
-}
-
-const OBJECT_INTENT_PREFIX = {
-	"WestRoof": "West roofline and coping family defining top silhouette rhythm for the west block.",
-	"EastRoof": "East roofline and coping family defining top silhouette rhythm for the east block.",
-	"WestBasePlinth": "West facade base family that grounds wall masses and reduces plain-box reads.",
-	"EastBasePlinth": "East facade base family that grounds wall masses and reduces plain-box reads.",
-	"WestSocle": "West lower facade belt course used to add architectural layering near pedestrian eye level.",
-	"EastSocle": "East lower facade belt course used to add architectural layering near pedestrian eye level.",
-	"WestWindowPanel": "West glazing bands representing floor-by-floor windows and interior depth reads.",
-	"EastWindowPanel": "East glazing bands representing floor-by-floor windows and interior depth reads.",
-	"WestLintel": "West horizontal lintel courses that separate facade tiers and improve vertical scale perception.",
-	"EastLintel": "East horizontal lintel courses that separate facade tiers and improve vertical scale perception.",
-	"WestHood": "West decorative hood/cornice strips that reduce flatness and catch highlights.",
-	"EastHood": "East decorative hood/cornice strips that reduce flatness and catch highlights.",
-	"WestCornice": "West top cornice cap that finishes the facade and sharpens skyline contrast.",
-	"EastCornice": "East top cornice cap that finishes the facade and sharpens skyline contrast.",
-	"WestChimney": "West chimney stacks and caps used for rooftop storytelling and silhouette breakup.",
-	"EastChimney": "East chimney stacks and caps used for rooftop storytelling and silhouette breakup.",
-	"WestFireEscape": "West fire-escape bars and uprights creating readable emergency egress structure.",
-	"EastFireEscape": "East fire-escape bars and uprights creating readable emergency egress structure.",
-	"WestPilaster": "West vertical pilaster rhythm to break long wall spans into human-scale bays.",
-	"EastPilaster": "East vertical pilaster rhythm to break long wall spans into human-scale bays.",
-	"WestWallBand": "West subtle facade banding used as weathering/detail breakup across long surfaces.",
-	"EastWallBand": "East subtle facade banding used as weathering/detail breakup across long surfaces.",
-	"WestWeathering": "West weathering streak overlays for age and material variation.",
-	"EastWeathering": "East weathering streak overlays for age and material variation.",
-	"WestGroundDetail": "West ground-level base darkening for dirt accumulation and contact shadow reads.",
-	"EastGroundDetail": "East ground-level base darkening for dirt accumulation and contact shadow reads.",
-	"WestEntry": "West entry steps and awnings defining where players read ground-level access points.",
-	"EastEntry": "East entry steps and awnings defining where players read ground-level access points.",
-	"WestDoorPanel": "West decorative door panel set used to imply active storefront and service access.",
-	"EastDoorPanel": "East decorative door panel set used to imply active storefront and service access.",
-	"WestDoorFrame": "West door frame trim family for depth and threshold readability.",
-	"EastDoorFrame": "East door frame trim family for depth and threshold readability.",
-	"WestDoorLintel": "West door lintels that mark structural headers above entries.",
-	"EastDoorLintel": "East door lintels that mark structural headers above entries.",
-	"WestDoorGlow": "West emissive strips used as nighttime guidance accents near entries.",
-	"EastDoorGlow": "East emissive strips used as nighttime guidance accents near entries.",
-	"WestBench": "West bench detail family including back/seat/support pieces for furniture readability.",
-	"EastBench": "East bench detail family including back/seat/support pieces for furniture readability.",
-	"WestPlanter": "West planter detail family including rim/soil layers for prop depth.",
-	"EastPlanter": "East planter detail family including rim/soil layers for prop depth.",
-	"WestCounter": "West service counter detail surfaces defining top working plane and edge trim.",
-	"EastBar": "East bar detail surfaces defining top working plane and edge trim.",
-	"CenterPodium": "Center podium trim and glow family that signals an intentional focal landmark.",
-	"Van": "Vehicle detail family including windows, handles, roof cap, bumper, and wheel additions.",
-	"Crate": "Cargo crate detail family with lid/strap accents to avoid plain box silhouettes.",
-	"Dumpster": "Dumpster detail family with lid, handles, and wheel accents for industrial readability.",
-	"StreetMark": "Painted lane markings used for directional rhythm and street-scale cues.",
-	"WestBox": "West clutter box family used to make alcoves feel occupied and lived-in.",
-	"EastBox": "East clutter box family used to make alcoves feel occupied and lived-in.",
-	"WestSign": "West signage family and mounts that imply shop identity and local context.",
-	"EastSign": "East signage family and mounts that imply shop identity and local context.",
-	"WestLamp": "West lamp posts/heads that reinforce night lighting logic and facade scale.",
-	"EastLamp": "East lamp posts/heads that reinforce night lighting logic and facade scale.",
-	"WestGraffiti": "West graffiti overlays for narrative wear and social texture.",
-	"EastGraffiti": "East graffiti overlays for narrative wear and social texture.",
-	"WestBoarding": "West boarded panel props implying renovation/closure storytelling.",
-	"EastBoarding": "East boarded panel props implying renovation/closure storytelling.",
-	"WestMullion": "West mullion crossbars that subdivide glazing and reduce flat panel reads.",
-	"EastMullion": "East mullion crossbars that subdivide glazing and reduce flat panel reads.",
-	"WestAccentLight": "West emissive accent strips used to articulate facade depth at night.",
-	"EastAccentLight": "East emissive accent strips used to articulate facade depth at night.",
-	"DayRouteMarker": "Non-blocking daytime route beacon used to teach contact locations.",
-}
+const INTENT_CATALOG = preload("res://scripts/world/intent_catalog.gd")
+const LAYOUT_DATA = preload("res://scripts/world/layout_data.gd")
+const MATERIAL_LIBRARY = preload("res://scripts/world/material_library.gd")
 
 # Core scene references created at runtime.
 var player = null
@@ -165,9 +59,9 @@ var current_objective = ""
 var message_text = ""
 var message_timer = 0.0
 
-# HUD label references and the procedural texture cache.
+# HUD label references and shared visual helper state.
 var hud = {}
-var texture_cache = {}
+var material_library = MATERIAL_LIBRARY.new()
 
 func _ready():
 	# Boot order matters here:
@@ -196,6 +90,8 @@ func _configure_window_for_native_screen():
 	var native_size = DisplayServer.screen_get_size(screen)
 	window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	window.size = native_size
+	if ui_root != null and is_instance_valid(ui_root):
+		_layout_hud()
 
 func _get_pixel_viewport_size(native_size):
 	var pixel_height = clampi(native_size.y / PIXEL_VIEWPORT_TARGET_DIVISOR, PIXEL_VIEWPORT_MIN_HEIGHT, PIXEL_VIEWPORT_MAX_HEIGHT)
@@ -296,8 +192,7 @@ func _create_point_light(name, pos, color, rng, energy):
 	add_child(light)
 	point_lights.append(light)
 
-# The helpers below generate lightweight procedural textures so the city can
-# read as asphalt, brick, tile, or glass before real art is imported.
+# Small color helper used by procedural geometry detail accents.
 func _mix_colors(a, b, t):
 	return Color(
 		lerpf(a.r, b.r, t),
@@ -306,282 +201,12 @@ func _mix_colors(a, b, t):
 		lerpf(a.a, b.a, t)
 	)
 
-func _noise_value(x, y, seed):
-	var value = sin(float(x) * 12.9898 + float(y) * 78.233 + float(seed) * 37.719) * 43758.5453
-	return value - floor(value)
-
-func _create_noise_texture(width, height, base_color, accent_color, seed, contrast := 0.35, darken := 0.12, speckle := 0.06):
-	# Ultra-detailed 128px multi-octave noise with normals/roughness variation - enhanced octaves/normals
-	width = 128
-	height = 128
-	var albedo_image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	var normal_image = Image.create(width, height, false, Image.FORMAT_RGB8)
-	var rough_image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	for y in range(height):
-		for x in range(width):
-			# 6 octaves for richer detail
-			var tone = 0.0
-			var normal_dx = 0.0
-			var normal_dy = 0.0
-			var amplitude = 1.0
-			var frequency = 1.0
-			for octave in range(6):
-				var nx = x * frequency
-				var ny = y * frequency
-				var n = _noise_value(nx, ny, seed + octave)
-				tone += n * amplitude
-				# Normal map from gradients
-				var nx1 = _noise_value(nx + 0.1, ny, seed + octave)
-				var ny1 = _noise_value(nx, ny + 0.1, seed + octave)
-				normal_dx += (nx1 - n) * amplitude * frequency
-				normal_dy += (ny1 - n) * amplitude * frequency
-				amplitude *= 0.45
-				frequency *= 2.1
-			tone = (tone / 2.3 + 0.5) * 0.28  # Normalize/bias
-			var color = _mix_colors(base_color, accent_color, tone * contrast)
-			
-			# Enhanced grit/roughness
-			var grit1 = _noise_value(x * 4.2 + 11, y * 3.5 + 17, seed + 5)
-			var grit2 = _noise_value(x * 8.5 + 23, y * 6.2 + 31, seed + 13)
-			var rough = grit1 * 0.6 + grit2 * 0.4
-			if grit1 > 0.92:
-				color = _mix_colors(color, Color(1, 1, 1, 1), speckle * 1.5)
-			elif grit1 < 0.08:
-				color = _mix_colors(color, Color(0, 0, 0, 1), darken * 1.3)
-			if grit2 > 0.88:
-				color = _mix_colors(color, Color(0.8, 0.8, 0.9, 1), 0.08)
-			
-			# Fine cracks with roughness boost
-			var crack = _noise_value(x * 14 + 47, y * 11 + 53, seed + 29)
-			if crack > 0.94:
-				color = _mix_colors(color, Color(0.28, 0.28, 0.28, 1), 0.28)
-				rough *= 1.4
-			
-			albedo_image.set_pixel(x, y, color)
-			# Pack normal (RG), roughness (B)
-			var nrm = Vector3(normal_dx * 0.5 + 0.5, normal_dy * 0.5 + 0.5, 1.0).normalized()
-			normal_image.set_pixel(x, y, Color(nrm.x, nrm.y, rough, 1.0))
-			rough_image.set_pixel(x, y, Color(color.r * 0.3 + 0.7, rough, rough, 1.0))  # Rough/metal/AO
-			
-	return {
-		"albedo": ImageTexture.create_from_image(albedo_image),
-		"normal": ImageTexture.create_from_image(normal_image),
-		"roughness": ImageTexture.create_from_image(rough_image)
-	}
-
-
-func _create_tile_texture(width, height, base_color, accent_color, grout_color, tile_w, tile_h, seed):
-	# Ultra-detailed tiles with grout variation, edge wear, multi-noise
-	width = 128
-	height = 128
-	var image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	for y in range(height):
-		for x in range(width):
-			var tile_x = x % tile_w
-			var tile_y = y % tile_h
-			var is_grout = tile_x <= 2 or tile_y <= 2 or tile_x >= tile_w - 2 or tile_y >= tile_h - 2
-			var color = grout_color
-			if not is_grout:
-				# Tile surface multi-noise for realism
-				var tile_tone = 0.0
-				var amp = 1.0
-				var freq = 1.0
-				for o in range(3):
-					tile_tone += _noise_value((x + o*7) * freq, (y + o*11) * freq, seed + o*19) * amp
-					amp *= 0.6
-					freq *= 2.5
-				tile_tone = (tile_tone / 1.8 + 0.5) * 0.28  # Bias toward midtones
-				color = _mix_colors(base_color, accent_color, tile_tone)
-				
-				# Tile defects/cracks
-				if _noise_value(x * 4 + 37, y * 6 + 43, seed + 67) > 0.96:
-					color = _mix_colors(color, Color(0.2, 0.2, 0.2, 1), 0.35)
-			
-			# Grout variation (sand/dirt)
-			if is_grout:
-				var grout_var = _noise_value(x * 2 + 5, y * 2 + 7, seed + 23)
-				color = _mix_colors(grout_color, Color(grout_color.r * 1.3, grout_color.g * 1.3, grout_color.b * 1.3), grout_var * 0.25)
-			
-			# Edge chipping
-			if (tile_x <= 3 or tile_y <= 3 or tile_x >= tile_w - 3 or tile_y >= tile_h - 3) and _noise_value(x * 8 + 59, y * 5 + 71, seed + 89) > 0.9:
-				color = _mix_colors(color, Color(0.4, 0.4, 0.4, 1), 0.4)
-			
-			image.set_pixel(x, y, color)
-	return ImageTexture.create_from_image(image)
-
-func _create_brick_texture(width, height, brick_color, accent_color, mortar_color, brick_w, brick_h, mortar, seed):
-	# Advanced running bond brick with mortar cracks, weathering, multi-patterns
-	width = 128
-	height = 128
-	var image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	for y in range(height):
-		var row = int(floor(float(y) / float(brick_h)))
-		var offset = int(brick_w / 2) if row % 2 == 1 else 0  # Running bond pattern
-		for x in range(width):
-			var shifted_x = int(fposmod(float(x + offset), float(brick_w)))
-			var shifted_y = int(fposmod(float(y), float(brick_h)))
-			var is_mortar_h = shifted_y < mortar or shifted_y > brick_h - mortar
-			var is_mortar_v = shifted_x < mortar
-			var is_mortar = is_mortar_h or is_mortar_v
-			
-			var color = mortar_color
-			if not is_mortar:
-				# Brick surface detail - multi-noise
-				var brick_var = 0.0
-				var amp = 1.0
-				for o in range(3):
-					brick_var += _noise_value(x * 2.1 + o*13, y * 1.8 + o*17, seed + o*23) * amp
-					amp *= 0.55
-				brick_var = (brick_var / 1.65 + 0.5) * 0.22
-				color = _mix_colors(brick_color, accent_color, brick_var)
-				
-				# Brick chips/cracks
-				if _noise_value(x * 6 + 41, y * 4 + 59, seed + 73) > 0.93:
-					color = _mix_colors(color, Color(0.25, 0.25, 0.25, 1), 0.4)
-			
-			# Mortar variation & cracks
-			if is_mortar:
-				var mortar_noise = _noise_value(x * 1.5 + 29, y * 1.5 + 37, seed + 47)
-				color = _mix_colors(mortar_color, Color(mortar_color.r * 0.8, mortar_color.g * 0.8, mortar_color.b * 0.8), mortar_noise * 0.3)
-				# Mortar cracks
-				if _noise_value(x * 9 + 61, y * 7 + 83, seed + 97) > 0.91:
-					color = Color(0.15, 0.15, 0.15, 1)
-			
-			# Vertical mortar joints thicker at edges
-			if is_mortar_v and shifted_x < mortar * 1.5:
-				color = _mix_colors(color, Color(0.12, 0.12, 0.12, 1), 0.6)
-			
-			image.set_pixel(x, y, color)
-	return ImageTexture.create_from_image(image)
-
-func _create_window_texture(width, height, frame_color, window_dark, window_lit, cols, rows, seed, lit_only := false):
-	# Ultra-detailed windows with mullions, curtains, reflections, blinds
-	width = 128
-	height = 192  # Taller for building scale
-	var image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	var cell_w = max(8, int(floor(float(width) / float(cols))))
-	var cell_h = max(12, int(floor(float(height) / float(rows))))
-	for y in range(height):
-		for x in range(width):
-			var col = int(floor(float(x) / float(cell_w)))
-			var row = int(floor(float(y) / float(cell_h)))
-			var local_x = x % cell_w
-			var local_y = y % cell_h
-			
-			# Complex frame with mullions
-			var is_frame = (local_x <= 2 or local_y <= 2 or local_x >= cell_w - 3 or local_y >= cell_h - 3) or \
-							 (local_x % (cell_w/2) <= 1.5 or local_y % (cell_h/2) <= 1.5)  # Cross mullions
-			
-			var lit = 0.0
-			var lit_freq1 = _noise_value(col * 5 + 3, row * 7 + 11, seed)
-			var lit_freq2 = _noise_value(col * 3 + 17, row * 5 + 23, seed + 41)
-			lit = (lit_freq1 * 0.7 + lit_freq2 * 0.3) > 0.48
-			
-			var color = frame_color
-			if not is_frame:
-				if lit_only:
-					color = window_lit if lit else Color(0, 0, 0, 1)
-				else:
-					# Window glass with reflections/curtains
-					var glass_base = window_lit if lit else window_dark
-					var reflection = _noise_value(x * 2.5 + 59, y * 1.8 + 71, seed + 89) * 0.15
-					color = _mix_colors(glass_base, Color(0.8, 0.9, 1.0, 0.3), reflection)
-					
-					# Random curtains/blinds (50% panes)
-					if _noise_value(col * 11 + 73, row * 13 + 97, seed + 113) > 0.5:
-						var curtain_var = _noise_value(x * 4 + 101, y * 3 + 107, seed + 131)
-						color = _mix_colors(color, Color(0.3, 0.25, 0.2, 0.8), curtain_var * 0.6)
-			
-			# Frame wear
-			if is_frame and _noise_value(x * 6.2 + 127, y * 4.1 + 139, seed + 151) > 0.92:
-				color = _mix_colors(color, Color(0.6, 0.55, 0.5, 1), 0.45)
-			
-			image.set_pixel(x, y, color)
-	return ImageTexture.create_from_image(image)
-
-func _create_stripe_texture(width, height, base_color, stripe_color, stripe_size, seed):
-	var image = Image.create(width, height, false, Image.FORMAT_RGBA8)
-	for y in range(height):
-		for x in range(width):
-			var stripe = int(floor(float(x + y) / float(stripe_size))) % 2 == 0
-			var color = stripe_color if stripe else base_color
-			color = _mix_colors(color, _mix_colors(base_color, stripe_color, _noise_value(x, y, seed)), 0.12)
-			image.set_pixel(x, y, color)
-	return ImageTexture.create_from_image(image)
-
-func _get_surface_texture(key):
-	if texture_cache.has(key):
-		return texture_cache[key]
-
-	var tex_set = null
-	match key:
-		"asphalt":
-			tex_set = _create_noise_texture(128, 128, Color("171b24"), Color("30394a"), 11, 0.42, 0.15, 0.07)
-			tex_set = {
-				"albedo": tex_set["albedo"],
-				"normal": null
-			}
-		"concrete":
-			tex_set = {"albedo": _create_tile_texture(128, 128, Color("5a616d"), Color("7a818e"), Color("3d434d"), 6, 6, 21), "normal": null}
-		"plaza":
-			tex_set = {"albedo": _create_tile_texture(128, 128, Color("434c58"), Color("606975"), Color("313843"), 8, 8, 31), "normal": null}
-		"warm_tile":
-			tex_set = {"albedo": _create_tile_texture(128, 128, Color("5d473f"), Color("74594f"), Color("362923"), 5, 5, 41), "normal": null}
-		"stone":
-			tex_set = {"albedo": _create_tile_texture(128, 128, Color("535760"), Color("6d727c"), Color("363b44"), 7, 7, 51), "normal": null}
-		"service_concrete":
-			tex_set = _create_noise_texture(128, 128, Color("2b313c"), Color("46505e"), 61, 0.34, 0.2, 0.05)
-			tex_set = {
-				"albedo": tex_set["albedo"],
-				"normal": null
-			}
-		"brick":
-			tex_set = {"albedo": _create_brick_texture(128, 128, Color("8a8179"), Color("a1968b"), Color("625a54"), 7, 4, 1, 71), "normal": null}
-		"dark_brick":
-			tex_set = {"albedo": _create_brick_texture(128, 128, Color("495564"), Color("627082"), Color("2f3946"), 7, 4, 1, 81), "normal": null}
-		"metal":
-			tex_set = {"albedo": _create_tile_texture(128, 128, Color("4b5867"), Color("677584"), Color("36414d"), 7, 16, 91), "normal": null}
-		"painted_metal":
-			tex_set = _create_noise_texture(128, 128, Color("4c5564"), Color("6e7889"), 101, 0.28, 0.1, 0.04)
-			tex_set = {
-				"albedo": tex_set["albedo"],
-				"normal": null
-			}
-		"fabric":
-			tex_set = {"albedo": _create_stripe_texture(128, 128, Color("a64033"), Color("d17b51"), 4, 111), "normal": null}
-		"tower_albedo":
-			tex_set = {"albedo": _create_window_texture(128, 192, Color("28303a"), Color("141b24"), Color("667d95"), 4, 6, 121, false), "normal": null}
-		"tower_emission":
-			tex_set = {"albedo": _create_window_texture(128, 192, Color(0, 0, 0, 1), Color(0, 0, 0, 1), Color("ffd89d"), 4, 6, 121, true), "normal": null}
-		_:
-			tex_set = null
-
-	if tex_set == null:
-		return null
-	texture_cache[key] = tex_set
-	return tex_set
-
+# Procedural texture generation and surface assignment rules live in
+# `scripts/world/material_library.gd`. Keeping this out of the main world
+# controller makes gameplay changes much easier to review.
 func _get_object_intent(name):
-	# This resolver powers the "why does this node exist?" metadata on each
-	# generated object so future editing sessions can quickly recover level intent.
-	if OBJECT_INTENT_EXACT.has(name):
-		return OBJECT_INTENT_EXACT[name]
-	for prefix in OBJECT_INTENT_PREFIX.keys():
-		if name.begins_with(prefix):
-			return OBJECT_INTENT_PREFIX[prefix]
-
-	var lower = name.to_lower()
-	if lower.contains("door"):
-		return "Facade entry object. It provides a clear human-scale cue and helps players parse what is walkable architecture versus background massing."
-	if lower.contains("window"):
-		return "Glazing/readability object. It exists to break wall repetition and reinforce believable floor-by-floor structure."
-	if lower.contains("wall") or lower.contains("building"):
-		return "Structural massing object. It defines sightlines, navigation pressure, and alley enclosure."
-	if lower.contains("marker"):
-		return "Gameplay guidance marker. It communicates objective or route context without adding collision."
-	if lower.contains("shadowzone"):
-		return "Stealth helper volume. It marks where the player can hide and affects detection logic."
-	return "General-purpose procedural blockout object. Keep it named and grouped so later art pass swaps are straightforward."
+	# Delegated to shared catalog so intent docs can live in a focused module.
+	return INTENT_CATALOG.resolve(name)
 
 func _annotate_object(node, name, size, build_mode):
 	# We attach rich metadata to every generated object so level intent remains
@@ -725,233 +350,8 @@ func _decorate_block_geometry(body, name, size, color):
 		_add_detail_wheel(body, "%sCasterRR" % name, Vector3(caster_x, caster_y, caster_z), caster_radius, caster_width)
 
 func _configure_material(material, name, color, emissive := false):
-	# Material selection... enhanced PBR with normal/rough from textures
-	var lower = name.to_lower()
-	material.albedo_color = color
-	material.roughness = 0.95
-	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	material.cull_mode = BaseMaterial3D.CULL_BACK
-	
-	# Default triplanar
-	material.uv1_triplanar = true
-	material.uv1_world_triplanar = true
-	material.uv1_scale = Vector3(0.85, 0.85, 0.85)
-
-	var tex_set = _get_surface_texture(lower)
-	if tex_set and tex_set.has("albedo"):
-		material.albedo_texture = tex_set["albedo"]
-	if tex_set and tex_set.has("normal") and tex_set["normal"] != null:
-		material.normal_enabled = true
-		material.normal_texture = tex_set["normal"]
-	if tex_set and tex_set.has("roughness") and tex_set["roughness"] != null:
-		material.roughness_texture = tex_set["roughness"]
-		material.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
-
-	if emissive:
-		material.emission_enabled = true
-		material.emission = color
-		material.emission_energy_multiplier = 1.1
-		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		material.albedo_color.a = 0.08
-		material.uv1_triplanar = false
-		if lower.contains("glow") or lower.contains("safehouse") or lower.contains("subway"):
-			material.albedo_color.a = 0.18
-		return
-
-	if lower.contains("windowpanel") or lower.contains("glass"):
-		# Keep glass setup on StandardMaterial3D to avoid invalid legacy remap warnings.
-		material.albedo_color = Color(color.r, color.g, color.b, 0.28)
-		material.roughness = 0.08
-		material.metallic = 0.12
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		material.uv1_triplanar = false
-		return
-
-	if lower.contains("puddle"):
-		material.albedo_color = Color(color.r, color.g, color.b, 0.68)
-		material.roughness = 0.05
-		material.metallic = 0.08
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		material.uv1_triplanar = false
-		return
-
-	if lower.contains("crosswalk") or lower.contains("centerline") or lower.contains("threshold") or lower.contains("rope") or lower.contains("mark"):
-		material.uv1_triplanar = false
-		material.uv1_scale = Vector3(1.0, 1.0, 1.0)
-		return
-
-	# THIN ELEMENTS - enhanced anti-clipping + no shadows/depth issues
-	if lower.contains("mullion") or lower.contains("trim") or lower.contains("weathering") or lower.contains("coping") or lower.contains("step") or lower.contains("hood") or lower.contains("socle") or lower.contains("chimney") or lower.contains("band") or lower.contains("lintel"):
-		material.uv1_triplanar = false
-		material.uv1_world_triplanar = false
-		material.uv1_scale = Vector3(1.2, 1.2, 1.2)
-		material.roughness = 0.88
-		material.cull_mode = BaseMaterial3D.CULL_DISABLED  # Double-sided thin trim
-		return
-
-
-	if lower.contains("lintel") or lower.contains("cornice") or lower.contains("pilaster") or lower.contains("plinth") or lower.contains("awning"):
-		material.albedo_texture = _get_surface_texture("stone").albedo
-		material.roughness = 0.8
-		material.metallic = 0.0
-		material.uv1_triplanar = false
-		material.uv1_world_triplanar = false
-		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
-		material.cull_mode = BaseMaterial3D.CULL_BACK
-		return
-
-	if lower.contains("fireescape"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.8
-		material.roughness = 0.45
-		material.uv1_triplanar = false
-		material.uv1_world_triplanar = false
-		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
-		material.cull_mode = BaseMaterial3D.CULL_BACK
-		return
-
-	if lower.contains("doorpanel"):
-		material.albedo_color = Color(0.15, 0.15, 0.15, 1.0)
-		material.metallic = 0.25
-		material.roughness = 0.65
-		material.uv1_triplanar = false
-		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
-		return
-
-	if lower.contains("doorframe"):
-		material.albedo_texture = _get_surface_texture("stone").albedo
-		material.roughness = 0.82
-		material.uv1_triplanar = false
-		material.uv1_scale = Vector3(0.6, 0.6, 0.6)
-		return
-
-	if lower.contains("tower"):
-		material.uv1_triplanar = false
-		material.uv1_world_triplanar = false
-		material.albedo_texture = _get_surface_texture("tower_albedo").albedo
-		material.emission_enabled = true
-		material.emission = Color("ffd89d")
-		material.emission_texture = _get_surface_texture("tower_emission").albedo
-		material.emission_energy_multiplier = 1.45
-		material.roughness = 0.8
-		return
-
-	if (lower.contains("roof") and not (lower.contains("vent") or lower.contains("mechanical"))) or lower.contains("parapet"):
-		material.albedo_texture = _get_surface_texture("painted_metal").albedo
-		material.metallic = 0.18
-		material.roughness = 0.78
-		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
-		return
-
-	if lower.contains("frontageconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("plaza").albedo
-		material.roughness = 1.0
-		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
-	elif lower.contains("galleryhotelconnectorfloor") or lower.contains("hotelofficeconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("stone").albedo
-		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
-	elif lower.contains("officeserviceconnectorfloor"):
-		material.albedo_texture = _get_surface_texture("service_concrete").albedo
-		material.uv1_scale = Vector3(0.42, 0.42, 0.42)
-	elif lower.contains("median") or lower.contains("curb") or lower.contains("dockplatform") or lower.contains("dockstep") or lower.contains("entrystep"):
-		material.albedo_texture = _get_surface_texture("concrete").albedo
-		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
-	elif lower.contains("avenuefloor"):
-		material.albedo_texture = _get_surface_texture("asphalt").albedo
-		material.roughness = 1.0
-		material.uv1_scale = Vector3(0.34, 0.34, 0.34)
-	elif lower.contains("sidewalk"):
-		material.albedo_texture = _get_surface_texture("concrete").albedo
-		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
-	elif lower.contains("forecourt") or lower.contains("safehousepad"):
-		material.albedo_texture = _get_surface_texture("plaza").albedo
-		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
-	elif lower.contains("cafefloor"):
-		material.albedo_texture = _get_surface_texture("warm_tile").albedo
-		material.uv1_scale = Vector3(0.55, 0.55, 0.55)
-	elif lower.contains("galleryfloor") or lower.contains("vipfloor") or lower.contains("hotelfloor") or lower.contains("officefloor"):
-		material.albedo_texture = _get_surface_texture("stone").albedo
-		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
-	elif lower.contains("servicefloor") or lower.contains("subwayalleyfloor") or lower.contains("alleyfloor") or lower.contains("servicelane"):
-		material.albedo_texture = _get_surface_texture("service_concrete").albedo
-		material.uv1_scale = Vector3(0.42, 0.42, 0.42)
-	elif lower.contains("massing"):
-		material.albedo_texture = _get_surface_texture("dark_brick").albedo
-		material.uv1_scale = Vector3(0.5, 0.5, 0.5)
-	elif lower.contains("planter"):
-		material.albedo_texture = _get_surface_texture("painted_metal").albedo
-		material.roughness = 0.7
-	elif lower.contains("taxi") or lower.contains("servicevan") or lower.contains("van") or lower.contains("dumpster"):
-		material.albedo_texture = _get_surface_texture("painted_metal").albedo
-		material.metallic = 0.35
-		material.roughness = 0.44
-		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
-	elif lower.contains("box") or lower.contains("crate"):
-		material.albedo_texture = _get_surface_texture("warm_tile").albedo
-		material.roughness = 0.68
-		material.uv1_scale = Vector3(0.62, 0.62, 0.62)
-	elif lower.contains("trashbag"):
-		material.albedo_texture = _get_surface_texture("fabric").albedo
-		material.roughness = 0.9
-		material.metallic = 0.0
-		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
-	elif lower.contains("sign"):
-		material.albedo_texture = _get_surface_texture("painted_metal").albedo
-		material.metallic = 0.2
-		material.roughness = 0.58
-		material.uv1_scale = Vector3(0.75, 0.75, 0.75)
-	elif lower.contains("lamp") or lower.contains("pipe") or lower.contains("handle"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.78
-		material.roughness = 0.38
-		material.uv1_scale = Vector3(1.0, 1.0, 1.0)
-	elif lower.contains("metal") or lower.contains("post") or lower.contains("shelter") or lower.contains("cart") or lower.contains("gate") or lower.contains("safe"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.8
-		material.roughness = 0.42
-		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
-	elif lower.contains("stair") or lower.contains("gate"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.65
-		material.roughness = 0.5
-		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
-	elif lower.contains("boundary") or lower.contains("subway") or lower.contains("safehouse") or lower.contains("fence") or lower.contains("alley"):
-		material.albedo_texture = _get_surface_texture("dark_brick").albedo
-		material.uv1_scale = Vector3(0.52, 0.52, 0.52)
-	elif lower.contains("west") or lower.contains("north") or lower.contains("south") or lower.contains("east"):
-		material.albedo_texture = _get_surface_texture("brick").albedo
-		material.uv1_scale = Vector3(0.52, 0.52, 0.52)
-	elif lower.contains("awning") or lower.contains("canopy"):
-		material.albedo_texture = _get_surface_texture("fabric").albedo
-		material.roughness = 0.78
-		material.uv1_scale = Vector3(0.8, 0.8, 0.8)
-	elif lower.contains("runner"):
-		material.albedo_texture = _get_surface_texture("fabric").albedo
-		material.roughness = 0.82
-		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
-	elif lower.contains("vent") or lower.contains("mechanical"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.7
-		material.roughness = 0.52
-		material.uv1_scale = Vector3(0.9, 0.9, 0.9)
-	elif lower.contains("bar") or lower.contains("plinth"):
-		material.albedo_texture = _get_surface_texture("stone").albedo
-		material.uv1_scale = Vector3(0.62, 0.62, 0.62)
-	elif lower.contains("counter") or lower.contains("desk") or lower.contains("bench") or lower.contains("newsstand"):
-		material.albedo_texture = _get_surface_texture("warm_tile").albedo
-		material.uv1_scale = Vector3(0.72, 0.72, 0.72)
-	elif lower.contains("crate"):
-		material.albedo_texture = _get_surface_texture("warm_tile").albedo
-		material.uv1_scale = Vector3(0.68, 0.68, 0.68)
-	elif lower.contains("booth") or lower.contains("sofa"):
-		material.albedo_texture = _get_surface_texture("fabric").albedo
-		material.roughness = 0.84
-		material.uv1_scale = Vector3(0.8, 0.8, 0.8)
-	elif lower.contains("signpanel"):
-		material.albedo_texture = _get_surface_texture("metal").albedo
-		material.metallic = 0.35
-		material.roughness = 0.4
+	# Delegates visual rule selection to the shared material helper.
+	material_library.configure_material(material, name, color, emissive)
 
 func _create_roots():
 	# Keeping geometry, markers, and NPCs under separate roots makes it much
@@ -1283,8 +683,8 @@ func _build_level_blockout():
 	# - `build_mode` (static block / mesh-only / collision-only)
 	# - `authored_size` (original dimensions)
 	#
-	# The source text for those intent notes lives in `OBJECT_INTENT_EXACT`
-	# and `OBJECT_INTENT_PREFIX` near the top of this file.
+	# The source text for those intent notes lives in:
+	# `scripts/world/intent_catalog.gd`.
 	var palette = {
 
 		"alley": Color("1a1f28"),
@@ -1304,7 +704,7 @@ func _build_level_blockout():
 # Continuous safety floor under the entire playable block.
 	_add_collision_block("WorldSupportFloor", Vector3(0.0, -0.18, 0.0), Vector3(80.0, 0.36, 64.0))
 
-# ALLEYWAY FLOOR - tight canyon ±20u total (±10 alley + ±5 curbs), 56 deep
+# ALLEYWAY FLOOR - tight canyon +/-20u total (+/-10 alley + +/-5 curbs), 56 deep
 	_add_block("AlleyFloor", Vector3(0.0, -0.1, 0.0), Vector3(20.0, 0.2, 56.0), palette["alley"], true, false)
 	
 	# SIDE CURBS - 5u total (2.5u each side)
@@ -1508,7 +908,7 @@ func _build_level_blockout():
 	_add_mesh_only("EastEntryStep2", Vector3(34.0, 0.25, 0.0), Vector3(2.0, 0.5, 1.2), Color("464d58"))
 	_add_mesh_only("EastEntryAwning", Vector3(34.5, 2.8, 15.0), Vector3(1.0, 0.6, 1.5), Color("8a8179"))
 
-# ALLEY PROPS - tightened to new ±10 alley (west -9.5 to -16 range)
+# ALLEY PROPS - tightened to new +/-10 alley (west -9.5 to -16 range)
 	# West side props
 	_add_block("WestDoor1", Vector3(-20.0, 1.5, -20.0), Vector3(1.0, 3.0, 0.2), palette["wall"], true)
 	_add_mesh_only("WestDoorFrame", Vector3(-20.0, 1.5, -19.95), Vector3(1.08, 3.08, 0.08), Color("3a3a3a"))
@@ -1530,7 +930,7 @@ func _build_level_blockout():
 	_add_block("WestCounter", Vector3(-8.5, 0.75, 0.0), Vector3(3.0, 1.5, 1.0), palette["metal"], true)
 	_add_mesh_only("WestCounterTop", Vector3(-8.5, 1.4, 0.0), Vector3(3.15, 0.1, 1.1), Color("8a9a9f"))
 	
-# East side props - tightened to new ±10 alley (east 7.5-16 range)
+# East side props - tightened to new +/-10 alley (east 7.5-16 range)
 	_add_block("EastDoor1", Vector3(20.0, 1.5, 20.0), Vector3(1.0, 3.0, 0.2), palette["wall"], true)
 	_add_mesh_only("EastDoorFrame", Vector3(20.0, 1.5, 20.05), Vector3(1.08, 3.08, 0.08), Color("3a3a3a"))
 	_add_mesh_only("EastDoorHandle", Vector3(19.55, 2.3, 20.15), Vector3(0.08, 0.15, 0.08), Color("8a8179"))
@@ -1750,21 +1150,10 @@ func _add_mesh_only(name, pos, size, color, emissive := false):
 
 
 func _create_shadow_zones():
-	# Shadow zones tightened for canyon (±10 alley focus)
-	_add_shadow_zone(Vector3(-9.5, 1.0, -20.0), Vector3(5.8, 2.0, 2.2)) # bench
-	_add_shadow_zone(Vector3(-16.0, 1.0, -4.8), Vector3(2.2, 2.0, 2.2))
-	_add_shadow_zone(Vector3(-12.0, 1.0, -4.9), Vector3(2.2, 2.0, 2.2))
-	_add_shadow_zone(Vector3(-16.0, 1.0, 6.0), Vector3(2.4, 2.0, 2.8))
-	_add_shadow_zone(Vector3(-10.0, 1.0, 6.0), Vector3(2.4, 2.0, 2.8))
-	_add_shadow_zone(Vector3(-25.0, 1.0, 11.0), Vector3(4.4, 2.0, 5.8))
-	_add_shadow_zone(Vector3(-27.0, 1.0, -14.7), Vector3(3.0, 2.0, 2.0))
-	_add_shadow_zone(Vector3(-2.2, 1.0, 3.2), Vector3(2.4, 2.0, 2.4))
-	_add_shadow_zone(Vector3(4.5, 1.0, 8.1), Vector3(2.4, 2.0, 2.4))
-	_add_shadow_zone(Vector3(17.0, 1.0, 7.4), Vector3(3.6, 2.0, 2.2))
-	_add_shadow_zone(Vector3(25.5, 1.0, 4.1), Vector3(2.8, 2.0, 2.0))
-	_add_shadow_zone(Vector3(16.0, 1.0, 17.2), Vector3(5.6, 2.0, 2.8))
-	_add_shadow_zone(Vector3(13.0, 1.0, 18.1), Vector3(4.8, 2.0, 2.4))
-	_add_shadow_zone(Vector3(27.0, 1.0, 18.2), Vector3(3.2, 2.0, 3.4))
+	# Data lives in `scripts/world/layout_data.gd` so world behavior and authored
+	# coordinates can evolve independently.
+	for zone in LAYOUT_DATA.shadow_zones():
+		_add_shadow_zone(zone["pos"], zone["size"])
 
 func _add_shadow_zone(pos, size):
 	# Each zone is a simple Area3D with the shared shadow script attached.
@@ -1781,35 +1170,43 @@ func _add_shadow_zone(pos, size):
 	_annotate_object(area, area.name, size, "shadow_area")
 
 func _spawn_level_characters():
-	# Day contacts teach the layout along the alleyway.
-	# Night actors create the stealth challenge in the same space.
-	
-# Day contacts - tightened alley
-	contact_npcs.append(_spawn_npc("Mara", "contact", "alibi", "day", Vector3(-9.5, 0.0, -15.0), [], 0.0))
-	contact_npcs.append(_spawn_npc("Jules", "contact", "guest_pass", "day", Vector3(-2.5, 0.0, 0.0), [], 0.0))
-	contact_npcs.append(_spawn_npc("Nico", "contact", "route_intel", "day", Vector3(7.0, 0.0, 8.0), [], 0.0))
-	# Day ambience patrols so the block does not feel frozen before night.
-	civilian_npcs.append(_spawn_npc("Day Civilian A", "civilian", "", "day", Vector3(-6.5, 0.0, -10.0), [Vector3(-6.5, 0.0, -10.0), Vector3(-3.5, 0.0, -3.5)], 0.7))
-	civilian_npcs.append(_spawn_npc("Day Civilian B", "civilian", "", "day", Vector3(0.5, 0.0, 5.5), [Vector3(0.5, 0.0, 5.5), Vector3(3.5, 0.0, 11.0)], 0.75))
-	civilian_npcs.append(_spawn_npc("Day Civilian C", "civilian", "", "day", Vector3(9.0, 0.0, -2.0), [Vector3(9.0, 0.0, -2.0), Vector3(6.0, 0.0, 3.0)], 0.72))
+	# Spawn coordinates and patrol routes now live in `scripts/world/layout_data.gd`
+	# so this method stays focused on group ownership rather than dictionary
+	# field wiring.
+	_spawn_group(LAYOUT_DATA.day_contacts(), contact_npcs)
+	_spawn_group(LAYOUT_DATA.day_civilians(), civilian_npcs)
+	_spawn_group(LAYOUT_DATA.night_guards(), guard_npcs)
 
-# Night guards - 2nd set + night2 ramp (extend patrols/detection)
-	guard_npcs.append(_spawn_npc("Guard One", "guard", "", "night", Vector3(-7.5, 0.0, -8.0), [Vector3(-7.5, 0.0, -8.0), Vector3(-7.5, 0.0, 8.0), Vector3(-3.0, 0.0, 12.0)], 1.6))
-	guard_npcs.append(_spawn_npc("Guard Two", "guard", "", "night", Vector3(7.5, 0.0, 10.0), [Vector3(7.5, 0.0, 10.0), Vector3(7.5, 0.0, 20.0)], 1.7))
-	guard_npcs.append(_spawn_npc("Guard Three", "guard", "", "night", Vector3(0.0, 0.0, 15.0), [Vector3(0.0, 0.0, 15.0), Vector3(4.0, 0.0, 22.0)], 1.8))  # 2nd guard night2
-	guard_npcs.append(_spawn_npc("Guard Four", "guard", "", "night", Vector3(-4.0, 0.0, 18.0), [Vector3(-4.0, 0.0, 18.0), Vector3(2.0, 0.0, 25.0)], 1.65))
-	
-	# Witness
-	var witness = _spawn_npc("Observer", "witness", "", "night", Vector3(1.5, 0.0, 2.0), [Vector3(1.5, 0.0, 2.0), Vector3(3.5, 0.0, 10.0)], 1.1)
-	civilian_npcs.append(witness)
+	var witness_npc = _spawn_from_record(LAYOUT_DATA.night_witness())
+	if witness_npc != null:
+		civilian_npcs.append(witness_npc)
 
-	# Target - tightened path
-	target_npc = _spawn_npc("Target", "target", "", "night", Vector3(0.0, 0.0, -12.0), [Vector3(0.0, 0.0, -12.0), Vector3(3.5, 0.0, -4.0), Vector3(5.0, 0.0, 4.0), Vector3(4.5, 0.0, 14.0), Vector3(1.5, 0.0, 20.0)], 1.4)
+	target_npc = _spawn_from_record(LAYOUT_DATA.night_target())
+	_spawn_group(LAYOUT_DATA.night_civilians(), civilian_npcs)
 
-	# Civilians - tightened paths
-	civilian_npcs.append(_spawn_npc("Civilian A", "civilian", "", "night", Vector3(-4.5, 0.0, 3.0), [Vector3(-4.5, 0.0, 3.0), Vector3(-5.5, 0.0, 8.0)], 0.9))
-	civilian_npcs.append(_spawn_npc("Civilian B", "civilian", "", "night", Vector3(2.5, 0.0, -4.0), [Vector3(2.5, 0.0, -4.0), Vector3(5.5, 0.0, 2.0)], 0.8))
-	civilian_npcs.append(_spawn_npc("Civilian C", "civilian", "", "night", Vector3(9.0, 0.0, 12.0), [Vector3(9.0, 0.0, 12.0), Vector3(11.0, 0.0, 18.0)], 0.85))
+func _spawn_group(spawn_rows, destination):
+	for spawn_row in spawn_rows:
+		var npc = _spawn_from_record(spawn_row)
+		if npc != null:
+			destination.append(npc)
+
+func _spawn_from_record(spawn_row):
+	# Shared dictionary-to-argument adapter for spawn data rows.
+	var required_fields = ["name_text", "role", "key", "phase_tag", "start_pos", "patrol", "speed"]
+	for field in required_fields:
+		if not spawn_row.has(field):
+			push_warning("Skipped spawn row because '%s' is missing: %s" % [field, spawn_row])
+			return null
+
+	return _spawn_npc(
+		spawn_row["name_text"],
+		spawn_row["role"],
+		spawn_row["key"],
+		spawn_row["phase_tag"],
+		spawn_row["start_pos"],
+		spawn_row["patrol"],
+		spawn_row["speed"]
+	)
 
 func _spawn_npc(name_text, role, key, phase_tag, start_pos, patrol, speed):
 	# NPCs are assembled procedurally for the same reason as the city geometry:
@@ -1990,7 +1387,6 @@ func _create_hud():
 	# Title - tiny, top left corner
 	var title = Label.new()
 	title.text = "ALLEY"
-	title.position = Vector2(8, 6)
 	title.add_theme_font_size_override("font_size", 11)
 	title.add_theme_color_override("font_color", Color("68d4ff"))
 	ui_root.add_child(title)
@@ -1998,8 +1394,6 @@ func _create_hud():
 
 	# Objective - compact, single line
 	var objective = Label.new()
-	objective.position = Vector2(8, 20)
-	objective.size = Vector2(300, 24)
 	objective.autowrap_mode = TextServer.AUTOWRAP_WORD
 	objective.add_theme_font_size_override("font_size", 12)
 	objective.add_theme_color_override("font_color", Color("e6ecff"))
@@ -2008,8 +1402,6 @@ func _create_hud():
 
 	# Stats - top right, tiny
 	var stats = Label.new()
-	stats.position = Vector2(1750, 6)
-	stats.size = Vector2(154, 36)
 	stats.autowrap_mode = TextServer.AUTOWRAP_WORD
 	stats.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	stats.add_theme_font_size_override("font_size", 10)
@@ -2019,8 +1411,6 @@ func _create_hud():
 
 	# Center message - small, fade away
 	var message = Label.new()
-	message.position = Vector2(700, 12)
-	message.size = Vector2(520, 32)
 	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	message.add_theme_font_size_override("font_size", 13)
 	message.add_theme_color_override("font_color", Color("fff3c6"))
@@ -2030,19 +1420,68 @@ func _create_hud():
 	# Bottom prompt - tiny, only when needed
 	var prompt_panel = ColorRect.new()
 	prompt_panel.color = Color(0.02, 0.03, 0.05, 0.58)
-	prompt_panel.position = Vector2(650, 1045)
-	prompt_panel.size = Vector2(620, 28)
 	ui_root.add_child(prompt_panel)
 	hud["prompt_panel"] = prompt_panel
 
 	var prompt = Label.new()
-	prompt.position = Vector2(670, 1050)
-	prompt.size = Vector2(580, 20)
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt.add_theme_font_size_override("font_size", 11)
 	prompt.add_theme_color_override("font_color", Color("8a9aaa"))
 	ui_root.add_child(prompt)
 	hud["prompt"] = prompt
+
+	_layout_hud()
+	var viewport = get_viewport()
+	var resize_callable = Callable(self, "_on_viewport_size_changed")
+	if viewport != null and not viewport.size_changed.is_connected(resize_callable):
+		viewport.size_changed.connect(resize_callable)
+
+func _on_viewport_size_changed():
+	_layout_hud()
+
+func _layout_hud():
+	if ui_root == null or not is_instance_valid(ui_root):
+		return
+
+	var title = hud.get("title") as Label
+	var objective = hud.get("objective") as Label
+	var stats = hud.get("stats") as Label
+	var message = hud.get("message") as Label
+	var prompt_panel = hud.get("prompt_panel") as ColorRect
+	var prompt = hud.get("prompt") as Label
+	if title == null or objective == null or stats == null or message == null or prompt_panel == null or prompt == null:
+		return
+
+	var viewport_size = get_viewport().get_visible_rect().size
+	if viewport_size.x <= 1.0 or viewport_size.y <= 1.0:
+		return
+
+	var margin = clampf(viewport_size.y * 0.012, 8.0, 18.0)
+	var objective_width = clampf(viewport_size.x * 0.42, 280.0, 640.0)
+	var objective_height = clampf(viewport_size.y * 0.085, 32.0, 88.0)
+	var stats_width = clampf(viewport_size.x * 0.18, 170.0, 280.0)
+	var stats_height = clampf(viewport_size.y * 0.11, 54.0, 104.0)
+	var message_width = clampf(viewport_size.x * 0.45, 320.0, 760.0)
+	var message_height = clampf(viewport_size.y * 0.05, 28.0, 56.0)
+	var prompt_width = clampf(viewport_size.x * 0.55, 300.0, 780.0)
+	var prompt_height = clampf(viewport_size.y * 0.035, 24.0, 36.0)
+
+	title.position = Vector2(margin, margin)
+	objective.position = Vector2(margin, margin + 16.0)
+	objective.size = Vector2(objective_width, objective_height)
+
+	stats.position = Vector2(viewport_size.x - margin - stats_width, margin)
+	stats.size = Vector2(stats_width, stats_height)
+
+	message.position = Vector2((viewport_size.x - message_width) * 0.5, margin + 2.0)
+	message.size = Vector2(message_width, message_height)
+
+	prompt_panel.position = Vector2((viewport_size.x - prompt_width) * 0.5, viewport_size.y - margin - prompt_height)
+	prompt_panel.size = Vector2(prompt_width, prompt_height)
+
+	var prompt_label_height = max(16.0, prompt_height - 8.0)
+	prompt.position = prompt_panel.position + Vector2(14.0, (prompt_height - prompt_label_height) * 0.5)
+	prompt.size = Vector2(prompt_width - 28.0, prompt_label_height)
 
 func _handle_interaction():
 	# One interaction key handles contacts, takedowns, and extraction in priority order.
