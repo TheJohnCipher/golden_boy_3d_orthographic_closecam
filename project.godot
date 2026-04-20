@@ -1,0 +1,49 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Golden Boy 3D City Blockout"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6")
+config/icon="res://art/icon.svg"
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/mode=4
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+
+[shaders]
+
+shader_1="res://shaders/window.gdshader"
+
+[audio]
+
+default_bus_layout="res://art/footstep.ogg"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=1
+
+[export]
+
+[export/presets]
+
+[preset.0]
+
+name="Windows Desktop"
+platform="WindowsDesktop"
+runnable=true
+custom_features=""
+export_path="c:/Users/3john/Downloads/golden_boy_3d_orthographic_closecam/golden_boy_3d_orthographic_closecam/golden_boy.exe"
+include_filter="art/*,scenes/*,scripts/*,shaders/*,project.godot"
