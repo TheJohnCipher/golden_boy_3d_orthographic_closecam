@@ -935,7 +935,7 @@ func _attempt_takedown(npc):
 	MISSION_CONTROLLER.attempt_takedown(self, npc)
 
 func _begin_night():
-	return MISSION_CONTROLLER.begin_night(self)
+	await MISSION_CONTROLLER.begin_night(self)
 
 func _apply_phase_visibility():
 	MISSION_CONTROLLER.apply_phase_visibility(self)
