@@ -20,6 +20,115 @@ const PIXEL_VIEWPORT_MIN_HEIGHT = 240
 const PIXEL_VIEWPORT_TARGET_DIVISOR = 3
 const PIXEL_VIEWPORT_MAX_HEIGHT = 420
 
+# ---------------------------------------------------------------------------
+# Object intent catalog
+# ---------------------------------------------------------------------------
+# These tables act as embedded design documentation for the procedural scene.
+# Every generated geometry node is tagged with the matching description so
+# future editors can understand "what this object is" and "why it exists"
+# without reverse-engineering coordinates and sizes.
+#
+# - `OBJECT_INTENT_EXACT` is for hero props or one-off structural elements.
+# - `OBJECT_INTENT_PREFIX` is for repeated families generated in loops.
+const OBJECT_INTENT_EXACT = {
+	"WorldSupportFloor": "Hidden collision safety slab under the whole level. It prevents physics tunneling or accidental fall-through at block seams.",
+	"AlleyFloor": "Primary traversal lane and stealth route. This is the asphalt spine that all mission paths are tuned around.",
+	"WestCurb": "Raised west curb that visually frames the alley and creates subtle elevation contrast against the main lane.",
+	"EastCurb": "Raised east curb mirroring the west side for readable street proportions and route boundaries.",
+	"WestTransitionFloor": "Secondary west floor band between curb and facade. It softens the transition from street to storefront.",
+	"EastTransitionFloor": "Secondary east floor band between curb and facade. It mirrors west side cadence for spatial balance.",
+	"WestWall": "Main west building mass used as the primary occlusion and silhouette wall for the alley canyon.",
+	"EastWall": "Main east building mass used as the mirrored occlusion and silhouette wall for the alley canyon.",
+	"OfficeTower": "Secondary tower volume on the east side used to break the roofline and add skyline hierarchy.",
+	"SouthBoundary": "Hard mission boundary at the south edge. Prevents out-of-bounds traversal and keeps encounters framed.",
+	"NorthBoundary": "Hard mission boundary at the north edge near extraction. Used for gameplay containment.",
+	"WestBoundary": "West hard wall boundary that blocks leaving the play corridor and supports stealth line-of-sight tuning.",
+	"EastBoundary": "East hard wall boundary that blocks leaving the play corridor and supports stealth line-of-sight tuning.",
+	"WestBuildingRail": "Hidden collision rail for west massing to prevent edge clipping into decorative facade meshes.",
+	"EastBuildingRail": "Hidden collision rail for east massing to prevent edge clipping into decorative facade meshes.",
+	"WestBench": "West social prop landmark for daytime contact beats and navigation memory.",
+	"EastBench": "East social prop landmark that mirrors west bench readability and supports route orientation.",
+	"WestPlanter": "West greenery prop introducing material contrast and soft cover reads.",
+	"EastPlanter": "East greenery prop introducing material contrast and soft cover reads.",
+	"WestCounter": "West service counter prop that reads as a cafe/bar frontage at street level.",
+	"EastBar": "East bar counter landmark used as a contact anchor and visual destination cue.",
+	"CenterPodium": "Center landmark pedestal for scene focus and objective readability in the middle corridor.",
+	"Van": "Large parked vehicle prop used as mid-lane obstruction and stealth path shaper.",
+	"Crate1": "Moveable-looking cargo crate prop used as environmental clutter and cover-like silhouette.",
+	"Dumpster": "Heavy utility bin prop that communicates service alley function and adds depth layering.",
+	"WestDoor1": "West utility door prop for facade storytelling and clear ground-floor scale reference.",
+	"EastDoor1": "East utility door prop for facade storytelling and clear ground-floor scale reference.",
+	"TrashBag1": "Soft waste bag clutter prop used to break hard-edge repetition in the alley.",
+	"TrashBag2": "Companion waste bag clutter prop to avoid mirrored repetition in debris placement.",
+	"Pipe": "Vertical service pipe used to suggest practical building infrastructure at street scale.",
+	"Pipe2": "Secondary service pipe to avoid single-prop staging and improve facade credibility.",
+}
+
+const OBJECT_INTENT_PREFIX = {
+	"WestRoof": "West roofline and coping family defining top silhouette rhythm for the west block.",
+	"EastRoof": "East roofline and coping family defining top silhouette rhythm for the east block.",
+	"WestBasePlinth": "West facade base family that grounds wall masses and reduces plain-box reads.",
+	"EastBasePlinth": "East facade base family that grounds wall masses and reduces plain-box reads.",
+	"WestSocle": "West lower facade belt course used to add architectural layering near pedestrian eye level.",
+	"EastSocle": "East lower facade belt course used to add architectural layering near pedestrian eye level.",
+	"WestWindowPanel": "West glazing bands representing floor-by-floor windows and interior depth reads.",
+	"EastWindowPanel": "East glazing bands representing floor-by-floor windows and interior depth reads.",
+	"WestLintel": "West horizontal lintel courses that separate facade tiers and improve vertical scale perception.",
+	"EastLintel": "East horizontal lintel courses that separate facade tiers and improve vertical scale perception.",
+	"WestHood": "West decorative hood/cornice strips that reduce flatness and catch highlights.",
+	"EastHood": "East decorative hood/cornice strips that reduce flatness and catch highlights.",
+	"WestCornice": "West top cornice cap that finishes the facade and sharpens skyline contrast.",
+	"EastCornice": "East top cornice cap that finishes the facade and sharpens skyline contrast.",
+	"WestChimney": "West chimney stacks and caps used for rooftop storytelling and silhouette breakup.",
+	"EastChimney": "East chimney stacks and caps used for rooftop storytelling and silhouette breakup.",
+	"WestFireEscape": "West fire-escape bars and uprights creating readable emergency egress structure.",
+	"EastFireEscape": "East fire-escape bars and uprights creating readable emergency egress structure.",
+	"WestPilaster": "West vertical pilaster rhythm to break long wall spans into human-scale bays.",
+	"EastPilaster": "East vertical pilaster rhythm to break long wall spans into human-scale bays.",
+	"WestWallBand": "West subtle facade banding used as weathering/detail breakup across long surfaces.",
+	"EastWallBand": "East subtle facade banding used as weathering/detail breakup across long surfaces.",
+	"WestWeathering": "West weathering streak overlays for age and material variation.",
+	"EastWeathering": "East weathering streak overlays for age and material variation.",
+	"WestGroundDetail": "West ground-level base darkening for dirt accumulation and contact shadow reads.",
+	"EastGroundDetail": "East ground-level base darkening for dirt accumulation and contact shadow reads.",
+	"WestEntry": "West entry steps and awnings defining where players read ground-level access points.",
+	"EastEntry": "East entry steps and awnings defining where players read ground-level access points.",
+	"WestDoorPanel": "West decorative door panel set used to imply active storefront and service access.",
+	"EastDoorPanel": "East decorative door panel set used to imply active storefront and service access.",
+	"WestDoorFrame": "West door frame trim family for depth and threshold readability.",
+	"EastDoorFrame": "East door frame trim family for depth and threshold readability.",
+	"WestDoorLintel": "West door lintels that mark structural headers above entries.",
+	"EastDoorLintel": "East door lintels that mark structural headers above entries.",
+	"WestDoorGlow": "West emissive strips used as nighttime guidance accents near entries.",
+	"EastDoorGlow": "East emissive strips used as nighttime guidance accents near entries.",
+	"WestBench": "West bench detail family including back/seat/support pieces for furniture readability.",
+	"EastBench": "East bench detail family including back/seat/support pieces for furniture readability.",
+	"WestPlanter": "West planter detail family including rim/soil layers for prop depth.",
+	"EastPlanter": "East planter detail family including rim/soil layers for prop depth.",
+	"WestCounter": "West service counter detail surfaces defining top working plane and edge trim.",
+	"EastBar": "East bar detail surfaces defining top working plane and edge trim.",
+	"CenterPodium": "Center podium trim and glow family that signals an intentional focal landmark.",
+	"Van": "Vehicle detail family including windows, handles, roof cap, bumper, and wheel additions.",
+	"Crate": "Cargo crate detail family with lid/strap accents to avoid plain box silhouettes.",
+	"Dumpster": "Dumpster detail family with lid, handles, and wheel accents for industrial readability.",
+	"StreetMark": "Painted lane markings used for directional rhythm and street-scale cues.",
+	"WestBox": "West clutter box family used to make alcoves feel occupied and lived-in.",
+	"EastBox": "East clutter box family used to make alcoves feel occupied and lived-in.",
+	"WestSign": "West signage family and mounts that imply shop identity and local context.",
+	"EastSign": "East signage family and mounts that imply shop identity and local context.",
+	"WestLamp": "West lamp posts/heads that reinforce night lighting logic and facade scale.",
+	"EastLamp": "East lamp posts/heads that reinforce night lighting logic and facade scale.",
+	"WestGraffiti": "West graffiti overlays for narrative wear and social texture.",
+	"EastGraffiti": "East graffiti overlays for narrative wear and social texture.",
+	"WestBoarding": "West boarded panel props implying renovation/closure storytelling.",
+	"EastBoarding": "East boarded panel props implying renovation/closure storytelling.",
+	"WestMullion": "West mullion crossbars that subdivide glazing and reduce flat panel reads.",
+	"EastMullion": "East mullion crossbars that subdivide glazing and reduce flat panel reads.",
+	"WestAccentLight": "West emissive accent strips used to articulate facade depth at night.",
+	"EastAccentLight": "East emissive accent strips used to articulate facade depth at night.",
+	"DayRouteMarker": "Non-blocking daytime route beacon used to teach contact locations.",
+}
+
 # Core scene references created at runtime.
 var player = null
 var environment = null
@@ -452,6 +561,169 @@ func _get_surface_texture(key):
 	texture_cache[key] = tex_set
 	return tex_set
 
+func _get_object_intent(name):
+	# This resolver powers the "why does this node exist?" metadata on each
+	# generated object so future editing sessions can quickly recover level intent.
+	if OBJECT_INTENT_EXACT.has(name):
+		return OBJECT_INTENT_EXACT[name]
+	for prefix in OBJECT_INTENT_PREFIX.keys():
+		if name.begins_with(prefix):
+			return OBJECT_INTENT_PREFIX[prefix]
+
+	var lower = name.to_lower()
+	if lower.contains("door"):
+		return "Facade entry object. It provides a clear human-scale cue and helps players parse what is walkable architecture versus background massing."
+	if lower.contains("window"):
+		return "Glazing/readability object. It exists to break wall repetition and reinforce believable floor-by-floor structure."
+	if lower.contains("wall") or lower.contains("building"):
+		return "Structural massing object. It defines sightlines, navigation pressure, and alley enclosure."
+	if lower.contains("marker"):
+		return "Gameplay guidance marker. It communicates objective or route context without adding collision."
+	if lower.contains("shadowzone"):
+		return "Stealth helper volume. It marks where the player can hide and affects detection logic."
+	return "General-purpose procedural blockout object. Keep it named and grouped so later art pass swaps are straightforward."
+
+func _annotate_object(node, name, size, build_mode):
+	# We attach rich metadata to every generated object so level intent remains
+	# discoverable in the remote scene tree and in debug tools.
+	if node == null:
+		return
+	node.set_meta("intent_note", _get_object_intent(name))
+	node.set_meta("authored_name", name)
+	node.set_meta("authored_size", size)
+	node.set_meta("build_mode", build_mode)
+
+func _build_mesh_profile(name, size):
+	# "Box everywhere" is fast for blockout, but it hurts readability.
+	# This profile builder swaps in simple primitives for specific prop types.
+	var lower = name.to_lower()
+
+	if lower.contains("pipe") and size.x <= 0.5 and size.z <= 0.5:
+		var pipe = CylinderMesh.new()
+		var pipe_radius = max(0.04, min(size.x, size.z) * 0.5)
+		pipe.top_radius = pipe_radius
+		pipe.bottom_radius = pipe_radius
+		pipe.height = max(size.y, 0.1)
+		return {"mesh": pipe, "rotation_degrees": Vector3.ZERO}
+
+	if lower.contains("trashbag"):
+		var bag = SphereMesh.new()
+		var bag_radius = max(0.12, min(size.x, size.z) * 0.48)
+		bag.radius = bag_radius
+		bag.height = max(size.y, bag_radius * 2.0)
+		return {"mesh": bag, "rotation_degrees": Vector3.ZERO}
+
+	if lower.contains("handle") and size.x <= 0.25 and size.z <= 0.25:
+		var handle = CylinderMesh.new()
+		var min_dim = min(size.x, min(size.y, size.z))
+		var handle_radius = max(0.015, min_dim * 0.45)
+		handle.top_radius = handle_radius
+		handle.bottom_radius = handle_radius
+		handle.height = max(size.x, max(size.y, size.z))
+		return {"mesh": handle, "rotation_degrees": Vector3(0.0, 0.0, 90.0)}
+
+	var box = BoxMesh.new()
+	box.size = size
+	return {"mesh": box, "rotation_degrees": Vector3.ZERO}
+
+func _add_detail_box(parent, name, local_pos, size, color, emissive := false):
+	# Detail strips/caps are tiny helper meshes that break plain rectangular
+	# silhouettes while keeping the blockout workflow procedural.
+	var detail = MeshInstance3D.new()
+	detail.name = name
+	var mesh = BoxMesh.new()
+	mesh.size = size
+	detail.mesh = mesh
+	var mat = StandardMaterial3D.new()
+	_configure_material(mat, name, color, emissive)
+	detail.material_override = mat
+	detail.position = local_pos
+	if size.y <= 0.08:
+		detail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(detail)
+	return detail
+
+func _add_detail_wheel(parent, name, local_pos, radius, width):
+	var wheel = MeshInstance3D.new()
+	wheel.name = name
+	var cyl = CylinderMesh.new()
+	cyl.top_radius = radius
+	cyl.bottom_radius = radius
+	cyl.height = width
+	wheel.mesh = cyl
+	var mat = StandardMaterial3D.new()
+	_configure_material(mat, name, Color("1f232b"), false)
+	mat.metallic = 0.25
+	mat.roughness = 0.68
+	wheel.material_override = mat
+	wheel.position = local_pos
+	wheel.rotation_degrees = Vector3(0.0, 0.0, 90.0)
+	parent.add_child(wheel)
+	return wheel
+
+func _should_auto_detail_block(name, size):
+	# We only auto-detail medium/small props. Large structural pieces already
+	# receive bespoke facade layering in `_build_level_blockout`.
+	var lower = name.to_lower()
+	if size.x > 6.0 or size.y > 6.0 or size.z > 6.0:
+		return false
+	# Only target props that are likely to read as "plain boxes" without help.
+	return (
+		lower.contains("box")
+		or lower.contains("crate")
+		or lower.contains("trashbag")
+		or lower == "van"
+		or lower.contains("dumpster")
+		or lower.contains("planter")
+		or lower.contains("counter")
+		or lower.contains("bar")
+		or lower.contains("podium")
+	)
+
+func _decorate_block_geometry(body, name, size, color):
+	# Automatic detail pass for `_add_block` objects. This is intentionally subtle:
+	# enough to identify props at a glance without losing blockout editability.
+	if not _should_auto_detail_block(name, size):
+		return
+
+	var lower = name.to_lower()
+	var top_cap_h = clampf(size.y * 0.08, 0.03, 0.12)
+	var top_cap_color = _mix_colors(color, Color(1.0, 1.0, 1.0, 1.0), 0.22)
+	if size.y > 0.35 and not lower.contains("trashbag") and not lower.contains("pipe"):
+		_add_detail_box(body, "%sTopCap" % name, Vector3(0.0, size.y * 0.5 + top_cap_h * 0.5, 0.0), Vector3(size.x * 1.03, top_cap_h, size.z * 1.03), top_cap_color)
+
+	# Cargo-like props get a mid-band so they read as containers, not bare cubes.
+	if (lower.contains("box") or lower.contains("crate")) and size.y > 0.4:
+		_add_detail_box(body, "%sBand" % name, Vector3(0.0, 0.0, 0.0), Vector3(size.x * 1.02, max(0.05, size.y * 0.12), size.z * 1.02), _mix_colors(color, Color("d7bf8a"), 0.35))
+
+	# Trash bags get a small top knot to sell the silhouette.
+	if lower.contains("trashbag"):
+		_add_detail_box(body, "%sKnot" % name, Vector3(0.0, size.y * 0.38, 0.0), Vector3(size.x * 0.22, size.y * 0.18, size.z * 0.22), _mix_colors(color, Color("6a6a6a"), 0.25))
+
+	# Van gets wheels so it immediately reads as a vehicle rather than a slab.
+	if lower == "van":
+		var wheel_radius = clampf(min(size.y, size.z) * 0.22, 0.18, 0.34)
+		var wheel_width = clampf(size.x * 0.08, 0.12, 0.22)
+		var x_offset = size.x * 0.34
+		var z_offset = size.z * 0.46
+		var y_offset = -size.y * 0.34
+		_add_detail_wheel(body, "%sWheelFL" % name, Vector3(-x_offset, y_offset, -z_offset), wheel_radius, wheel_width)
+		_add_detail_wheel(body, "%sWheelFR" % name, Vector3(x_offset, y_offset, -z_offset), wheel_radius, wheel_width)
+		_add_detail_wheel(body, "%sWheelRL" % name, Vector3(-x_offset, y_offset, z_offset), wheel_radius, wheel_width)
+		_add_detail_wheel(body, "%sWheelRR" % name, Vector3(x_offset, y_offset, z_offset), wheel_radius, wheel_width)
+
+	# Dumpster gets compact casters for clearer utility-prop readability.
+	if lower.contains("dumpster"):
+		var caster_radius = clampf(min(size.x, size.z) * 0.07, 0.06, 0.1)
+		var caster_width = clampf(size.x * 0.05, 0.06, 0.1)
+		var caster_x = size.x * 0.43
+		var caster_z = size.z * 0.43
+		var caster_y = -size.y * 0.46
+		_add_detail_wheel(body, "%sCasterFL" % name, Vector3(-caster_x, caster_y, -caster_z), caster_radius, caster_width)
+		_add_detail_wheel(body, "%sCasterFR" % name, Vector3(caster_x, caster_y, -caster_z), caster_radius, caster_width)
+		_add_detail_wheel(body, "%sCasterRL" % name, Vector3(-caster_x, caster_y, caster_z), caster_radius, caster_width)
+		_add_detail_wheel(body, "%sCasterRR" % name, Vector3(caster_x, caster_y, caster_z), caster_radius, caster_width)
+
 func _configure_material(material, name, color, emissive := false):
 	# Material selection... enhanced PBR with normal/rough from textures
 	var lower = name.to_lower()
@@ -610,11 +882,30 @@ func _configure_material(material, name, color, emissive := false):
 	elif lower.contains("planter"):
 		material.albedo_texture = _get_surface_texture("painted_metal").albedo
 		material.roughness = 0.7
-	elif lower.contains("taxi") or lower.contains("servicevan") or lower.contains("dumpster"):
+	elif lower.contains("taxi") or lower.contains("servicevan") or lower.contains("van") or lower.contains("dumpster"):
 		material.albedo_texture = _get_surface_texture("painted_metal").albedo
 		material.metallic = 0.35
 		material.roughness = 0.44
 		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
+	elif lower.contains("box") or lower.contains("crate"):
+		material.albedo_texture = _get_surface_texture("warm_tile").albedo
+		material.roughness = 0.68
+		material.uv1_scale = Vector3(0.62, 0.62, 0.62)
+	elif lower.contains("trashbag"):
+		material.albedo_texture = _get_surface_texture("fabric").albedo
+		material.roughness = 0.9
+		material.metallic = 0.0
+		material.uv1_scale = Vector3(0.95, 0.95, 0.95)
+	elif lower.contains("sign"):
+		material.albedo_texture = _get_surface_texture("painted_metal").albedo
+		material.metallic = 0.2
+		material.roughness = 0.58
+		material.uv1_scale = Vector3(0.75, 0.75, 0.75)
+	elif lower.contains("lamp") or lower.contains("pipe") or lower.contains("handle"):
+		material.albedo_texture = _get_surface_texture("metal").albedo
+		material.metallic = 0.78
+		material.roughness = 0.38
+		material.uv1_scale = Vector3(1.0, 1.0, 1.0)
 	elif lower.contains("metal") or lower.contains("post") or lower.contains("shelter") or lower.contains("cart") or lower.contains("gate") or lower.contains("safe"):
 		material.albedo_texture = _get_surface_texture("metal").albedo
 		material.metallic = 0.8
@@ -985,6 +1276,15 @@ func _create_player():
 func _build_level_blockout():
 	# Clean urban alleyway design - simple, clean, and playable.
 	# Central 40-unit-wide alley with tall buildings on both sides.
+	#
+	# Documentation note for future maintainers:
+	# Every object spawned here is automatically annotated with:
+	# - `intent_note` (what the object is and why it exists)
+	# - `build_mode` (static block / mesh-only / collision-only)
+	# - `authored_size` (original dimensions)
+	#
+	# The source text for those intent notes lives in `OBJECT_INTENT_EXACT`
+	# and `OBJECT_INTENT_PREFIX` near the top of this file.
 	var palette = {
 
 		"alley": Color("1a1f28"),
@@ -1370,6 +1670,7 @@ func _add_marker_column(pos, color):
 	column.material_override = mat
 	column.position = Vector3(pos.x, 0.8, pos.z)
 	marker_root.add_child(column)
+	_annotate_object(column, column.name, Vector3(0.1, 1.6, 0.1), "marker_mesh")
 
 func _add_block(name, pos, size, color, with_collision := true, flat := false):
 	# Standard helper for visible city geometry. Most walls, props, and floors
@@ -1380,15 +1681,16 @@ func _add_block(name, pos, size, color, with_collision := true, flat := false):
 	geometry_root.add_child(body)
 
 	var mesh_instance = MeshInstance3D.new()
-	var box = BoxMesh.new()
-	box.size = size
-	mesh_instance.mesh = box
+	var mesh_profile = _build_mesh_profile(name, size)
+	mesh_instance.mesh = mesh_profile["mesh"]
+	mesh_instance.rotation_degrees = mesh_profile["rotation_degrees"]
 	var mat = StandardMaterial3D.new()
 	_configure_material(mat, name, color, false)
 	mesh_instance.material_override = mat
 	if flat:
 		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	body.add_child(mesh_instance)
+	_decorate_block_geometry(body, name, size, color)
 
 	if with_collision:
 		var shape = CollisionShape3D.new()
@@ -1396,6 +1698,7 @@ func _add_block(name, pos, size, color, with_collision := true, flat := false):
 		box_shape.size = size
 		shape.shape = box_shape
 		body.add_child(shape)
+	_annotate_object(body, name, size, "static_block")
 	return body
 
 func _add_collision_block(name, pos, size):
@@ -1411,15 +1714,16 @@ func _add_collision_block(name, pos, size):
 	box_shape.size = size
 	shape.shape = box_shape
 	body.add_child(shape)
+	_annotate_object(body, name, size, "collision_only")
 	return body
 
 func _add_mesh_only(name, pos, size, color, emissive := false):
 	# Enhanced mesh-only with LOD culling, better clipping fixes
 	var node = MeshInstance3D.new()
 	node.name = name
-	var box = BoxMesh.new()
-	box.size = size
-	node.mesh = box
+	var mesh_profile = _build_mesh_profile(name, size)
+	node.mesh = mesh_profile["mesh"]
+	node.rotation_degrees = mesh_profile["rotation_degrees"]
 	var mat = StandardMaterial3D.new()
 	_configure_material(mat, name, color, emissive)
 	
@@ -1441,6 +1745,7 @@ func _add_mesh_only(name, pos, size, color, emissive := false):
 		node.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 		
 	geometry_root.add_child(node)
+	_annotate_object(node, name, size, "mesh_only")
 	return node
 
 
@@ -1473,6 +1778,7 @@ func _add_shadow_zone(pos, size):
 	box.size = size
 	shape.shape = box
 	area.add_child(shape)
+	_annotate_object(area, area.name, size, "shadow_area")
 
 func _spawn_level_characters():
 	# Day contacts teach the layout along the alleyway.
