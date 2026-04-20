@@ -54,8 +54,16 @@ When all three are complete, press `Tab`.
 
 - `scripts/world_3d.gd`  
   World orchestrator. Builds the city, spawns actors, runs mission state, and creates the HUD.
+- `scripts/world/mission_controller.gd`  
+  Mission state machine and interaction rules (contacts, takedown flow, suspicion, objectives).
+- `scripts/world/hud_controller.gd`  
+  HUD creation, responsive layout, and runtime HUD text updates.
 - `scripts/world/layout_data.gd`  
   Declarative coordinates and spawn records (shadow zones, contacts, guards, civilians, target).
+- `scripts/world/npc_factory.gd`  
+  Runtime NPC assembly and layout-data-driven spawning helpers.
+- `scripts/world/player_factory.gd`  
+  Runtime player assembly helper used by the world orchestrator.
 - `scripts/world/intent_catalog.gd`  
   Object intent documentation catalog used to annotate generated geometry metadata.
 - `scripts/world/material_library.gd`  
