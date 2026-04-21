@@ -34,7 +34,7 @@ var walk_cycle_time = 0.0
 
 @onready var visuals = $Visuals
 @onready var camera_pivot = $CameraPivot
-@onready var camera = $CameraPivot/Camera3D
+@onready var camera = $CameraPivot/SpringArm3D/Camera3D
 @onready var footstep_player : AudioStreamPlayer3D = $FootstepPlayer
 @onready var leg_left: Node3D = get_node_or_null("Visuals/LegLeft")
 @onready var leg_right: Node3D = get_node_or_null("Visuals/LegRight")

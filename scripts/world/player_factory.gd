@@ -335,22 +335,36 @@ static func create_player(world):
 
 	var camera_pivot = Node3D.new()
 	camera_pivot.name = "CameraPivot"
+	# Anchor near shoulder height so the spring arm sweeps behind the player,
+	# not through the floor.
+	camera_pivot.position = Vector3(0.0, 1.2, 0.0)
 	camera_pivot.rotation_degrees = Vector3(-18.0, 0.0, 0.0)
 	player.add_child(camera_pivot)
 
+	# SpringArm3D shortens when it detects geometry between the player and the
+	# camera, preventing the camera from clipping through walls.
+	var spring_arm = SpringArm3D.new()
+	spring_arm.name = "SpringArm3D"
+	spring_arm.spring_length = 6.5
+	spring_arm.collision_mask = 1
+	spring_arm.margin = 0.3
+	camera_pivot.add_child(spring_arm)
+
 	var camera = Camera3D.new()
 	camera.name = "Camera3D"
-	camera.position = Vector3(0.0, 0.0, 10.5)
 	camera.projection = Camera3D.PROJECTION_PERSPECTIVE
-	camera.fov = 52.0
+	camera.fov = 62.0
 	camera.far = 110.0
 	camera.near = 0.1
 	camera.current = true
-	camera_pivot.add_child(camera)
+	spring_arm.add_child(camera)
 
 	var footstep_player = AudioStreamPlayer3D.new()
 	footstep_player.name = "FootstepPlayer"
 	player.add_child(footstep_player)
 
 	world.add_child(player)
+	# Exclude the player's own physics body after it enters the tree so the
+	# spring arm doesn't shorten against the player capsule.
+	spring_arm.add_excluded_object(player.get_rid())
 	return player

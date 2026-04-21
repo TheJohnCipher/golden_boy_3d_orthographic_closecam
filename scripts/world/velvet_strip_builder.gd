@@ -313,8 +313,8 @@ static func _build_hotel_crown(world, mats) -> void:
 	# Roof slab (so catwalks have a surface)
 	_block(world, "VSHotelCrownRoof", Vector3((x_min + x_max) * 0.5, total_h + 0.05, 0.0), Vector3(x_max - x_min, 0.3, 12.0), mats.get_material("aged_concrete"))
 	# Side walls (solid from ground to roof, so catwalk can attach)
-	_facade_wall(world, "VSHotelCrownSideW", x_min - 0.3, x_min, -0.2, 0.0, total_h, mats.get_material("marble_wall"))
-	_facade_wall(world, "VSHotelCrownSideE", x_max, x_max + 0.3, -0.2, 0.0, total_h, mats.get_material("marble_wall"))
+	_block(world, "VSHotelCrownSideW", Vector3(x_min - 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("marble_wall"))
+	_block(world, "VSHotelCrownSideE", Vector3(x_max + 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("marble_wall"))
 	# Back wall (toward service grid)
 	_facade_wall(world, "VSHotelCrownBackWall", x_min, x_max, INTERIOR_BACK_Z, 0.0, total_h, mats.get_material("painted_brick_cool"))
 
@@ -471,8 +471,8 @@ static func _build_crown_lounge(world, mats) -> void:
 	_block(world, "VSCrownLoungeRoof", Vector3((x_min + x_max) * 0.5, total_h + 0.05, 0.0), Vector3(x_max - x_min, 0.3, 12.0), mats.get_material("aged_concrete"))
 
 	# Side walls
-	_facade_wall(world, "VSCrownLoungeSideW", x_min - 0.3, x_min, -0.2, 0.0, total_h, mats.get_material("dark_marble"))
-	_facade_wall(world, "VSCrownLoungeSideE", x_max, x_max + 0.3, -0.2, 0.0, total_h, mats.get_material("dark_marble"))
+	_block(world, "VSCrownLoungeSideW", Vector3(x_min - 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("dark_marble"))
+	_block(world, "VSCrownLoungeSideE", Vector3(x_max + 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("dark_marble"))
 	# Back wall with a BOH door opening
 	var boh_cx = entry_cx + 2.0
 	var boh_w = 1.6
@@ -697,8 +697,8 @@ static func _build_boutique_hotel(world, mats) -> void:
 	# Roof slab
 	_block(world, "VSBoutiqueRoof", Vector3((x_min + x_max) * 0.5, total_h + 0.05, 0.0), Vector3(x_max - x_min, 0.3, 12.0), mats.get_material("aged_concrete"))
 	# Side walls
-	_facade_wall(world, "VSBoutiqueSideW", x_min - 0.3, x_min, -0.2, 0.0, total_h, mats.get_material("painted_brick_warm"))
-	_facade_wall(world, "VSBoutiqueSideE", x_max, x_max + 0.3, -0.2, 0.0, total_h, mats.get_material("painted_brick_warm"))
+	_block(world, "VSBoutiqueSideW", Vector3(x_min - 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("painted_brick_warm"))
+	_block(world, "VSBoutiqueSideE", Vector3(x_max + 0.15, total_h * 0.5, 0.0), Vector3(0.3, total_h, INTERIOR_BACK_Z - FACADE_FRONT_Z), mats.get_material("painted_brick_warm"))
 	# Back wall toward Service Grid (with a rear utility door)
 	var rear_cx = entry_cx
 	var rear_door_w = 1.2
