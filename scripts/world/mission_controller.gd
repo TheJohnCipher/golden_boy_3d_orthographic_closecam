@@ -73,18 +73,29 @@ static func begin_night(world):
 	if world.phase == "night":
 		return
 
+	_apply_environment_profile(world, true)
+	var day_energy = _stored_light_energy(world.day_sun, 1.8)
+	var moon_energy = _stored_light_energy(world.moon_light, 0.32)
+	world.day_sun.visible = true
+	world.moon_light.visible = true
+	world.day_sun.light_energy = day_energy
+	world.moon_light.light_energy = 0.0
+
 	var tween = world.create_tween()
-	tween.parallel().tween_property(world.environment.environment, "ambient_light_energy", 0.26, 2.0)
-	tween.parallel().tween_property(world.environment.environment, "background_color", Color("0c1018"), 2.0)
-	tween.parallel().tween_property(world.day_sun, "visible", false, 1.0)
-	tween.parallel().tween_property(world.moon_light, "visible", true, 1.0)
+	tween.parallel().tween_property(world.day_sun, "light_energy", 0.0, 1.0)
+	tween.parallel().tween_property(world.moon_light, "light_energy", moon_energy, 1.0)
 	tween.parallel().tween_property(world.hud["title"], "modulate:a", 0.0, 0.5).set_delay(1.5)
 	tween.parallel().tween_property(world.hud["objective"], "modulate:a", 0.0, 0.5).set_delay(1.5)
 	await tween.finished
 
 	world.phase = "night"
 	world.suspicion = 0.0
-	world.player.position = Vector3(8.5, 0.0, 17.0)
+	var night_spawn := Vector3(8.5, 0.0, 17.0)
+	if "night_start_position" in world:
+		var candidate = world.night_start_position
+		if candidate is Vector3:
+			night_spawn = candidate
+	world.player.position = night_spawn
 	apply_phase_visibility(world)
 	refresh_objective(world)
 
@@ -92,6 +103,50 @@ static func begin_night(world):
 	tween2.tween_property(world.hud["title"], "modulate:a", 1.0, 0.5)
 	tween2.parallel().tween_property(world.hud["objective"], "modulate:a", 1.0, 0.5)
 	show_message(world, "Night phase active. Target is in the alley. Take them down and extract through the north door.")
+
+static func _stored_light_energy(light, fallback: float) -> float:
+	if light == null or not is_instance_valid(light):
+		return fallback
+	if light.has_meta("base_energy"):
+		return float(light.get_meta("base_energy"))
+	return fallback
+
+static func _apply_environment_profile(world, night: bool) -> void:
+	if world.environment == null or not is_instance_valid(world.environment):
+		return
+	var env = world.environment.environment
+	if env == null:
+		return
+
+	var can_use_night_fx = bool("forward_plus_renderer" in world and world.forward_plus_renderer)
+	env.background_mode = Environment.BG_COLOR
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	if night:
+		env.background_color = Color("0c1018")
+		env.tonemap_exposure = 0.88
+		env.ambient_light_color = Color("2a2f3a")
+		env.ambient_light_energy = 0.26
+		env.glow_enabled = can_use_night_fx
+		env.fog_enabled = can_use_night_fx
+		env.volumetric_fog_enabled = can_use_night_fx
+		env.ssr_enabled = can_use_night_fx
+		if can_use_night_fx:
+			env.fog_density = 0.014
+			env.fog_aerial_perspective = 0.32
+			env.fog_light_color = Color("dcb58e")
+			env.volumetric_fog_density = 0.08
+			env.ssr_max_steps = 48
+			env.ssr_fade_in = 0.2
+			env.ssr_fade_out = 0.4
+	else:
+		env.background_color = Color("8ba9c8")
+		env.tonemap_exposure = 1.02
+		env.ambient_light_color = Color("c7d7ea")
+		env.ambient_light_energy = 0.66
+		env.glow_enabled = false
+		env.fog_enabled = false
+		env.volumetric_fog_enabled = false
+		env.ssr_enabled = false
 
 static func apply_phase_visibility(world) -> void:
 	var night = world.phase == "night"
@@ -114,8 +169,13 @@ static func apply_phase_visibility(world) -> void:
 			marker.visible = not night
 
 	world.extraction_marker.visible = night and world.takedown_done
+	var day_energy = _stored_light_energy(world.day_sun, 1.8)
+	var moon_energy = _stored_light_energy(world.moon_light, 0.32)
 	world.day_sun.visible = not night
 	world.moon_light.visible = night
+	world.day_sun.light_energy = 0.0 if night else day_energy
+	world.moon_light.light_energy = moon_energy if night else 0.0
+	_apply_environment_profile(world, night)
 
 static func update_prompt(world) -> void:
 	var prompt = ""
@@ -215,9 +275,13 @@ static func raise_suspicion(world, amount: float, source_name := "") -> void:
 				npc.detect_radius *= 1.3
 				npc.detect_rate *= 1.4
 				npc.patrol_speed *= 1.2
-				show_message(world, "Night 2: Guards on alert - faster, wider vision.")
+			show_message(world, "Night 2: Guards on alert - faster, wider vision.")
+
+	var previous_suspicion: float = float(world.suspicion)
 	world.suspicion = min(world.suspicion + amount, 100.0)
-	if source_name != "" and int(world.suspicion) % 20 == 0:
+	var previous_bucket := int(floor(previous_suspicion / 20.0))
+	var current_bucket := int(floor(world.suspicion / 20.0))
+	if source_name != "" and current_bucket > previous_bucket and current_bucket >= 1 and current_bucket < 5:
 		show_message(world, "%s is getting a better look at you." % source_name)
 	if world.suspicion >= 100.0:
 		fail_mission(world, "The room turns on you. Your cover collapses.")

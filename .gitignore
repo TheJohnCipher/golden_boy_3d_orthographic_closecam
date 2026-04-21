@@ -1,2 +1,5 @@
 .godot/
+.vscode/
+Thumbs.db
+.DS_Store
 

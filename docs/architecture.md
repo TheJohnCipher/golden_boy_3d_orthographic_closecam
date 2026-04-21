@@ -1,63 +1,73 @@
 # Architecture Guide
 
-This project is a procedural single-level stealth prototype. Most runtime content is generated from scripts.
+This project is a procedural stealth prototype where the world is generated at runtime.
 
-## Top-level ownership
+## Project Layout
+
+- `scenes/`
+  - Scene entry points.
+- `scripts/`
+  - Active runtime scripts (`world_3d.gd`, `player_3d.gd`, `npc_3d.gd`) plus compatibility wrappers.
+- `scripts/world/`
+  - Subsystems, builders, data, and runtime factories.
+- `art/`
+  - Intentional assets used by the prototype.
+- `docs/`
+  - Architecture and map notes.
+
+## Runtime Entry Points
 
 - `scenes/main.tscn`
-  - Entry scene, currently controlled by `scripts/world_3d.gd`.
+  - Main scene, bound to `res://scripts/world_3d.gd`.
 - `scripts/world_3d.gd`
-  - World orchestrator.
-  - Owns boot order, scene roots, level blockout calls, mission flow, HUD, and phase transitions.
+  - Active world orchestrator (boot order, generation, mission flow, HUD updates).
 - `scripts/player_3d.gd`
-  - Player movement, camera, and hidden-state behavior.
+  - Active player controller (movement, camera, stealth state, locomotion visuals).
 - `scripts/npc_3d.gd`
-  - NPC patrol, detection, interaction checks, and marker behavior.
-- `scripts/shadow_zone_3d.gd`
-  - Hides/unhides the player when entering/exiting shadow volumes.
+  - Active NPC controller (patrols, detection, interactions).
 
-## World module layout (`scripts/world/`)
+## Active Modules
 
-- `intent_catalog.gd`
-  - Object intent documentation resolver.
-  - Maps authored object names/prefixes to readable intent metadata (`intent_note`).
-- `layout_data.gd`
-  - Declarative level data.
-  - Owns shadow zone coordinates and all NPC spawn records.
-- `material_library.gd`
-  - Shared visual system.
-  - Owns procedural texture generation and material assignment rules.
-- `mission_controller.gd`
-  - Mission state machine and interaction logic.
-  - Handles contacts, takedowns, suspicion, phase visibility, and objectives.
-- `hud_controller.gd`
-  - HUD creation, responsive layout, and per-frame HUD text updates.
-- `npc_factory.gd`
-  - Builds NPC runtime nodes and applies spawn records from `layout_data.gd`.
-- `player_factory.gd`
-  - Builds the runtime player node hierarchy used by `player_3d.gd`.
+- `scripts/world/layout_data.gd`
+  - Declarative layout records (shadow zones, contacts, guards, civilians, target).
+- `scripts/world/mission_controller.gd`
+  - Mission state machine and objective/progression logic.
+- `scripts/world/hud_controller.gd`
+  - HUD creation, layout, and frame updates.
+- `scripts/world/input_actions.gd`
+  - InputMap defaults.
+- `scripts/world/player_factory.gd`
+  - Runtime player node construction.
+- `scripts/world/npc_factory.gd`
+  - Runtime NPC node construction.
+- `scripts/world/velvet_strip_builder.gd`
+  - District geometry generation.
+- `scripts/world/pbr_materials.gd`
+  - PBR material palette used by the Velvet Strip builder.
+- `scripts/world/material_library.gd`
+  - Procedural material/texture fallback pipeline.
+- `scripts/world/intent_catalog.gd`
+  - Metadata intent notes for generated geometry.
 
-## How to change things safely
+## Compatibility Wrappers
 
-1. Geometry and mission behavior:
-   - Edit `scripts/world_3d.gd`.
-   - For mission flow specifics, edit `scripts/world/mission_controller.gd`.
-2. Spawn positions, patrol routes, and shadow-zone bounds:
-   - Edit `scripts/world/layout_data.gd`.
-3. Visual intent descriptions for generated objects:
-   - Edit `scripts/world/intent_catalog.gd`.
-4. Surface appearance, texture families, and material matching:
-   - Edit `scripts/world/material_library.gd`.
-5. HUD structure and responsive placement:
-   - Edit `scripts/world/hud_controller.gd`.
-6. Runtime actor construction:
-   - Edit `scripts/world/player_factory.gd` and `scripts/world/npc_factory.gd`.
+These files exist so old paths do not silently break:
 
-## Maintainer conventions
+- `scripts/world/world_3d.gd` -> extends `res://scripts/world_3d.gd`
+- `scripts/world/player_3d.gd` -> extends `res://scripts/player_3d.gd`
+- `scripts/world/npc_3d.gd` -> extends `res://scripts/npc_3d.gd`
+- `scripts/input_actions.gd` -> forwards to `scripts/world/input_actions.gd`
+- `scripts/velvet_strip_builder.gd` -> forwards to `scripts/world/velvet_strip_builder.gd`
 
-- Keep `world_3d.gd` focused on orchestration, not low-level mission/HUD/actor construction.
-- Prefer data-driven records in `layout_data.gd` over new hardcoded spawn calls.
-- Preserve metadata annotations (`intent_note`, `authored_name`, `authored_size`, `build_mode`) for generated objects.
-- When adding new object naming patterns, update both:
-  - geometry naming in `world_3d.gd`
-  - intent/material mapping rules in the world modules.
+Edit the active files listed above, not the wrappers.
+
+## Validation
+
+- Run `powershell -ExecutionPolicy Bypass -File tools/validate_wrappers.ps1` after moving or renaming script paths.
+- The script checks that wrapper targets still exist and wrappers still forward to the expected file.
+
+## Maintainer Conventions
+
+- Keep `scripts/world_3d.gd` orchestration-focused.
+- Prefer data-driven updates in `scripts/world/layout_data.gd`.
+- Preserve generated metadata (`intent_note`, `authored_name`, `authored_size`, `build_mode`).

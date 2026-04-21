@@ -13,6 +13,9 @@ const GRAVITY = 28.0
 const MOUSE_SENSITIVITY = 0.18
 const MIN_CAMERA_PITCH = -55.0
 const MAX_CAMERA_PITCH = 25.0
+const LEG_SWING_DEGREES = 22.0
+const SHIN_SWING_DEGREES = 28.0
+const FOOT_SWING_DEGREES = 14.0
 
 var world_ref = null
 var shadow_count = 0
@@ -25,11 +28,18 @@ var facing = Vector3(0, 0, 1)
 # write back into the camera rig every frame.
 var camera_yaw = 0.0
 var camera_pitch = 0.0
+var walk_cycle_time = 0.0
 
 @onready var visuals = $Visuals
 @onready var camera_pivot = $CameraPivot
 @onready var camera = $CameraPivot/Camera3D
 @onready var footstep_player : AudioStreamPlayer3D = $FootstepPlayer
+@onready var leg_left: Node3D = get_node_or_null("Visuals/LegLeft")
+@onready var leg_right: Node3D = get_node_or_null("Visuals/LegRight")
+@onready var shin_left: Node3D = get_node_or_null("Visuals/ShinLeft")
+@onready var shin_right: Node3D = get_node_or_null("Visuals/ShinRight")
+@onready var foot_left: Node3D = get_node_or_null("Visuals/FootLeft")
+@onready var foot_right: Node3D = get_node_or_null("Visuals/FootRight")
 
 func _ready():
 	add_to_group("player")
@@ -39,7 +49,12 @@ func _ready():
 	camera_yaw = camera_pivot.rotation_degrees.y
 	camera_pitch = camera_pivot.rotation_degrees.x
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	footstep_player.stream = load("res://art/footstep.ogg")
+	var footstep_path := "res://art/footstep.ogg"
+	var audio_file := FileAccess.open(footstep_path, FileAccess.READ)
+	if audio_file != null and audio_file.get_length() > 0:
+		var footstep_stream = load(footstep_path)
+		if footstep_stream is AudioStream:
+			footstep_player.stream = footstep_stream
 
 func _input(event):
 	# Mouse motion rotates the whole pivot rig around the player body.
@@ -56,24 +71,17 @@ func _input(event):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	# Esc toggles between "game controlling the mouse" and "player wants their cursor back".
-	elif event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+	elif event.is_action_pressed("toggle_mouse_capture") and (not (event is InputEventKey) or not event.echo):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta):
-	# Read raw WASD input. This project currently avoids InputMap setup and keeps
-	# the prototype controls explicit in script for easier iteration.
-	var input_dir = Vector2.ZERO
-	if Input.is_key_pressed(KEY_A):
-		input_dir.x -= 1.0
-	if Input.is_key_pressed(KEY_D):
-		input_dir.x += 1.0
-	if Input.is_key_pressed(KEY_W):
-		input_dir.y -= 1.0
-	if Input.is_key_pressed(KEY_S):
-		input_dir.y += 1.0
+	# Read movement from InputMap actions so control bindings stay centralized.
+	var strafe_input = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	var forward_input = Input.get_action_strength("move_forward") - Input.get_action_strength("move_back")
+	var input_dir = Vector2(strafe_input, forward_input)
 	if input_dir.length() > 1.0:
 		input_dir = input_dir.normalized()
 
@@ -87,9 +95,7 @@ func _physics_process(delta):
 	right.y = 0.0
 	right = right.normalized()
 
-	# `input_dir.y` is negative for W, so we invert it here to keep W moving in
-	# the visually expected forward direction.
-	var move_dir = (right * input_dir.x) + (forward * -input_dir.y)
+	var move_dir = (right * input_dir.x) + (forward * input_dir.y)
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
@@ -111,17 +117,50 @@ func _physics_process(delta):
 	move_and_slide()
 
 	var flat_velocity = Vector3(velocity.x, 0.0, velocity.z)
+	var flat_speed = flat_velocity.length()
 	if flat_velocity.length() > 0.15:
 		facing = flat_velocity.normalized()
 		var target = visuals.global_position + facing
 		target.y = visuals.global_position.y
-		visuals.look_at(target, Vector3.UP)
+		# Player model is authored with +Z as "front", so use_model_front must be true.
+		visuals.look_at(target, Vector3.UP, true)
 		
 		# Procedural footsteps
-		if is_on_floor() and footstep_player.playing == false:
+		if is_on_floor() and footstep_player.stream != null and footstep_player.playing == false:
 			footstep_player.pitch_scale = randf_range(0.85, 1.15)
 			footstep_player.volume_db = -10.0 + randf_range(-3.0, 3.0)
 			footstep_player.play()
+
+	var speed_ratio = clampf(flat_speed / WALK_SPEED, 0.0, 1.0)
+	var locomoting = is_on_floor() and flat_speed > 0.12
+	_update_leg_pose(delta, speed_ratio, locomoting)
+
+func _approach_rotation_x(node: Node3D, target_x: float, weight: float) -> void:
+	if node == null:
+		return
+	node.rotation_degrees.x = lerpf(node.rotation_degrees.x, target_x, weight)
+
+func _update_leg_pose(delta: float, speed_ratio: float, locomoting: bool) -> void:
+	if locomoting:
+		var cycle_rate = lerpf(6.5, 11.0, speed_ratio)
+		walk_cycle_time += delta * cycle_rate
+	else:
+		walk_cycle_time = lerpf(walk_cycle_time, 0.0, min(1.0, delta * 6.0))
+
+	var blend = min(1.0, delta * (14.0 if locomoting else 10.0))
+	var gait_phase = walk_cycle_time
+	var gait_strength = speed_ratio if locomoting else 0.0
+	var leg_swing = sin(gait_phase) * LEG_SWING_DEGREES * gait_strength
+	var shin_l = max(0.0, -sin(gait_phase)) * SHIN_SWING_DEGREES * gait_strength
+	var shin_r = max(0.0, sin(gait_phase)) * SHIN_SWING_DEGREES * gait_strength
+	var foot_swing = sin(gait_phase + PI * 0.5) * FOOT_SWING_DEGREES * gait_strength
+
+	_approach_rotation_x(leg_left, leg_swing, blend)
+	_approach_rotation_x(leg_right, -leg_swing, blend)
+	_approach_rotation_x(shin_left, shin_l, blend)
+	_approach_rotation_x(shin_right, shin_r, blend)
+	_approach_rotation_x(foot_left, -foot_swing, blend)
+	_approach_rotation_x(foot_right, foot_swing, blend)
 
 # Shadow zones increment and decrement this counter instead of using a single
 # boolean so overlapping hide areas still work correctly.

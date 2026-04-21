@@ -19,6 +19,7 @@ static func create_player(world):
 	var visuals = Node3D.new()
 	visuals.name = "Visuals"
 	visuals.position = Vector3(0.0, 0.0, 0.0)
+	visuals.rotation_degrees = Vector3(0.0, 180.0, 0.0)
 	player.add_child(visuals)
 
 	var body_mesh = MeshInstance3D.new()
@@ -243,6 +244,72 @@ static func create_player(world):
 	belt.scale = Vector3(1.05, 1.05, 1.05)
 	visuals.add_child(belt)
 
+	var pants_mat = StandardMaterial3D.new()
+	pants_mat.albedo_color = Color("233247")
+	pants_mat.roughness = 0.66
+
+	var boot_mat = StandardMaterial3D.new()
+	boot_mat.albedo_color = Color("191919")
+	boot_mat.roughness = 0.62
+
+	var leg_left = MeshInstance3D.new()
+	leg_left.name = "LegLeft"
+	var leg_left_mesh = CapsuleMesh.new()
+	leg_left_mesh.radius = 0.11
+	leg_left_mesh.height = 0.58
+	leg_left.mesh = leg_left_mesh
+	leg_left.material_override = pants_mat
+	leg_left.position = Vector3(-0.13, 0.22, 0.0)
+	visuals.add_child(leg_left)
+
+	var leg_right = MeshInstance3D.new()
+	leg_right.name = "LegRight"
+	var leg_right_mesh = CapsuleMesh.new()
+	leg_right_mesh.radius = 0.11
+	leg_right_mesh.height = 0.58
+	leg_right.mesh = leg_right_mesh
+	leg_right.material_override = pants_mat
+	leg_right.position = Vector3(0.13, 0.22, 0.0)
+	visuals.add_child(leg_right)
+
+	var shin_left = MeshInstance3D.new()
+	shin_left.name = "ShinLeft"
+	var shin_left_mesh = CapsuleMesh.new()
+	shin_left_mesh.radius = 0.1
+	shin_left_mesh.height = 0.5
+	shin_left.mesh = shin_left_mesh
+	shin_left.material_override = pants_mat
+	shin_left.position = Vector3(-0.13, -0.14, 0.0)
+	visuals.add_child(shin_left)
+
+	var shin_right = MeshInstance3D.new()
+	shin_right.name = "ShinRight"
+	var shin_right_mesh = CapsuleMesh.new()
+	shin_right_mesh.radius = 0.1
+	shin_right_mesh.height = 0.5
+	shin_right.mesh = shin_right_mesh
+	shin_right.material_override = pants_mat
+	shin_right.position = Vector3(0.13, -0.14, 0.0)
+	visuals.add_child(shin_right)
+
+	var foot_left = MeshInstance3D.new()
+	foot_left.name = "FootLeft"
+	var foot_left_mesh = BoxMesh.new()
+	foot_left_mesh.size = Vector3(0.2, 0.12, 0.3)
+	foot_left.mesh = foot_left_mesh
+	foot_left.material_override = boot_mat
+	foot_left.position = Vector3(-0.13, -0.44, 0.07)
+	visuals.add_child(foot_left)
+
+	var foot_right = MeshInstance3D.new()
+	foot_right.name = "FootRight"
+	var foot_right_mesh = BoxMesh.new()
+	foot_right_mesh.size = Vector3(0.2, 0.12, 0.3)
+	foot_right.mesh = foot_right_mesh
+	foot_right.material_override = boot_mat
+	foot_right.position = Vector3(0.13, -0.44, 0.07)
+	visuals.add_child(foot_right)
+
 	var pouch_left = MeshInstance3D.new()
 	pouch_left.name = "PouchLeft"
 	var pouch_mesh = BoxMesh.new()
@@ -266,7 +333,7 @@ static func create_player(world):
 
 	var camera_pivot = Node3D.new()
 	camera_pivot.name = "CameraPivot"
-	camera_pivot.rotation_degrees = Vector3(-18.0, 90.0, 0.0)
+	camera_pivot.rotation_degrees = Vector3(-18.0, 0.0, 0.0)
 	player.add_child(camera_pivot)
 
 	var camera = Camera3D.new()
