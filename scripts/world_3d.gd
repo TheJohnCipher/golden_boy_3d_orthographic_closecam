@@ -26,13 +26,15 @@ const NPC_FACTORY = preload("res://scripts/world/npc_factory.gd")
 const HUD_CONTROLLER = preload("res://scripts/world/hud_controller.gd")
 const MISSION_CONTROLLER = preload("res://scripts/world/mission_controller.gd")
 const INPUT_ACTIONS = preload("res://scripts/world/input_actions.gd")
-const BUILDING_ENTRY_ZS = [-22.0, -11.0, 0.0, 11.0, 22.0]
+const INPUT_REBIND_MANAGER = preload("res://scripts/world/input_rebind_manager.gd")
+const PAUSE_MENU_CONTROLLER = preload("res://scripts/world/pause_menu_controller.gd")
+const BUILDING_ENTRY_ZS = [-39.6, -19.8, 0.0, 19.8, 39.6]
 const BUILDING_FLOORS = [2.1, 5.1, 8.1, 11.1, 14.1]
-const BUILDING_WINDOW_BAYS = [-22.0, -14.0, -6.0, 2.0, 10.0, 18.0]
+const BUILDING_WINDOW_BAYS = [-39.6, -25.2, -10.8, 3.6, 18.0, 32.4]
 const BUILDING_BALCONY_LEVELS = [5.0, 9.0, 13.0]
-const BUILDING_BALCONY_BAYS = [-18.0, -6.0, 6.0, 18.0]
-const BUILDING_ROOF_ZS = [-20.0, -8.0, 4.0, 16.0]
-const BUILDING_PIPE_ZS = [-18.0, 0.0, 18.0]
+const BUILDING_BALCONY_BAYS = [-32.4, -10.8, 10.8, 32.4]
+const BUILDING_ROOF_ZS = [-36.0, -14.4, 7.2, 28.8]
+const BUILDING_PIPE_ZS = [-32.4, 0.0, 32.4]
 const SAFE_WINDOWED_SIZE = Vector2i(1280, 720)
 const MAP_SURFACE_Y = 0.0
 const MAP_MIN_VISIBLE_BOTTOM_Y = -0.04
@@ -110,12 +112,18 @@ var audio_device_warning_shown = false
 
 # HUD label references and shared visual helper state.
 var hud = {}
+var pause_overlay = null
+var pause_menu_container = null
 var material_library = MATERIAL_LIBRARY.new()
 var pbr_materials = PBR_MATERIALS.new()
 var forward_plus_renderer := false
 var use_velvet_strip := true
 var night_start_position := Vector3(-18.0, 0.0, -14.0)
 var phase_transition_in_progress := false
+
+func _enter_tree():
+	# Apply native display sizing as early as possible.
+	_configure_window_for_native_screen()
 
 func _ready():
 	# Boot order matters here:
@@ -125,11 +133,10 @@ func _ready():
 	# 4. spawn gameplay actors
 	# 5. create HUD and initial mission text
 	INPUT_ACTIONS.ensure_defaults()
-	var window = get_viewport().get_window()
-	if window.mode == Window.MODE_WINDOWED:
-		_configure_window_for_safe_windowed()
-	else:
-		_configure_window_for_native_screen()
+	INPUT_REBIND_MANAGER.load_bindings()
+	# Always start at the current display's native size.
+	_configure_window_for_native_screen()
+	call_deferred("_reapply_native_display_size_after_boot")
 	_stabilize_window_mode()
 	_recover_audio_output_device(true)
 	_create_environment_and_lights()
@@ -145,17 +152,23 @@ func _ready():
 	_spawn_level_characters()
 	_create_extraction_zone()
 	_create_hud()
+	PAUSE_MENU_CONTROLLER.create_pause_menu(self)
 	_apply_phase_visibility()
 	_refresh_objective()
 	_show_message("Velvet Strip stealth run. Work the contacts. Complete the night extraction.")
 
 func _configure_window_for_native_screen():
-	# Native resolution, no pixelation for smooth detailed visuals
+	# Native fullscreen launch, no pixelation from low-res viewport scaling.
 	var window = get_viewport().get_window()
 	var screen = DisplayServer.window_get_current_screen()
+	var screen_pos = DisplayServer.screen_get_position(screen)
 	var native_size = DisplayServer.screen_get_size(screen)
 	window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+	window.content_scale_size = native_size
+	window.content_scale_factor = 1.0
 	window.size = native_size
+	window.position = screen_pos
+	window.mode = Window.MODE_FULLSCREEN
 	if ui_root != null and is_instance_valid(ui_root):
 		_layout_hud()
 
@@ -169,10 +182,18 @@ func _configure_window_for_safe_windowed():
 	target.x = min(target.x, max(native_size.x - 120, 960))
 	target.y = min(target.y, max(native_size.y - 120, 540))
 	window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+	window.content_scale_size = target
+	window.content_scale_factor = 1.0
 	window.size = target
 	window.position = screen_pos + (native_size - target) / 2
 	if ui_root != null and is_instance_valid(ui_root):
 		_layout_hud()
+
+func _reapply_native_display_size_after_boot():
+	# Some launch paths can apply window/viewport settings after _ready().
+	# Re-apply on the next frame so render resolution matches display size.
+	await get_tree().process_frame
+	_configure_window_for_native_screen()
 
 func _stabilize_window_mode():
 	# Exclusive fullscreen can trigger monitor mode/brightness handshakes on
@@ -228,7 +249,11 @@ func _recover_audio_output_device(force_log := false):
 func _unhandled_input(event):
 	# Global level controls live here instead of in the player script because
 	# they affect mission state, scene reload, and window mode.
-	if event.is_action_pressed("interact"):
+	if event.is_action_pressed("pause"):
+		PAUSE_MENU_CONTROLLER.toggle_pause(self)
+		get_tree().root.set_input_as_handled()
+		return
+	elif event.is_action_pressed("interact"):
 		_handle_interaction()
 	elif event.is_action_pressed("phase_switch"):
 		if phase == "day":

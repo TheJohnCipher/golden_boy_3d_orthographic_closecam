@@ -5,11 +5,14 @@ const ACTION_KEYS = {
 	"move_right": [KEY_D],
 	"move_forward": [KEY_W],
 	"move_back": [KEY_S],
+	"jump": [KEY_SPACE],
+	"sprint": [KEY_SHIFT],
 	"interact": [KEY_E],
 	"phase_switch": [KEY_TAB],
 	"restart_level": [KEY_R],
 	"toggle_mouse_capture": [KEY_ESCAPE],
 	"toggle_fullscreen": [KEY_F11],
+	"pause": [KEY_P],
 }
 
 static func ensure_defaults() -> void:

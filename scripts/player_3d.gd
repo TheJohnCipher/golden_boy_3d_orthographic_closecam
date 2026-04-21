@@ -3,9 +3,11 @@ extends CharacterBody3D
 # Main player controller for the prototype.
 # The scene is built entirely from code in `world_3d.gd`, so these node paths
 # are part of a contract between the world builder and this controller.
-const WALK_SPEED = 8.4
-const ACCEL = 30.0
-const DECEL = 36.0
+const WALK_SPEED = 4.5
+const SPRINT_SPEED = 9.0
+const JUMP_VELOCITY = 7.5
+const ACCEL = 14.0
+const DECEL = 18.0
 const GRAVITY = 28.0
 
 # Mouse look is intentionally mild because the user wanted a "normal 3D game"
@@ -99,20 +101,20 @@ func _physics_process(delta):
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 
-	var target_velocity = move_dir * WALK_SPEED
+	var speed = SPRINT_SPEED if Input.is_action_pressed("sprint") else WALK_SPEED
+	var target_velocity = move_dir * speed
 
-	# Separate acceleration and deceleration makes the character feel snappier
-	# without instantly snapping to zero when the player lets go of a key.
 	var accel = ACCEL if move_dir.length() > 0.0 else DECEL
 	velocity.x = move_toward(velocity.x, target_velocity.x, accel * delta)
 	velocity.z = move_toward(velocity.z, target_velocity.z, accel * delta)
 
-	# The project is grounded-only right now, so vertical velocity is just
-	# gravity plus a tiny downward force to keep floor contact stable.
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
 	else:
-		velocity.y = -0.01
+		if Input.is_action_just_pressed("jump"):
+			velocity.y = JUMP_VELOCITY
+		else:
+			velocity.y = -0.01
 
 	move_and_slide()
 

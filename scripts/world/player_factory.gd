@@ -5,7 +5,8 @@ static func create_player(world):
 	var player = CharacterBody3D.new()
 	player.name = "Player"
 	player.set_script(world.PLAYER_SCRIPT)
-	player.position = Vector3(-12.0, 0.0, -20.0)
+	# Spawn on the sidewalk in front of Hotel Crown, facing the facades.
+	player.position = Vector3(-10.0, 0.0, -8.0)
 	player.world_ref = world
 
 	var collision = CollisionShape3D.new()
@@ -18,7 +19,8 @@ static func create_player(world):
 
 	var visuals = Node3D.new()
 	visuals.name = "Visuals"
-	visuals.position = Vector3(0.0, 0.0, 0.0)
+	# Lift the rendered body so boots sit correctly on the ground plane.
+	visuals.position = Vector3(0.0, 0.4, 0.0)
 	visuals.rotation_degrees = Vector3(0.0, 180.0, 0.0)
 	player.add_child(visuals)
 

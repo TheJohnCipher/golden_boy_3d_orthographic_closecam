@@ -40,6 +40,7 @@ static func build(world: Node3D) -> void:
 	_build_service_grid(world, mats)
 	_build_rooftop_path(world, mats)
 	_build_street_dressing(world, mats)
+	_build_district_perimeter(world, mats)
 	_build_signage(world, mats)
 	_spawn_atmospherics(world, mats)
 	_build_extraction(world, mats)
@@ -127,17 +128,17 @@ static func _build_street(world, mats) -> void:
 	mark_mat.roughness = 0.55
 	mark_mat.metallic = 0.0
 	for i in range(6):
-		var z_pos = -17.0 + i * 1.8
+		var z_pos = -10.8 + i * 1.6
 		_mesh(world, "VSLaneDash%d" % i, Vector3(-2.0, 0.0051, z_pos), Vector3(0.25, 0.005, 1.0), mark_mat)
 
-	# Crosswalk in front of the lounge entry.
+	# Crosswalk in front of the lounge entry (just south of the sidewalk).
 	for i in range(7):
 		var x_pos = -1.0 + i * 0.7
-		_mesh(world, "VSCrosswalk%d" % i, Vector3(x_pos, 0.0052, -9.5), Vector3(0.45, 0.005, 2.6), mark_mat)
+		_mesh(world, "VSCrosswalk%d" % i, Vector3(x_pos, 0.0052, -11.3), Vector3(0.45, 0.005, 2.6), mark_mat)
 
 	# Puddle decals scattered for wet reflections.
 	var puddle_positions = [
-		Vector3(-14.0, 0.005, -10.0),
+		Vector3(-14.0, 0.005, -12.0),
 		Vector3(-6.0, 0.005, -15.0),
 		Vector3(3.0, 0.005, -13.0),
 		Vector3(10.5, 0.005, -11.0),
@@ -156,10 +157,36 @@ static func _build_street(world, mats) -> void:
 		world.geometry_root.add_child(puddle)
 
 static func _build_south_sidewalk(world, mats) -> void:
-	var sidewalk = _block(world, "VSSouthSidewalk", Vector3(-2.0, 0.04, -5.7), Vector3(64.0, 0.18, 0.6), mats.get_material("aged_concrete"))
-	sidewalk.set_meta("intent_note", "Strip of sidewalk between the street and facade entries.")
-	# Curb along the street edge.
-	_mesh(world, "VSSouthCurb", Vector3(-2.0, 0.075, -6.2), Vector3(64.0, 0.15, 0.12), mats.get_material("aged_concrete"))
+	var sidewalk = _block(world, "VSSouthSidewalk", Vector3(-2.0, 0.05, -7.75), Vector3(64.0, 0.18, 3.5), mats.get_material("aged_concrete"))
+	sidewalk.set_meta("intent_note", "Sidewalk between the street and facade entries — 3.5 m wide for a proper strip boulevard.")
+	# Curb at the street edge (south end of the sidewalk slab).
+	_mesh(world, "VSSouthCurb", Vector3(-2.0, 0.125, -9.55), Vector3(64.0, 0.15, 0.12), mats.get_material("aged_concrete"))
+
+static func _build_district_perimeter(world, mats) -> void:
+	# Hard bounds for the first playable block so the player cannot drift onto the
+	# hidden support floor around the district.
+	var x_min = -24.8
+	var x_max = 20.8
+	var z_south = -19.7
+	var z_north = 14.3
+	var wall_h = 2.8
+	var wall_t = 0.6
+	var span_x = x_max - x_min
+	var span_z = z_north - z_south
+	var wall_mat = mats.get_material("painted_brick_cool")
+	var cap_mat = mats.get_material("dark_marble")
+
+	_block(world, "VSDistrictSouthWall", Vector3((x_min + x_max) * 0.5, wall_h * 0.5, z_south), Vector3(span_x, wall_h, wall_t), wall_mat)
+	_block(world, "VSDistrictNorthWall", Vector3((x_min + x_max) * 0.5, wall_h * 0.5, z_north), Vector3(span_x, wall_h, wall_t), wall_mat)
+	_block(world, "VSDistrictWestWall", Vector3(x_min, wall_h * 0.5, (z_south + z_north) * 0.5), Vector3(wall_t, wall_h, span_z), wall_mat)
+	_block(world, "VSDistrictEastWall", Vector3(x_max, wall_h * 0.5, (z_south + z_north) * 0.5), Vector3(wall_t, wall_h, span_z), wall_mat)
+
+	# Thin caps help the border read as intentional world geometry instead of
+	# plain invisible blockers.
+	_mesh(world, "VSDistrictSouthCap", Vector3((x_min + x_max) * 0.5, wall_h + 0.08, z_south), Vector3(span_x, 0.16, wall_t + 0.1), cap_mat)
+	_mesh(world, "VSDistrictNorthCap", Vector3((x_min + x_max) * 0.5, wall_h + 0.08, z_north), Vector3(span_x, 0.16, wall_t + 0.1), cap_mat)
+	_mesh(world, "VSDistrictWestCap", Vector3(x_min, wall_h + 0.08, (z_south + z_north) * 0.5), Vector3(wall_t + 0.1, 0.16, span_z), cap_mat)
+	_mesh(world, "VSDistrictEastCap", Vector3(x_max, wall_h + 0.08, (z_south + z_north) * 0.5), Vector3(wall_t + 0.1, 0.16, span_z), cap_mat)
 
 # ------------------------------------------------------------------------
 # Facade helpers: composed geometry, not single boxes.
@@ -248,8 +275,8 @@ static func _build_hotel_crown(world, mats) -> void:
 	_facade_wall(world, "VSHotelCrownWallGroundL", x_min, entry_cx - entry_w * 0.5, FACADE_FRONT_Z, 0.5, floor_h, mats.get_material("marble_wall"))
 	_facade_wall(world, "VSHotelCrownWallGroundR", entry_cx + entry_w * 0.5, x_max, FACADE_FRONT_Z, 0.5, floor_h, mats.get_material("marble_wall"))
 	# Ground-floor tall windows in each flanking panel
-	_window_bay(world, "VSHotelCrownGroundWinL", (x_min + entry_cx - entry_w * 0.5) * 0.5, 1.7, FACADE_FRONT_Z - 0.01, 2.6, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
-	_window_bay(world, "VSHotelCrownGroundWinR", (entry_cx + entry_w * 0.5 + x_max) * 0.5, 1.7, FACADE_FRONT_Z - 0.01, 2.6, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+	_window_bay(world, "VSHotelCrownGroundWinL", (x_min + entry_cx - entry_w * 0.5) * 0.5, 1.8, FACADE_FRONT_Z - 0.01, 2.6, 2.2, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+	_window_bay(world, "VSHotelCrownGroundWinR", (entry_cx + entry_w * 0.5 + x_max) * 0.5, 1.8, FACADE_FRONT_Z - 0.01, 2.6, 2.2, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
 
 	# Entry recess (inside face is set back 0.8m into the facade)
 	var recess_z = FACADE_FRONT_Z + 0.8
@@ -278,7 +305,7 @@ static func _build_hotel_crown(world, mats) -> void:
 		var bay_count = 3
 		for b in range(bay_count):
 			var bx = x_min + (x_max - x_min) * (b + 1) / float(bay_count + 1)
-			_window_bay(world, "VSHotelCrownF%dWin%d" % [f, b], bx, cy, FACADE_FRONT_Z - 0.01, 1.6, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+			_window_bay(world, "VSHotelCrownF%dWin%d" % [f, b], bx, cy, FACADE_FRONT_Z - 0.01, 1.8, 2.0, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
 
 	# Roof parapet + cap
 	_cornice_band(world, "VSHotelCrownCornice", x_min - 0.2, x_max + 0.2, FACADE_FRONT_Z, total_h - 0.1, 0.35, 0.6, mats.get_material("dark_marble"))
@@ -308,6 +335,74 @@ static func _build_hotel_crown(world, mats) -> void:
 	down.shadow_enabled = false
 	world.add_child(down)
 	world.point_lights.append(down)
+	_build_hotel_crown_lobby(world, mats, x_min, x_max)
+
+# ------------------------------------------------------------------------
+# Hotel Crown lobby interior
+# ------------------------------------------------------------------------
+
+static func _build_hotel_crown_lobby(world, mats, x_min: float, x_max: float) -> void:
+	var cx = (x_min + x_max) * 0.5
+	var floor_h = 3.2
+
+	# Lobby floor — polished marble
+	_block(world, "VSHotelLobbyFloor", Vector3(cx, 0.03, 0.0), Vector3(x_max - x_min - 0.4, 0.06, INTERIOR_BACK_Z - FACADE_FRONT_Z - 0.2), mats.get_material("marble_floor"))
+
+	# Reception desk — centered, set back from the revolving door
+	_block(world, "VSHotelReceptionDesk", Vector3(cx, 0.55, 1.8), Vector3(4.0, 1.1, 0.8), mats.get_material("dark_marble"))
+	_mesh(world, "VSHotelReceptionTop", Vector3(cx, 1.12, 1.8), Vector3(4.2, 0.06, 0.9), mats.get_material("marble_floor"))
+	_mesh(world, "VSHotelReceptionFront", Vector3(cx, 0.55, 1.38), Vector3(4.0, 1.1, 0.08), mats.get_material("brushed_gold"))
+	_mesh(world, "VSHotelReceptionGoldLine", Vector3(cx, 1.07, 1.34), Vector3(4.2, 0.04, 0.04), mats.get_material("polished_gold"))
+
+	# Lobby chairs flanking the entry corridor
+	for i in range(2):
+		var side = 1 - i * 2
+		var chair_x = cx + side * 3.5
+		_block(world, "VSHotelLobbyChairSeat%d" % i, Vector3(chair_x, 0.25, -3.2), Vector3(0.8, 0.5, 0.8), mats.get_material("velvet_red"))
+		_mesh(world, "VSHotelLobbyChairBack%d" % i, Vector3(chair_x, 0.75, -2.85), Vector3(0.8, 0.6, 0.12), mats.get_material("velvet_red"))
+		_mesh(world, "VSHotelLobbyChairLegs%d" % i, Vector3(chair_x, 0.07, -3.2), Vector3(0.7, 0.14, 0.7), mats.get_material("polished_gold"))
+
+	# Lobby columns flanking the main axis
+	for i in range(2):
+		var side = 1 - i * 2
+		for row in range(2):
+			var col_x = cx + side * 4.0
+			var col_z = -2.0 + row * 4.0
+			_block(world, "VSHotelLobbyCol%d_%d" % [i, row], Vector3(col_x, floor_h * 0.5, col_z), Vector3(0.4, floor_h, 0.4), mats.get_material("marble_wall"))
+			_mesh(world, "VSHotelLobbyColCap%d_%d" % [i, row], Vector3(col_x, floor_h - 0.08, col_z), Vector3(0.55, 0.2, 0.55), mats.get_material("brushed_gold"))
+
+	# Feature wall behind reception — back-lit dark marble panel
+	_mesh(world, "VSHotelLobbyFeatureWall", Vector3(cx, floor_h * 0.5, INTERIOR_BACK_Z - 0.08), Vector3(x_max - x_min - 0.6, floor_h - 0.2, 0.1), mats.get_material("dark_marble"))
+	_mesh(world, "VSHotelLobbyFeatureGlow", Vector3(cx, floor_h * 0.5, INTERIOR_BACK_Z - 0.15), Vector3(x_max - x_min - 2.0, floor_h - 0.8, 0.04), mats.get_material("neon_amber"))
+
+	# Chandelier — central disc with drop arms and bulbs
+	_cylinder(world, "VSHotelChandelierDisc", Vector3(cx, floor_h - 0.18, 0.0), 0.35, 0.1, mats.get_material("polished_gold"))
+	for r in range(8):
+		var ang = r * PI * 2.0 / 8.0
+		var dx = cx + cos(ang) * 0.55
+		var dz = sin(ang) * 0.55
+		_cylinder(world, "VSHotelChandelierArm%d" % r, Vector3(dx, floor_h - 0.52, dz), 0.025, 0.42, mats.get_material("polished_gold"))
+		_cylinder(world, "VSHotelChandelierBulb%d" % r, Vector3(dx, floor_h - 0.78, dz), 0.05, 0.09, mats.get_material("lamp_bulb"))
+
+	var chan_light := OmniLight3D.new()
+	chan_light.name = "VSHotelChandelierLight"
+	chan_light.position = Vector3(cx, floor_h - 0.5, 0.0)
+	chan_light.light_color = Color("fff5d0")
+	chan_light.light_energy = 7.0
+	chan_light.omni_range = 14.0
+	chan_light.shadow_enabled = false
+	world.add_child(chan_light)
+	world.point_lights.append(chan_light)
+
+	var desk_light := OmniLight3D.new()
+	desk_light.name = "VSHotelDeskLight"
+	desk_light.position = Vector3(cx, 2.2, 1.8)
+	desk_light.light_color = Color("ffd39a")
+	desk_light.light_energy = 3.5
+	desk_light.omni_range = 7.0
+	desk_light.shadow_enabled = false
+	world.add_child(desk_light)
+	world.point_lights.append(desk_light)
 
 static func _build_crown_lounge(world, mats) -> void:
 	# The signature interior hub: a black + gold cocktail lounge.
@@ -366,7 +461,7 @@ static func _build_crown_lounge(world, mats) -> void:
 	# Upper floor: 2nd story windows
 	for b in range(4):
 		var bx = x_min + (x_max - x_min) * (b + 1) / 5.0
-		_window_bay(world, "VSCrownLoungeF2Win%d" % b, bx, floor_h + floor_h * 0.5, FACADE_FRONT_Z - 0.01, 1.1, 1.6, mats.get_material("polished_gold"), mats.get_material("tinted_glass"))
+		_window_bay(world, "VSCrownLoungeF2Win%d" % b, bx, floor_h + floor_h * 0.5, FACADE_FRONT_Z - 0.01, 1.4, 1.8, mats.get_material("polished_gold"), mats.get_material("tinted_glass"))
 
 	# Cornice + parapet
 	_cornice_band(world, "VSCrownLoungeCornice", x_min - 0.15, x_max + 0.15, FACADE_FRONT_Z, total_h - 0.15, 0.3, 0.5, mats.get_material("polished_gold"))
@@ -500,6 +595,52 @@ static func _build_crown_lounge_interior(world, mats, x_min, x_max, boh_cx) -> v
 		var rx = -0.6 + i * 1.2
 		_mesh(world, "VSStanchionRope%d" % i, Vector3(rx, 0.7, FACADE_FRONT_Z + 1.2), Vector3(1.2, 0.05, 0.05), mats.get_material("rope_velvet"))
 
+	# Cocktail tables in the center floor
+	for i in range(2):
+		var tcx = x_min + 4.0 + i * 2.2
+		var tcz = -1.5 + i * 2.5
+		_cylinder(world, "VSCocktailTablePost%d" % i, Vector3(tcx, 0.55, tcz), 0.04, 1.1, mats.get_material("polished_gold"))
+		_cylinder(world, "VSCocktailTableTop%d" % i, Vector3(tcx, 1.12, tcz), 0.4, 0.04, mats.get_material("dark_marble"))
+		for s in range(2):
+			var sx = tcx + (s * 2 - 1) * 0.62
+			_cylinder(world, "VSCocktailStoolPost%d_%d" % [i, s], Vector3(sx, 0.35, tcz), 0.03, 0.7, mats.get_material("chrome"))
+			_cylinder(world, "VSCocktailStoolSeat%d_%d" % [i, s], Vector3(sx, 0.72, tcz), 0.18, 0.06, mats.get_material("velvet_red"))
+
+	# DJ booth near the back wall
+	var dj_cx = (x_min + x_max) * 0.5 + 1.0
+	var dj_z = INTERIOR_BACK_Z - 1.2
+	_block(world, "VSDJBooth", Vector3(dj_cx, 0.7, dj_z), Vector3(3.0, 1.4, 0.9), mats.get_material("black_lacquer"))
+	_mesh(world, "VSDJBoothTop", Vector3(dj_cx, 1.42, dj_z), Vector3(3.2, 0.06, 1.0), mats.get_material("dark_marble"))
+	_mesh(world, "VSDJBoothFront", Vector3(dj_cx, 0.7, dj_z - 0.48), Vector3(3.0, 1.4, 0.06), mats.get_material("polished_gold"))
+	_mesh(world, "VSDJMixer", Vector3(dj_cx, 1.52, dj_z - 0.05), Vector3(1.0, 0.08, 0.6), mats.get_material("chrome"))
+	_cylinder(world, "VSDJTurntableL", Vector3(dj_cx - 0.9, 1.52, dj_z - 0.05), 0.22, 0.04, mats.get_material("signage_backing"))
+	_cylinder(world, "VSDJTurntableR", Vector3(dj_cx + 0.9, 1.52, dj_z - 0.05), 0.22, 0.04, mats.get_material("signage_backing"))
+	_mesh(world, "VSDJBoothNeon", Vector3(dj_cx, 0.1, dj_z - 0.52), Vector3(2.8, 0.06, 0.04), mats.get_material("neon_cyan"))
+	var dj_light := OmniLight3D.new()
+	dj_light.name = "VSDJBoothLight"
+	dj_light.position = Vector3(dj_cx, 1.8, dj_z)
+	dj_light.light_color = Color("80c8ff")
+	dj_light.light_energy = 3.5
+	dj_light.omni_range = 5.0
+	dj_light.shadow_enabled = false
+	world.add_child(dj_light)
+	world.point_lights.append(dj_light)
+
+	# Neon art panel on north interior wall (above DJ booth zone)
+	_mesh(world, "VSLoungeWallArtBack", Vector3(x_min + 4.0, 2.2, INTERIOR_BACK_Z - 0.08), Vector3(5.5, 1.8, 0.08), mats.get_material("signage_backing"))
+	_mesh(world, "VSLoungeWallArtNeonA", Vector3(x_min + 3.2, 2.5, INTERIOR_BACK_Z - 0.13), Vector3(2.0, 0.08, 0.04), mats.get_material("neon_pink"))
+	_mesh(world, "VSLoungeWallArtNeonB", Vector3(x_min + 4.8, 2.0, INTERIOR_BACK_Z - 0.13), Vector3(3.0, 0.08, 0.04), mats.get_material("neon_amber"))
+	_mesh(world, "VSLoungeWallArtNeonC", Vector3(x_min + 4.2, 2.9, INTERIOR_BACK_Z - 0.13), Vector3(1.4, 0.06, 0.04), mats.get_material("neon_cyan"))
+	var art_light := OmniLight3D.new()
+	art_light.name = "VSLoungeWallArtLight"
+	art_light.position = Vector3(x_min + 4.0, 2.2, INTERIOR_BACK_Z - 0.6)
+	art_light.light_color = Color("ff6080")
+	art_light.light_energy = 2.5
+	art_light.omni_range = 4.5
+	art_light.shadow_enabled = false
+	world.add_child(art_light)
+	world.point_lights.append(art_light)
+
 # ------------------------------------------------------------------------
 # Boutique Hotel B (4 stories, warm painted brick)
 # ------------------------------------------------------------------------
@@ -521,8 +662,8 @@ static func _build_boutique_hotel(world, mats) -> void:
 	_facade_wall(world, "VSBoutiqueGroundL", x_min, entry_cx - entry_w * 0.5, FACADE_FRONT_Z, 0.44, floor_h, mats.get_material("painted_brick_warm"))
 	_facade_wall(world, "VSBoutiqueGroundR", entry_cx + entry_w * 0.5, x_max, FACADE_FRONT_Z, 0.44, floor_h, mats.get_material("painted_brick_warm"))
 	# Ground bay windows
-	_window_bay(world, "VSBoutiqueGroundWinL", (x_min + entry_cx - entry_w * 0.5) * 0.5, 1.6, FACADE_FRONT_Z - 0.01, 1.8, 1.6, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
-	_window_bay(world, "VSBoutiqueGroundWinR", (entry_cx + entry_w * 0.5 + x_max) * 0.5, 1.6, FACADE_FRONT_Z - 0.01, 1.8, 1.6, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+	_window_bay(world, "VSBoutiqueGroundWinL", (x_min + entry_cx - entry_w * 0.5) * 0.5, 1.7, FACADE_FRONT_Z - 0.01, 2.0, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+	_window_bay(world, "VSBoutiqueGroundWinR", (entry_cx + entry_w * 0.5 + x_max) * 0.5, 1.7, FACADE_FRONT_Z - 0.01, 2.0, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
 	# Entry
 	_mesh(world, "VSBoutiqueEntryLintel", Vector3(entry_cx, entry_h + 0.2, FACADE_FRONT_Z - 0.05), Vector3(entry_w + 0.4, 0.4, 0.5), mats.get_material("dark_marble"))
 	_mesh(world, "VSBoutiqueDoor", Vector3(entry_cx, entry_h * 0.5, FACADE_FRONT_Z - 0.04), Vector3(entry_w - 0.2, entry_h, 0.08), mats.get_material("dark_wood"))
@@ -541,7 +682,7 @@ static func _build_boutique_hotel(world, mats) -> void:
 		# 2 windows per floor plus a balcony on alternating floors
 		for b in range(2):
 			var bx = x_min + (x_max - x_min) * (b + 1) / 3.0
-			_window_bay(world, "VSBoutiqueF%dWin%d" % [f, b], bx, cy, FACADE_FRONT_Z - 0.01, 1.4, 1.6, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
+			_window_bay(world, "VSBoutiqueF%dWin%d" % [f, b], bx, cy, FACADE_FRONT_Z - 0.01, 1.6, 1.8, mats.get_material("brushed_gold"), mats.get_material("tinted_glass"))
 		# Balcony railing on 2nd and 3rd floors
 		if f == 1 or f == 2:
 			_mesh(world, "VSBoutiqueBalconyF%d" % f, Vector3((x_min + x_max) * 0.5, floor_h * f + 0.15, FACADE_FRONT_Z - 0.3), Vector3(x_max - x_min - 0.6, 0.15, 0.6), mats.get_material("brushed_gold"))
@@ -566,6 +707,66 @@ static func _build_boutique_hotel(world, mats) -> void:
 	_mesh(world, "VSBoutiqueBackLintel", Vector3(rear_cx, 2.2, INTERIOR_BACK_Z), Vector3(rear_door_w + 0.3, 0.25, 0.4), mats.get_material("aged_concrete"))
 	_facade_wall(world, "VSBoutiqueBackUpper", rear_cx - rear_door_w * 0.5, rear_cx + rear_door_w * 0.5, INTERIOR_BACK_Z, 2.34, total_h, mats.get_material("painted_brick_cool"))
 	_mesh(world, "VSBoutiqueBackDoor", Vector3(rear_cx, 1.05, INTERIOR_BACK_Z - 0.15), Vector3(rear_door_w - 0.1, 2.1, 0.06), mats.get_material("chrome"))
+	_build_boutique_interior(world, mats, x_min, x_max)
+
+# ------------------------------------------------------------------------
+# Boutique Hotel interior
+# ------------------------------------------------------------------------
+
+static func _build_boutique_interior(world, mats, x_min: float, x_max: float) -> void:
+	var cx = (x_min + x_max) * 0.5
+	var floor_h = 3.2
+
+	# Interior floor — polished stone
+	_block(world, "VSBoutiqueIntFloor", Vector3(cx, 0.03, 0.0), Vector3(x_max - x_min - 0.4, 0.06, INTERIOR_BACK_Z - FACADE_FRONT_Z - 0.2), mats.get_material("marble_floor"))
+
+	# Central display island — glass-top pedestal
+	_block(world, "VSBoutiqueDisplayBase", Vector3(cx, 0.45, 0.0), Vector3(2.4, 0.9, 1.2), mats.get_material("dark_marble"))
+	_mesh(world, "VSBoutiqueDisplayGlass", Vector3(cx, 0.92, 0.0), Vector3(2.6, 0.06, 1.4), mats.get_material("tinted_glass"))
+	_mesh(world, "VSBoutiqueDisplayEdge", Vector3(cx, 0.935, 0.0), Vector3(2.66, 0.03, 1.46), mats.get_material("polished_gold"))
+
+	# Shelving unit on west wall
+	_mesh(world, "VSBoutiqueShelfUnit", Vector3(x_min + 0.32, 1.6, 0.5), Vector3(0.28, 3.0, 4.0), mats.get_material("dark_wood"))
+	for s in range(4):
+		_mesh(world, "VSBoutiqueShelf%d" % s, Vector3(x_min + 0.58, 0.8 + s * 0.7, 0.5), Vector3(0.36, 0.04, 3.8), mats.get_material("brushed_gold"))
+
+	# Garment rack on east wall
+	_mesh(world, "VSBoutiqueRackBar", Vector3(x_max - 1.5, 1.8, 1.0), Vector3(0.04, 0.04, 3.0), mats.get_material("chrome"))
+	_cylinder(world, "VSBoutiqueRackPostL", Vector3(x_max - 1.5, 1.0, -0.4), 0.03, 2.0, mats.get_material("chrome"))
+	_cylinder(world, "VSBoutiqueRackPostR", Vector3(x_max - 1.5, 1.0, 2.4), 0.03, 2.0, mats.get_material("chrome"))
+	for g in range(5):
+		var gmat = "velvet_red" if g % 2 == 0 else "black_lacquer"
+		_mesh(world, "VSBoutiqueGarment%d" % g, Vector3(x_max - 1.38, 1.42, -0.1 + g * 0.55), Vector3(0.32, 0.7, 0.08), mats.get_material(gmat))
+
+	# Checkout counter near the entry
+	_block(world, "VSBoutiqueCounter", Vector3(cx + 1.2, 0.5, -3.8), Vector3(2.0, 1.0, 0.7), mats.get_material("dark_wood"))
+	_mesh(world, "VSBoutiqueCounterTop", Vector3(cx + 1.2, 1.04, -3.8), Vector3(2.2, 0.04, 0.8), mats.get_material("dark_marble"))
+
+	# Track lighting
+	for t in range(4):
+		var tx = x_min + 0.9 + t * (x_max - x_min - 1.0) / 4.0
+		var track := SpotLight3D.new()
+		track.name = "VSBoutiqueTrack%d" % t
+		track.position = Vector3(tx, floor_h - 0.1, 0.5)
+		track.rotation_degrees = Vector3(-80.0, 0.0, 0.0)
+		track.light_color = Color("fff8e8")
+		track.light_energy = 4.5
+		track.spot_range = 6.0
+		track.spot_angle = 28.0
+		track.spot_angle_attenuation = 0.5
+		track.shadow_enabled = false
+		world.add_child(track)
+		world.point_lights.append(track)
+
+	var fill := OmniLight3D.new()
+	fill.name = "VSBoutiqueFill"
+	fill.position = Vector3(cx, 2.5, 0.5)
+	fill.light_color = Color("ffe8d0")
+	fill.light_energy = 2.5
+	fill.omni_range = 10.0
+	fill.shadow_enabled = false
+	world.add_child(fill)
+	world.point_lights.append(fill)
 
 # ------------------------------------------------------------------------
 # Neon bank (far east): sign towers, no interior.

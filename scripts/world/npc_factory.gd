@@ -150,15 +150,15 @@ static func spawn_npc(world, name_text, role, key, phase_tag, start_pos, patrol,
 	if role == "contact":
 		npc.rotation_degrees = Vector3(0.0, 190.0, 0.0)
 	elif role == "guard":
-		npc.detect_radius = 5.5
+		npc.detect_radius = 9.9  # 5.5 * 1.8
 		npc.detect_fov = 56.0
 		npc.detect_rate = 22.0
 	elif role == "witness":
-		npc.detect_radius = 4.8
+		npc.detect_radius = 8.64  # 4.8 * 1.8
 		npc.detect_fov = 62.0
 		npc.detect_rate = 15.0
 	elif role == "target":
-		npc.detect_radius = 3.9
+		npc.detect_radius = 7.02  # 3.9 * 1.8
 		npc.detect_fov = 52.0
 		npc.detect_rate = 10.0
 	elif role == "civilian":
