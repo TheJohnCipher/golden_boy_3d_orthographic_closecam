@@ -1,6 +1,6 @@
-# Golden Boy 2D City Blockout
+# Golden Boy 2D City Prototype
 
-Complete playable stealth blockout prototype.
+Complete playable 2D oblique stealth prototype.
 
 ## Quick Start
 1. Download Godot 4.6+ from godotengine.org (Engine/Windows/x86_64).

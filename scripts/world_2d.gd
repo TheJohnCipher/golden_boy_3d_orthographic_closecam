@@ -6,7 +6,7 @@ const MissionManager = preload("res://scripts/mission_manager.gd")
 
 const HUD_SCENE = preload("res://scenes/hud_2d.tscn")
 
-# ── Mission state (same contract as world_3d) ─────────────────────────────────
+# ── Mission state ─────────────────────────────────────────────────────────────
 var contact_npcs       : Array = []
 var guard_npcs         : Array = []
 var civilian_npcs      : Array = []
@@ -173,7 +173,7 @@ func _on_difficulty_spiked() -> void:
 func _init_input_map() -> void:
 	var map = {
 		"move_left": KEY_A, "move_right": KEY_D, "move_forward": KEY_W, "move_back": KEY_S,
-		"interact": KEY_E, "phase_switch": KEY_TAB, "restart_level": KEY_R,
+		"interact": KEY_E, "phase_switch": KEY_TAB, "sprint": KEY_SHIFT, "restart_level": KEY_R,
 		"toggle_fullscreen": KEY_F11, "pause": KEY_P, "toggle_mouse_capture": KEY_ESCAPE
 	}
 	for act in map:

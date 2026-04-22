@@ -27,25 +27,28 @@ The 2D map is organized as a series of connected halls and wings:
 
 ## Master layout
 
-```text
-                                 NORTH / ALLEY (Y: ~20)
-+------------------------------------------------------------------------------------------------+
-| NORTH BOUNDARY WALL                                                                            |
-|                                                                                                |
-|  ALLEY (R_ALLEY)            (Extraction Zone)                                                  |
-|                                                                                                |
-|      [ BACK HALL (R_BACK_HALL) ]                                                               |
-|                                                                                                |
-|  +----------+               +----------------------+                +----------+               |
-|  | WEST WING| <-----------> |  MAIN HALL (Gallery) | <------------> | EAST WING|               |
-|  | (Lounge) |               |  (R_MAIN_HALL)       |                | (Lounge) |               |
-|  +----------+               +----------  ----------+                +----------+               |
-|                                                                                                |
-|                              [ FOYER (R_FOYER) ]                                               |
-|                                                                                                |
-|                              [ PLAZA (R_PLAZA) ]                                               |
-|                               Player Day Start                                                 |
-+------------------------------------------------------------------------------------------------+
+```text                                          
+                                  [0,0] (NORTH)
+                                    |
+       +----------------------------+----------------------------+
+  Y20  |                  ALLEY (Extraction)                     | [R_ALLEY]
+       +----------------------------+----------------------------+
+  Y85  |                  BACK HALL (Service)                    | [R_BACK_HALL]
+       +----------+-----------------+----------------------------+
+  Y150 | WEST     |                 |                      EAST  |
+       | WING     |    MAIN HALL    |                      WING  |
+       | (Lounge) |    (Gallery)    |                      (Hotel)|
+  Y350 |          |                 |                            |
+       +----------+------|   |------+----------------------------+
+  Y370                   |   |
+                         |   | [FOYER]
+  Y460             +-----|   |-----+
+                   |               |
+                   |     PLAZA     | [R_PLAZA]
+  Y600             | (Day Start)   |
+                   +---------------+
+                                    |
+                                  [SOUTH]
 ```
 
 ## Walkable slabs

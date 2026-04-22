@@ -2,6 +2,25 @@
 
 This project is a 2D procedural stealth prototype where the world is drawn using Godot's 2D engine with an oblique projection.
 
+## System Overview
+
+```mermaid
+graph TD
+    subgraph Scene_Root [Main Scene]
+        World[world_2d.gd: Orchestrator]
+        Level[level_base.gd: Tool-based Geometry]
+        Mission[mission_manager.gd: State & Rules]
+        HUD[hud_2d.gd: Reactive UI]
+    end
+
+    World --> Level
+    World --> Mission
+    Mission -. "Signals: state_changed" .-> HUD
+    
+    Player[player_2d.gd] <--> Mission
+    NPC[npc_2d.gd] -- "Signals: suspicion_detected" --> Mission
+```
+
 ## Project Layout
 
 - `scenes/`
