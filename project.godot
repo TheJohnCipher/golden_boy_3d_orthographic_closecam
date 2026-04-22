@@ -17,10 +17,10 @@ config/icon="res://art/icon.svg"
 
 [display]
 
+window/size/viewport_width=480
+window/size/viewport_height=270
 window/size/mode=3
-window/size/viewport_width=640
-window/size/viewport_height=360
-window/stretch/mode="disabled"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 
 [preset.0]
@@ -35,9 +35,6 @@ include_filter="art/*,scenes/*,scripts/*,shaders/*,project.godot"
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
 "#StableforVSCode[debug]file_logging/enable_file_logging"=true
 file_logging/max_log_files=50
-
-[shaders]
-
-shader_1="res://shaders/window.gdshader"

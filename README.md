@@ -1,6 +1,6 @@
-# Golden Boy 3D City Blockout
+# Golden Boy 2D City Blockout
 
-Complete playable stealth blockout! BLACKBOXAI finished: Tested structure, added win screen, full loop works.
+Complete playable stealth blockout prototype.
 
 ## Quick Start
 1. Download Godot 4.6+ from godotengine.org (Engine/Windows/x86_64).
@@ -9,7 +9,7 @@ Complete playable stealth blockout! BLACKBOXAI finished: Tested structure, added
 
 ## Controls
 - WASD: Move (camera-relative)
-- Mouse: Look
+- Mouse: Aim / Look direction
 - E: Interact/takedown/extract
 - Tab: Day->Night (after 3 contacts)
 - R: Restart
@@ -22,23 +22,8 @@ Complete playable stealth blockout! BLACKBOXAI finished: Tested structure, added
 
 **Win**: Victory screen!
 
-## Files
-See `docs/architecture.md`.
+## Core Scripts
+- `scripts/world_2d.gd` (world orchestration)
+- `scripts/player_2d.gd` / `scripts/npc_2d.gd` (characters)
 
-Active gameplay scripts:
-- `scripts/world_3d.gd` (world orchestration)
-- `scripts/player_3d.gd` / `scripts/npc_3d.gd` (characters)
-- `scripts/world/player_factory.gd` / `scripts/world/npc_factory.gd` (runtime construction)
-- `scripts/world/mission_controller.gd` (mission flow)
-- `scripts/world/hud_controller.gd` (HUD)
-- `scripts/world/layout_data.gd` (spawn and zone data)
-
-Note: compatibility wrappers exist at:
-`scripts/world/world_3d.gd`, `scripts/world/player_3d.gd`, `scripts/world/npc_3d.gd`,
-`scripts/input_actions.gd`, and `scripts/velvet_strip_builder.gd`.
-Edit the active targets in `scripts/` and `scripts/world/`.
-
-Maintenance check:
-- `powershell -ExecutionPolicy Bypass -File tools/validate_wrappers.ps1`
-
-Prototype ready for art/levels polish.
+All core logic and data are now consolidated within `scripts/world_2d.gd`.

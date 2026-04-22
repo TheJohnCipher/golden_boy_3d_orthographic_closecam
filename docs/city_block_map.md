@@ -1,70 +1,50 @@
 # City Block Map
 
-This document matches the current procedural level in `scripts/world_3d.gd`.
+This document matches the 2D procedural layout defined in `scripts/world/layout_data.gd`.
 
 Use it for three things:
-- checking the actual block proportions before moving geometry
-- seeing which openings are intentional and which surfaces should be fully sealed
-- keeping the day and night routes aligned with the rebuilt city frontage
+- Checking room boundaries (`Rect2`) for collision or shadow logic.
+- Aligning NPC patrol paths with the 2D drawing logic.
+- Identifying "Safe" vs "Danger" zones in the 2D oblique projection.
 
 ## Axis reference
 
-- `X-` = west / left side of the block
-- `X+` = east / right side of the block
-- `Z-` = south / avenue side
-- `Z+` = north / service side
+- `X` = horizontal (0 is left, 640 is right)
+- `Y` = vertical (Small values are North/Top, Large values are South/Bottom)
 
-The level starts on the **south avenue** and pushes deeper into the block as `Z` increases.
+The level is drawn in an **Oblique Projection** with a `Y` scale of `0.65`.
 
 ## Design intent
 
-The city is now built as a stepped frontage instead of a row of unrelated boxes:
+The 2D map is organized as a series of connected halls and wings:
 
-- **Cafe** on the west side is a low public arcade with a smaller upper mass.
-- **Gallery** is the civic centerpiece with the cleanest forecourt, taller upper mass, and the clearest front door.
-- **Hotel** is the luxury anchor with the deepest frontage, strongest canopy, and the tallest upper mass.
-- **Office annex** is a tighter rear connector, not a full second hero building.
-- **Service yard + safehouse** form the back-of-house escape route.
-
-The play space remains one compact stealth block, but the visible massing now sells a more professional city scale:
-
-- roof slabs are capped with parapets
-- major openings have lintels
-- upper masses step back from the playable shell
-- the skyline reads as layered frontage instead of flat boxes
+- **Alley**: The northernmost service route and extraction point.
+- **Back Hall**: A transition zone between the alley and the main venue.
+- **West Wing / East Wing**: Side lounges (Cafe and Hotel-style wings).
+- **Main Hall**: The central gameplay hub (Gallery/Ballroom).
+- **Foyer**: The formal entry point.
+- **Plaza**: The public southern start area.
 
 ## Master layout
 
 ```text
-                                 NORTH / SERVICE EDGE (+Z)
+                                 NORTH / ALLEY (Y: ~20)
 +------------------------------------------------------------------------------------------------+
-| NORTH BOUNDARY / BACKDROP TOWERS                                                               |
+| NORTH BOUNDARY WALL                                                                            |
 |                                                                                                |
-|  WEST ALLEY                 GALLERY REAR        HOTEL / OFFICE REAR          SAFEHOUSE        |
-|  subway stairs              bench, plinths      office bridge, dock, yard     green door      |
-|  Nico intel                 Alden crosses here  Guard Two patrol               extraction      |
+|  ALLEY (R_ALLEY)            (Extraction Zone)                                                  |
 |                                                                                                |
-|  x -32..-22                 x -6..8             x 12..34                      x 29..36        |
+|      [ BACK HALL (R_BACK_HALL) ]                                                               |
 |                                                                                                |
-|  +----------+               +--------------+    +------------+------+          +------+       |
-|  |          |               |              |    |            |      |          |      |       |
-|  |  ALLEY   |               |   GALLERY    |----|   HOTEL    |OFFICE|----------| SAFE |       |
-|  |          |               |              |    |            |      |          |HOUSE |       |
-|  +----  ----+               +------  ------+    +------  -----+------+          +--  --+       |
-|       alley door                   main door            main door                  west door     |
+|  +----------+               +----------------------+                +----------+               |
+|  | WEST WING| <-----------> |  MAIN HALL (Gallery) | <------------> | EAST WING|               |
+|  | (Lounge) |               |  (R_MAIN_HALL)       |                | (Lounge) |               |
+|  +----------+               +----------  ----------+                +----------+               |
 |                                                                                                |
-|----------------------------- FORECOURT / CIVIC PLAZA / HOTEL DROP-OFF ------------------------|
+|                              [ FOYER (R_FOYER) ]                                               |
 |                                                                                                |
-|   cafe arcade tables          sculpture court          gallery queue           valet runner     |
-|   Mara contact                day crossing             Jules contact           night approach    |
-|                                                                                                |
-|  +------------+               +--------------+         +------------+                          |
-|  |    CAFE    |               |   GALLERY    |         |   HOTEL    |                          |
-|  |            |               |              |         |            |                          |
-|  +-----  -----+               +------  ------+         +-----  -----+                          |
-|                                                                                                |
-|--------------------------- SOUTH AVENUE / CROSSWALK / STREET MEDIANS -------------------------|
-|  bus shelter + newsstand        player start west           medians + taxis + lamp posts       |
+|                              [ PLAZA (R_PLAZA) ]                                               |
+|                               Player Day Start                                                 |
 +------------------------------------------------------------------------------------------------+
 ```
 
