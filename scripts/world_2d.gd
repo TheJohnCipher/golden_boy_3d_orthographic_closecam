@@ -66,12 +66,20 @@ func _ready() -> void:
 # ── Window ────────────────────────────────────────────────────────────────────
 func _configure_window() -> void:
 	var win := get_viewport().get_window()
+	# Viewport mode keeps pixels sharp; EXPAND fills non-standard aspect ratios
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
 	win.content_scale_size = Vector2i(480, 270)
+	
 	var scr := DisplayServer.window_get_current_screen()
-	win.size     = DisplayServer.screen_get_size(scr)
+	# Set window position and size to match the display before entering fullscreen
 	win.position = DisplayServer.screen_get_position(scr)
-	win.mode     = Window.MODE_FULLSCREEN
+	win.size = DisplayServer.screen_get_size(scr)
+
+	if OS.get_name() != "Web":
+		win.mode = Window.MODE_FULLSCREEN
+	else:
+		win.mode = Window.MODE_WINDOWED
 
 # ── Roots & lights ────────────────────────────────────────────────────────────
 func _init_roots() -> void:
@@ -233,7 +241,8 @@ func _spawn_player_node() -> void:
 	var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 	sh.radius = 6.0; cs.shape = sh; player.add_child(cs)
 	player.position = Vector2(320.0, 530.0); add_child(player)
-	_camera.reparent(player); _camera.position = Vector2.ZERO
+	_camera.get_parent().remove_child(_camera)
+	player.add_child(_camera); _camera.position = Vector2.ZERO
 
 func _spawn_npc_nodes() -> void:
 	for s in GameConstants.NPC_SPAWNS:

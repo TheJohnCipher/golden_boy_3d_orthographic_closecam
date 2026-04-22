@@ -1,73 +1,115 @@
-[gd_scene format=3 uid="uid://d63g2jbj6gui"]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" uid="uid://kct4s53e3rr8" path="res://scripts/hud_2d.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/hud_2d.gd" id="1_script"]
 
-[node name="HUD" type="CanvasLayer" unique_id=1397866492]
+[node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_script")
 
-[node name="Title" type="Label" parent="." unique_id=62409005]
-offset_left = 150.0
+[node name="Title" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -90.0
 offset_top = 6.0
-offset_right = 330.0
+offset_right = 90.0
 offset_bottom = 29.0
+grow_horizontal = 2
 theme_override_font_sizes/font_size = 16
 text = "GOLDEN BOY"
+horizontal_alignment = 1
 
-[node name="Objective" type="Label" parent="." unique_id=1738685568]
+[node name="Objective" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 6.0
-offset_top = 256.0
+offset_top = -24.0
 offset_right = 400.0
-offset_bottom = 279.0
+offset_bottom = -1.0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 7
+vertical_alignment = 2
 
-[node name="Money" type="Label" parent="." unique_id=242875732]
+[node name="Money" type="Label" parent="."]
 offset_left = 6.0
 offset_top = 8.0
 offset_right = 100.0
-offset_bottom = 31.0
+offset_bottom = 20.0
 theme_override_font_sizes/font_size = 7
 
-[node name="Message" type="Label" parent="." unique_id=1525649246]
-offset_left = 70.0
-offset_top = 128.0
-offset_right = 400.0
-offset_bottom = 151.0
+[node name="Message" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -165.0
+offset_top = 60.0
+offset_right = 165.0
+offset_bottom = 83.0
+grow_horizontal = 2
 theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="SuspicionText" type="Label" parent="." unique_id=1952057844]
-offset_left = 330.0
-offset_top = 248.0
-offset_right = 470.0
-offset_bottom = 271.0
+[node name="SuspicionText" type="Label" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -32.0
+offset_right = -10.0
+offset_bottom = -9.0
+grow_horizontal = 0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 7
+horizontal_alignment = 2
 
-[node name="PhaseHint" type="Label" parent="." unique_id=1868557580]
+[node name="PhaseHint" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 6.0
-offset_top = 264.0
+offset_top = -14.0
 offset_right = 150.0
-offset_bottom = 287.0
+offset_bottom = -3.0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 6
 
-[node name="SuspicionBar" type="ColorRect" parent="." unique_id=975896334]
-offset_left = 330.0
-offset_top = 252.0
-offset_right = 470.0
-offset_bottom = 258.0
+[node name="SuspicionBar" type="ColorRect" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -18.0
+offset_right = -10.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
 color = Color(0.14, 0.07, 0.07, 1)
 
-[node name="Fill" type="ColorRect" parent="SuspicionBar" unique_id=505590434]
+[node name="Fill" type="ColorRect" parent="SuspicionBar"]
 layout_mode = 0
 offset_right = 140.0
 offset_bottom = 6.0
 
-[node name="PromptPanel" type="Control" parent="." unique_id=1113401971]
-layout_mode = 3
+[node name="PromptPanel" type="Control" parent="."]
 anchors_preset = 0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_top = -35.0
+offset_bottom = -35.0
+grow_horizontal = 2
+grow_vertical = 0
 
-[node name="Prompt" type="Label" parent="PromptPanel" unique_id=2093930988]
+[node name="Prompt" type="Label" parent="PromptPanel"]
 layout_mode = 0
-offset_left = 150.0
-offset_top = 220.0
-offset_right = 330.0
-offset_bottom = 243.0
+offset_left = -90.0
+offset_right = 90.0
+offset_bottom = 23.0
 theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
