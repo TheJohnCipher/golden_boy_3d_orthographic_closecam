@@ -207,6 +207,20 @@ func _setup_environment_layers() -> void:
 	_night_tint = ColorRect.new(); _night_tint.size = Vector2(1000, 1000)
 	_night_tint.position = Vector2(-500, -500); _night_tint.color = Color(0,0,0,0)
 	tint_layer.add_child(_night_tint)
+	
+	# Cinematic Vignette
+	var vignette_layer = CanvasLayer.new(); vignette_layer.layer = 10; add_child(vignette_layer)
+	var vignette = TextureRect.new()
+	vignette.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v_tex = GradientTexture2D.new()
+	v_tex.fill = GradientTexture2D.FILL_RADIAL
+	v_tex.fill_from = Vector2(0.5, 0.5)
+	v_tex.gradient = Gradient.new()
+	v_tex.gradient.set_color(0, Color(0, 0, 0, 0))
+	v_tex.gradient.set_color(1, Color(0, 0, 0, 0.4))
+	vignette.texture = v_tex
+	vignette_layer.add_child(vignette)
 
 func _spawn_player_node() -> void:
 	player = GameConstants.PLAYER_SCRIPT.new(); player.world_ref = self

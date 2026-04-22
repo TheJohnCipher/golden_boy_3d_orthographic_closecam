@@ -52,10 +52,14 @@ func _generate_geometry() -> void:
 	for data in rooms:
 		_create_room_nodes(data[0], data[1], data[2])
 	
-	# --- ARCHITECTURAL HEADERS (Lintels) ---
-	# These connect room tops over openings to create "doorways"
-	_create_lintel("FoyerEntrance", Rect2(260, 370, 120, 10))
-	_create_lintel("MainHallEntrance", Rect2(200, 150, 240, 10))
+	# --- ADVANCED ARCHITECTURE (Archways & Entrances) ---
+	_create_archway("FoyerEntrance", Vector2(260, 370), 120.0)
+	_create_archway("MainHallEntrance", Vector2(200, 150), 240.0)
+
+	# --- GALLERY ART (Main Hall Decor) ---
+	_create_painting("Art_1", Vector2(150, 150), Vector2(30, 20), Color("#7b1fa2"))
+	_create_painting("Art_2", Vector2(300, 150), Vector2(40, 25), Color("#1b5e20"))
+	_create_painting("Art_3", Vector2(450, 150), Vector2(25, 30), Color("#b71c1c"))
 
 	# --- MAP DESIGN REFINEMENT: INTERIOR & COVER ---
 	
@@ -139,8 +143,9 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	add_child(poly)
 	if Engine.is_editor_hint(): poly.owner = self
 	
-	# --- MATERIAL SPECIFIC FLOORING ---
+	# --- FLOORING & AMBIENT OCCLUSION ---
 	_add_room_flooring(n_name, rect, color)
+	_add_surface_texture(n_name + "FloorTex", rect, color.darkened(0.05), 40)
 	
 	# Wall Shadow (Ambient Occlusion on the floor where it hits the wall)
 	var shadow = Polygon2D.new()
@@ -161,20 +166,43 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 		Vector2(rect.position.x, rect.end.y), Vector2(rect.end.x, rect.end.y),
 		Vector2(rect.end.x, rect.end.y + h), Vector2(rect.position.x, rect.end.y + h)
 	])
-	face.color = GameConstants.C_WALL_FACE
+	
+	# --- VERTICAL GRADIENT (Lighter at top, darker at bottom) ---
+	face.vertex_colors = PackedColorArray([
+		GameConstants.C_WALL_FACE.lightened(0.05),
+		GameConstants.C_WALL_FACE.lightened(0.05),
+		GameConstants.C_WALL_FACE.darkened(0.08),
+		GameConstants.C_WALL_FACE.darkened(0.08)
+	])
 	add_child(face)
 	if Engine.is_editor_hint(): face.owner = self
+
+	# Wall Grit/Texture
+	var wall_rect = Rect2(rect.position.x, rect.end.y, rect.size.x, h)
+	_add_surface_texture(n_name + "WallGrit", wall_rect, GameConstants.C_WALL_FACE.darkened(0.15), 30)
+
+	# Wall Pilasters (Structural vertical beams)
+	for x in range(int(rect.position.x) + 60, int(rect.end.x), 120):
+		_create_pilaster(n_name + "Pilaster_" + str(x), Vector2(x, rect.end.y), h)
+
+	# --- CORNER OCCLUSION (Subtle vertical shadows at room edges) ---
+	_create_detail_rect(n_name + "L_AO", Rect2(rect.position.x, rect.end.y, 6, h), Color(0, 0, 0, 0.12))
+	_create_detail_rect(n_name + "R_AO", Rect2(rect.end.x - 6, rect.end.y, 6, h), Color(0, 0, 0, 0.12))
 	
-	# --- NORTH WINDOW LIGHT SHAFTS ---
-	if n_name != "Alley" and n_name != "Plaza":
-		for i in range(2):
-			var wx = rect.position.x + (rect.size.x * (0.3 + i * 0.4))
-			var w_rect = Rect2(wx - 20, rect.position.y, 40, rect.size.y * 0.4)
-			var shaft = Polygon2D.new()
-			shaft.polygon = PackedVector2Array([w_rect.position, Vector2(w_rect.end.x, w_rect.position.y), Vector2(w_rect.end.x + 20, w_rect.end.y), Vector2(w_rect.position.x - 20, w_rect.end.y)])
-			shaft.color = Color(1, 1, 1, 0.03) # Very subtle dust/light
-			add_child(shaft)
-			if Engine.is_editor_hint(): shaft.owner = self
+	# Crown Molding (The ornate trim at the top of the wall face)
+	var molding = Line2D.new()
+	molding.name = n_name + "CrownMolding"
+	molding.points = PackedVector2Array([
+		rect.position, 
+		Vector2(rect.end.x, rect.position.y)
+	])
+	molding.width = 2.0
+	molding.default_color = GameConstants.C_WALL_FACE.lightened(0.08)
+	add_child(molding)
+	if Engine.is_editor_hint(): molding.owner = self
+
+	# --- ARCHITECTURAL ORNAMENTATION ---
+	_add_wall_decor(n_name, rect, h)
 	
 	# Wall Top (The thickness/rim of the wall)
 	var top = Polygon2D.new()
@@ -273,36 +301,13 @@ func _create_visual_rect(v_name: String, rect: Rect2, color: Color, add_face: bo
 		if Engine.is_editor_hint(): bevel.owner = self
 
 func _create_neon_strip(l_name: String, from: Vector2, to: Vector2, color: Color) -> void:
-	var container = Node2D.new()
-	container.name = l_name
-	add_child(container)
-	if Engine.is_editor_hint(): container.owner = self
-
 	var line = Line2D.new()
+	line.name = l_name
 	line.points = PackedVector2Array([from, to])
-	line.width = 2.0
+	line.width = 1.5
 	line.default_color = color
-	container.add_child(line)
+	add_child(line)
 	if Engine.is_editor_hint(): line.owner = self
-
-	# Add a glow/light effect using a PointLight2D
-	var light = PointLight2D.new()
-	light.color = color
-	light.energy = 0.8
-	light.blend_mode = Light2D.BLEND_MODE_ADD
-	light.position = (from + to) / 2.0
-	
-	# Create a procedural glow texture
-	var tex = GradientTexture2D.new()
-	tex.fill = GradientTexture2D.FILL_RADIAL
-	tex.fill_from = Vector2(0.5, 0.5)
-	tex.gradient = Gradient.new()
-	tex.gradient.set_color(0, Color(1, 1, 1, 1))
-	tex.gradient.set_color(1, Color(1, 1, 1, 0))
-	light.texture = tex
-	light.texture_scale = (from.distance_to(to) / 64.0)
-	container.add_child(light)
-	if Engine.is_editor_hint(): light.owner = self
 
 func _create_visual_circle(v_name: String, pos: Vector2, radius: float, color: Color) -> void:
 	var poly = Polygon2D.new()
@@ -352,19 +357,100 @@ func _create_pillar_face(f_name: String, pos: Vector2, radius: float) -> void:
 
 # --- ARCHITECTURAL HELPERS ---
 
-func _create_lintel(l_name: String, rect: Rect2) -> void:
-	var h = GameConstants.WALL_FACE_H * 0.4 # Lintel is shorter than full wall
-	var poly = Polygon2D.new()
-	poly.name = l_name + "_Face"
-	poly.polygon = PackedVector2Array([
-		rect.position, Vector2(rect.end.x, rect.position.y),
-		Vector2(rect.end.x, rect.position.y + h), Vector2(rect.position.x, rect.position.y + h)
+func _add_wall_decor(n_name: String, rect: Rect2, h: float) -> void:
+	# Rooms that get interior paneling/wainscoting
+	var is_interior = n_name.contains("MainHall") or n_name.contains("EastWing") or n_name.contains("WestWing") or n_name.contains("Foyer")
+	
+	if is_interior:
+		# Wainscoting (Lower wall paneling)
+		var w_h = h * 0.45
+		var wainscot = Polygon2D.new()
+		wainscot.name = n_name + "Wainscot"
+		wainscot.polygon = PackedVector2Array([
+			Vector2(rect.position.x, rect.end.y + h - w_h), Vector2(rect.end.x, rect.end.y + h - w_h),
+			Vector2(rect.end.x, rect.end.y + h), Vector2(rect.position.x, rect.end.y + h)
+		])
+		wainscot.color = GameConstants.C_WALL_FACE.darkened(0.12)
+		add_child(wainscot)
+		if Engine.is_editor_hint(): wainscot.owner = self
+		
+		# Sub-panels inside Wainscoting
+		var p_w = 32.0
+		for x in range(int(rect.position.x) + 12, int(rect.end.x) - 12, int(p_w + 8)):
+			var p_rect = Rect2(x, rect.end.y + h - w_h + 6, p_w, w_h - 12)
+			var panel = Polygon2D.new()
+			panel.polygon = _get_chamfered_rect_pts(p_rect, 2.0)
+			panel.color = GameConstants.C_WALL_FACE.darkened(0.18)
+			add_child(panel)
+			if Engine.is_editor_hint(): panel.owner = self
+		
+		# Chair Rail (The trim line at the top of the wainscot)
+		_create_detail_line(n_name + "ChairRail", Vector2(rect.position.x, rect.end.y + h - w_h), Vector2(rect.end.x, rect.end.y + h - w_h), GameConstants.C_WALL_FACE.lightened(0.05), 1.5)
+
+func _create_archway(l_name: String, pos: Vector2, width: float) -> void:
+	var h = GameConstants.WALL_FACE_H * 0.5
+	var bracket_w = 12.0
+	
+	# Left Bracket
+	_create_visual_rect(l_name + "L", Rect2(pos.x, pos.y, bracket_w, h), GameConstants.C_WALL_FACE, false)
+	# Right Bracket
+	_create_visual_rect(l_name + "R", Rect2(pos.x + width - bracket_w, pos.y, bracket_w, h), GameConstants.C_WALL_FACE, false)
+	# Lintel Beam
+	_create_visual_rect(l_name + "Beam", Rect2(pos.x, pos.y, width, 6), GameConstants.C_WALL_FACE.lightened(0.05), false)
+
+func _create_pilaster(p_name: String, pos: Vector2, height: float) -> void:
+	var w = 8.0
+	var face = Polygon2D.new()
+	face.name = p_name
+	face.polygon = PackedVector2Array([
+		pos + Vector2(-w/2, 0), pos + Vector2(w/2, 0),
+		pos + Vector2(w/2, height), pos + Vector2(-w/2, height)
 	])
-	poly.color = GameConstants.C_WALL_FACE.darkened(0.05)
-	add_child(poly)
-	if Engine.is_editor_hint(): poly.owner = self
+	face.color = GameConstants.C_WALL_FACE.lightened(0.03)
+	add_child(face)
+	if Engine.is_editor_hint(): face.owner = self
+	
+	# Side highlights for the pilaster depth
+	_create_detail_line(p_name + "_L", pos + Vector2(-w/2, 0), pos + Vector2(-w/2, height), GameConstants.C_WALL_FACE.lightened(0.1))
+	_create_detail_line(p_name + "_R", pos + Vector2(w/2, 0), pos + Vector2(w/2, height), GameConstants.C_WALL_FACE.darkened(0.1))
+
+func _create_painting(p_name: String, pos: Vector2, size: Vector2, art_color: Color) -> void:
+	# Frame
+	var frame = Polygon2D.new()
+	frame.name = p_name + "_Frame"
+	var f_rect = Rect2(pos.x, pos.y, size.x, size.y)
+	frame.polygon = _get_chamfered_rect_pts(f_rect, 2.0)
+	frame.color = Color("#3e2723") # Dark wood
+	add_child(frame)
+	if Engine.is_editor_hint(): frame.owner = self
+	
+	# Canvas
+	var canvas = Polygon2D.new()
+	canvas.name = p_name + "_Canvas"
+	var c_rect = Rect2(pos.x + 2, pos.y + 2, size.x - 4, size.y - 4)
+	canvas.polygon = _get_chamfered_rect_pts(c_rect, 1.0)
+	canvas.color = art_color
+	add_child(canvas)
+	if Engine.is_editor_hint(): canvas.owner = self
+	
+	# Subtle spotlight hit
+	var shine = Polygon2D.new()
+	shine.polygon = PackedVector2Array([
+		Vector2(pos.x + 2, pos.y + 2), Vector2(pos.x + size.x - 4, pos.y + 2),
+		Vector2(pos.x + 2, pos.y + size.y - 4)
+	])
+	shine.color = Color(1, 1, 1, 0.1)
+	add_child(shine)
+	if Engine.is_editor_hint(): shine.owner = self
 
 # --- NEW HELPER FUNCTIONS FOR SHAPE & TEXTURE ---
+
+func _add_surface_texture(t_name: String, rect: Rect2, color: Color, count: int) -> void:
+	var parent = Node2D.new(); parent.name = t_name; add_child(parent)
+	if Engine.is_editor_hint(): parent.owner = self
+	for i in range(count):
+		var p = rect.position + Vector2(randf() * rect.size.x, randf() * rect.size.y)
+		_create_tiny_dot_parented(parent, t_name + "_" + str(i), p, color)
 
 func _add_room_flooring(n_name: String, rect: Rect2, color: Color) -> void:
 	var detail_color = color.darkened(0.15)
@@ -424,6 +510,17 @@ func _create_detail_line(l_name: String, start: Vector2, end: Vector2, color: Co
 	add_child(line)
 	if Engine.is_editor_hint(): line.owner = self
 
+func _create_detail_rect(r_name: String, rect: Rect2, color: Color) -> void:
+	var poly = Polygon2D.new()
+	poly.name = r_name
+	poly.polygon = PackedVector2Array([
+		rect.position, Vector2(rect.end.x, rect.position.y),
+		rect.end, Vector2(rect.position.x, rect.end.y)
+	])
+	poly.color = color
+	add_child(poly)
+	if Engine.is_editor_hint(): poly.owner = self
+
 func _create_tiny_dot(d_name: String, pos: Vector2, color: Color) -> void:
 	var dot = Polygon2D.new()
 	dot.name = d_name
@@ -432,6 +529,16 @@ func _create_tiny_dot(d_name: String, pos: Vector2, color: Color) -> void:
 	])
 	dot.color = color
 	add_child(dot)
+	if Engine.is_editor_hint(): dot.owner = self
+
+func _create_tiny_dot_parented(parent: Node, d_name: String, pos: Vector2, color: Color) -> void:
+	var dot = Polygon2D.new()
+	dot.name = d_name
+	dot.polygon = PackedVector2Array([
+		pos + Vector2(-1,-1), pos + Vector2(1,-1), pos + Vector2(1,1), pos + Vector2(-1,1)
+	])
+	dot.color = color
+	parent.add_child(dot)
 	if Engine.is_editor_hint(): dot.owner = self
 
 func _create_visual_marker(m_name: String, pos: Vector2) -> void:
