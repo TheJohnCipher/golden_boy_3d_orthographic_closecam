@@ -491,6 +491,7 @@ func _draw_arrow(pos: Vector2, dir: Vector2, c: Color) -> void:
 func _show_message(txt: String) -> void:
 	message_text = txt
 	message_timer = 4.0
+	_update_hud_elements()
 
 func _apply_phase_visibility() -> void:
 	for npc in contact_npcs: npc.visible = (mission.phase == "day")
