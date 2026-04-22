@@ -585,9 +585,10 @@ func _process(delta: float) -> void:
 		message_timer -= delta
 		if message_timer <= 0.0:
 			message_text = ""
-	_update_hud_elements()
+			_update_hud_elements() # Only update when message clears
+
 	_update_prompt()
-	queue_redraw()   # needed for extraction pulse, suspicion bar, night pools
+	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
