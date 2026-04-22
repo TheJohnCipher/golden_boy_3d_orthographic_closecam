@@ -36,7 +36,9 @@ func _ready() -> void:
 	mission.mission_failed.connect(_fail_mission)
 	mission.difficulty_spiked.connect(_on_difficulty_spiked)
 
+	RenderingServer.set_default_clear_color(Color("#0d0d12")) # Dark, moody background
 	_init_input_map()
+	y_sort_enabled = true # Enable depth sorting for the whole world
 	_init_roots()
 	_setup_camera()
 	_setup_environment_layers()
@@ -62,7 +64,9 @@ func _configure_window() -> void:
 
 # ── Roots & lights ────────────────────────────────────────────────────────────
 func _init_roots() -> void:
-	npc_root    = Node2D.new(); npc_root.name    = "NPCs";    add_child(npc_root)
+	npc_root    = Node2D.new(); npc_root.name    = "NPCs"
+	npc_root.y_sort_enabled = true # Ensure NPCs sort against each other
+	add_child(npc_root)
 
 # ── Runtime Overlays ─────────────────────────────────────────────────────────
 func _draw() -> void:
@@ -206,6 +210,7 @@ func _setup_environment_layers() -> void:
 
 func _spawn_player_node() -> void:
 	player = GameConstants.PLAYER_SCRIPT.new(); player.world_ref = self
+	player.y_sort_enabled = true # Ensure player sorts against the world
 	var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 	sh.radius = 6.0; cs.shape = sh; player.add_child(cs)
 	player.position = Vector2(320.0, 530.0); add_child(player)
@@ -215,6 +220,7 @@ func _spawn_npc_nodes() -> void:
 	for s in GameConstants.NPC_SPAWNS:
 		var npc = GameConstants.NPC_SCRIPT.new(); npc.world_ref = self
 		npc.setup(s.role, s.name, s.key, s.phase)
+		npc.y_sort_enabled = true
 		npc.position = s.pos; npc.patrol_points.assign(s.patrol)
 		npc.suspicion_detected.connect(mission.raise_suspicion)
 		var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()

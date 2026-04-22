@@ -9,6 +9,8 @@ var facing         := Vector2(0.0, 1.0)
 var _move_time     := 0.0
 
 func _physics_process(delta: float) -> void:
+	var has_sprint = InputMap.has_action("sprint")
+	
 	var dir := Vector2(
 		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
 		Input.get_action_strength("move_back")  - Input.get_action_strength("move_forward")
@@ -20,7 +22,9 @@ func _physics_process(delta: float) -> void:
 		_move_time += delta
 	else:
 		_move_time = 0.0
-	velocity = dir * (SPRINT_SPEED if Input.is_action_pressed("sprint") else WALK_SPEED)
+	
+	var is_sprinting = has_sprint and Input.is_action_pressed("sprint")
+	velocity = dir * (SPRINT_SPEED if is_sprinting else WALK_SPEED)
 	move_and_slide()
 	queue_redraw()
 
@@ -28,7 +32,7 @@ func _draw() -> void:
 	var hidden := is_hidden()
 	var moving := _move_time > 0.0
 	var step   := sin(_move_time * 12.0)
-	var sprint := Input.is_action_pressed("sprint")
+	var sprint := InputMap.has_action("sprint") and Input.is_action_pressed("sprint")
 
 	var c_suit := Color("#16121e") if not hidden else Color("#0a080f")
 	var c_mid  := Color("#221b30") if not hidden else Color("#110f18")
