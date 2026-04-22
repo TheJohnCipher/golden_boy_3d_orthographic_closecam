@@ -52,6 +52,44 @@ func _generate_geometry() -> void:
 	for data in rooms:
 		_create_room_nodes(data[0], data[1], data[2])
 	
+	# --- MAP DESIGN REFINEMENT: INTERIOR & COVER ---
+	
+	# 1. Alley: Industrial Clutter (Hiding Spots)
+	# Forces player to weave between obstacles instead of running a straight line.
+	_create_collision_rect("AlleyDumpster_1", Rect2(150, 20, 40, 30))
+	_create_visual_rect("AlleyDumpster_1_Vis", Rect2(150, 20, 40, 30), Color("#2a303b"), true)
+	_create_collision_rect("AlleyCrates", Rect2(380, 45, 30, 40))
+	_create_visual_rect("AlleyCrates_Vis", Rect2(380, 45, 30, 40), Color("#3d2e20"), true)
+
+	# 2. Back Hall: Service Alcove (Closet)
+	_create_collision_rect("ServiceAlcove", Rect2(480, 85, 60, 45))
+	_create_visual_rect("ServiceAlcove_Vis", Rect2(480, 85, 60, 45), GameConstants.C_WALL_FACE, true)
+
+	# 3. West Wing (Cafe): Counter and Seating
+	_create_collision_rect("CafeCounter", Rect2(30, 180, 15, 100))
+	_create_visual_rect("CafeCounter_Vis", Rect2(30, 180, 15, 100), Color("#3e2723"), true)
+	_create_visual_circle("CafeTable_1", Vector2(85, 210), 10.0, Color("#1c1420"))
+	_create_visual_circle("CafeTable_2", Vector2(85, 290), 10.0, Color("#1c1420"))
+
+	# 4. Main Hall (Gallery): Central Hub and Art Displays
+	# Adding a central divider to break line of sight in the middle of the room.
+	_create_collision_rect("CentralDisplay", Rect2(280, 240, 80, 30))
+	_create_visual_rect("CentralDisplay_Vis", Rect2(280, 240, 80, 30), Color("#455a64"), true)
+	_create_visual_circle("ArtPedestal_1", Vector2(180, 190), 8.0, Color("#cfd8dc"))
+	_create_visual_circle("ArtPedestal_2", Vector2(460, 190), 8.0, Color("#cfd8dc"))
+
+	# 5. East Wing (Hotel): Reception Desk
+	_create_collision_rect("ReceptionDesk", Rect2(480, 220, 80, 20))
+	_create_visual_rect("ReceptionDesk_Vis", Rect2(480, 220, 80, 20), Color("#263238"), true)
+
+	# 6. Plaza (Public South): Kiosks and Benches
+	_create_collision_rect("NewsKiosk", Rect2(450, 500, 45, 45))
+	_create_visual_rect("NewsKiosk_Vis", Rect2(450, 500, 45, 45), Color("#1a1a2e"), true)
+	_create_collision_rect("PlazaBench_1", Rect2(120, 520, 60, 12))
+	_create_visual_rect("PlazaBench_1_Vis", Rect2(120, 520, 60, 12), Color("#4e342e"), true)
+	_create_collision_rect("PlazaBench_2", Rect2(240, 520, 60, 12))
+	_create_visual_rect("PlazaBench_2_Vis", Rect2(240, 520, 60, 12), Color("#4e342e"), true)
+
 	# Restore Neon Strips
 	_create_neon_strip("NeonPink", Vector2(120, 165), Vector2(480, 165), GameConstants.C_NEON_PINK)
 	_create_neon_strip("NeonCyan", Vector2(120, 358), Vector2(480, 358), GameConstants.C_NEON_CYAN)
@@ -96,6 +134,21 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	add_child(poly)
 	if Engine.is_editor_hint(): poly.owner = self
 	
+	# --- MATERIAL SPECIFIC FLOORING ---
+	_add_room_flooring(n_name, rect, color)
+	
+	# Wall Shadow (Ambient Occlusion on the floor where it hits the wall)
+	var shadow = Polygon2D.new()
+	shadow.name = n_name + "WallShadow"
+	var sh_h = 4.0
+	shadow.polygon = PackedVector2Array([
+		Vector2(rect.position.x, rect.end.y - sh_h), Vector2(rect.end.x, rect.end.y - sh_h),
+		Vector2(rect.end.x, rect.end.y), Vector2(rect.position.x, rect.end.y)
+	])
+	shadow.color = Color(0, 0, 0, 0.15)
+	add_child(shadow)
+	if Engine.is_editor_hint(): shadow.owner = self
+
 	var face = Polygon2D.new()
 	face.name = n_name + "WallFace"
 	var h = GameConstants.WALL_FACE_H
@@ -106,6 +159,82 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	face.color = GameConstants.C_WALL_FACE
 	add_child(face)
 	if Engine.is_editor_hint(): face.owner = self
+	
+	# --- SIDE WALLS (Depth for West/East boundaries) ---
+	var side_w = 4.0
+	# West Wall Depth
+	var w_face = Polygon2D.new()
+	w_face.name = n_name + "WestDepth"
+	w_face.polygon = PackedVector2Array([
+		rect.position, Vector2(rect.position.x - side_w, rect.position.y + h),
+		Vector2(rect.position.x - side_w, rect.end.y + h), Vector2(rect.position.x, rect.end.y)
+	])
+	w_face.color = GameConstants.C_WALL_FACE.darkened(0.1)
+	add_child(w_face)
+	if Engine.is_editor_hint(): w_face.owner = self
+	
+	# East Wall Depth
+	var e_face = Polygon2D.new()
+	e_face.name = n_name + "EastDepth"
+	e_face.polygon = PackedVector2Array([
+		Vector2(rect.end.x, rect.position.y), Vector2(rect.end.x + side_w, rect.position.y + h),
+		Vector2(rect.end.x + side_w, rect.end.y + h), Vector2(rect.end.x, rect.end.y)
+	])
+	e_face.color = GameConstants.C_WALL_FACE.darkened(0.1)
+	add_child(e_face)
+	if Engine.is_editor_hint(): e_face.owner = self
+	
+	# --- WALL PANELING (Vertical seams every 40px) ---
+	for x in range(int(rect.position.x) + 40, int(rect.end.x), 40):
+		_create_detail_line(n_name + "Panel_" + str(x), Vector2(x, rect.end.y), Vector2(x, rect.end.y + h), GameConstants.C_WALL_FACE.darkened(0.15))
+	
+	# Baseboard (Dark line at the very bottom of the wall face)
+	_create_detail_line(n_name + "Baseboard", Vector2(rect.position.x, rect.end.y + h), Vector2(rect.end.x, rect.end.y + h), GameConstants.C_WALL_FACE.darkened(0.3), 2.0)
+
+	# Wall Cap/Trim (A thin highlight line at the top of the wall face)
+	var trim = Line2D.new()
+	trim.name = n_name + "WallTrim"
+	trim.points = PackedVector2Array([
+		Vector2(rect.position.x, rect.end.y), 
+		Vector2(rect.end.x, rect.end.y)
+	])
+	trim.width = 1.0
+	trim.default_color = GameConstants.C_WALL_FACE.lightened(0.15)
+	add_child(trim)
+	if Engine.is_editor_hint(): trim.owner = self
+
+func _create_visual_rect(v_name: String, rect: Rect2, color: Color, add_face: bool = false) -> void:
+	var chamfer = 4.0
+	var poly = Polygon2D.new()
+	poly.name = v_name
+	# Soften the "blocky" look with an 8-point chamfered rectangle
+	poly.polygon = _get_chamfered_rect_pts(rect, chamfer)
+	poly.color = color
+	add_child(poly)
+	if Engine.is_editor_hint(): poly.owner = self
+	
+	if add_face:
+		var face = Polygon2D.new()
+		face.name = v_name + "_Face"
+		var h = GameConstants.WALL_FACE_H * 0.5 # Props are shorter than walls
+		face.polygon = PackedVector2Array([
+			Vector2(rect.position.x, rect.end.y), Vector2(rect.end.x, rect.end.y),
+			Vector2(rect.end.x, rect.end.y + h), Vector2(rect.position.x, rect.end.y + h)
+		])
+		face.color = color.darkened(0.2)
+		add_child(face)
+		if Engine.is_editor_hint(): face.owner = self
+		
+		# Top Bevel (Sell the 3D edge)
+		var bevel = Line2D.new()
+		bevel.name = v_name + "_Bevel"
+		bevel.points = PackedVector2Array([
+			Vector2(rect.position.x, rect.end.y), Vector2(rect.end.x, rect.end.y)
+		])
+		bevel.width = 1.0
+		bevel.default_color = color.lightened(0.1)
+		add_child(bevel)
+		if Engine.is_editor_hint(): bevel.owner = self
 
 func _create_neon_strip(l_name: String, from: Vector2, to: Vector2, color: Color) -> void:
 	var line = Line2D.new()
@@ -127,6 +256,18 @@ func _create_visual_circle(v_name: String, pos: Vector2, radius: float, color: C
 	poly.color = color
 	add_child(poly)
 	if Engine.is_editor_hint(): poly.owner = self
+	
+	# Inner Rim for circles (Pillars/Tables)
+	var rim = Polygon2D.new()
+	rim.name = v_name + "_Rim"
+	var pts_rim = PackedVector2Array()
+	for i in range(16):
+		var a = TAU * i / 16.0
+		pts_rim.append(pos + Vector2(cos(a), sin(a)) * (radius * 0.8))
+	rim.polygon = pts_rim
+	rim.color = color.lightened(0.05)
+	add_child(rim)
+	if Engine.is_editor_hint(): rim.owner = self
 
 func _create_pillar_face(f_name: String, pos: Vector2, radius: float) -> void:
 	var face = Polygon2D.new()
@@ -140,6 +281,85 @@ func _create_pillar_face(f_name: String, pos: Vector2, radius: float) -> void:
 	face.color = GameConstants.C_WALL_FACE
 	add_child(face)
 	if Engine.is_editor_hint(): face.owner = self
+	
+	# Pillar Cap (The dark top edge where the pillar meets the ceiling)
+	var cap = Line2D.new()
+	cap.name = f_name + "_Cap"
+	cap.points = PackedVector2Array([Vector2(pos.x - radius, pos.y), Vector2(pos.x + radius, pos.y)])
+	cap.width = 1.5
+	cap.default_color = GameConstants.C_WALL_FACE.lightened(0.2)
+	add_child(cap)
+	if Engine.is_editor_hint(): cap.owner = self
+
+# --- NEW HELPER FUNCTIONS FOR SHAPE & TEXTURE ---
+
+func _add_room_flooring(n_name: String, rect: Rect2, color: Color) -> void:
+	var detail_color = color.darkened(0.15)
+	
+	if n_name.contains("Alley"):
+		# Concrete: Random cracks
+		for i in range(5):
+			var start = rect.position + Vector2(randf() * rect.size.x, randf() * rect.size.y)
+			var end = start + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+			_create_detail_line(n_name + "Crack_" + str(i), start, end, detail_color, 0.5)
+	
+	elif n_name.contains("MainHall") or n_name.contains("Foyer"):
+		# Grand Gallery: Diamond Tiles
+		var step = 32.0
+		for x in range(int(rect.position.x), int(rect.end.x), int(step)):
+			for y in range(int(rect.position.y), int(rect.end.y), int(step)):
+				if (int(x/step) + int(y/step)) % 2 == 0:
+					var tile = Polygon2D.new()
+					tile.name = n_name + "Tile_" + str(x) + "_" + str(y)
+					tile.polygon = _get_chamfered_rect_pts(Rect2(x+4, y+4, step-8, step-8), 2.0)
+					tile.color = detail_color
+					add_child(tile)
+					if Engine.is_editor_hint(): tile.owner = self
+					
+	elif n_name.contains("WestWing"):
+		# Cafe: Wood Planks
+		var p_h = 12.0
+		for y in range(int(rect.position.y), int(rect.end.y), int(p_h)):
+			_create_detail_line(n_name + "Plank_" + str(y), Vector2(rect.position.x, y), Vector2(rect.end.x, y), detail_color)
+			
+	elif n_name.contains("EastWing"):
+		# Hotel: Plush Stipple
+		for i in range(20):
+			var p = rect.position + Vector2(randf() * rect.size.x, randf() * rect.size.y)
+			_create_tiny_dot(n_name + "Stipple_" + str(i), p, detail_color)
+	
+	else:
+		# Default Grid
+		var grid = 64.0
+		for x in range(int(rect.position.x), int(rect.end.x), int(grid)):
+			_create_detail_line(n_name + "V_" + str(x), Vector2(x, rect.position.y), Vector2(x, rect.end.y), detail_color)
+
+func _get_chamfered_rect_pts(rect: Rect2, r: float) -> PackedVector2Array:
+	return PackedVector2Array([
+		rect.position + Vector2(r, 0), Vector2(rect.end.x - r, rect.position.y),
+		Vector2(rect.end.x, rect.position.y + r), Vector2(rect.end.x, rect.end.y - r),
+		rect.end - Vector2(r, 0), Vector2(rect.position.x + r, rect.end.y),
+		Vector2(rect.position.x, rect.end.y - r), Vector2(rect.position.x, rect.position.y + r)
+	])
+
+func _create_detail_line(l_name: String, start: Vector2, end: Vector2, color: Color, width: float = 1.0) -> void:
+	var line = Line2D.new()
+	line.name = l_name
+	line.points = PackedVector2Array([start, end])
+	line.width = width
+	line.default_color = color
+	add_child(line)
+	if Engine.is_editor_hint(): line.owner = self
+
+func _create_tiny_dot(d_name: String, pos: Vector2, color: Color) -> void:
+	var dot = Polygon2D.new()
+	dot.name = d_name
+	dot.polygon = PackedVector2Array([
+		pos + Vector2(-1,-1), pos + Vector2(1,-1), pos + Vector2(1,1), pos + Vector2(-1,1)
+	])
+	dot.color = color
+	add_child(dot)
+	if Engine.is_editor_hint(): dot.owner = self
 
 func _create_visual_marker(m_name: String, pos: Vector2) -> void:
 	var marker = Node2D.new()

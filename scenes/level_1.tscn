@@ -3,248 +3,1395 @@
 [ext_resource type="Script" uid="uid://mncb6wnsikyy" path="res://scripts/level_base.gd" id="1_level_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_014kd"]
-size = Vector2(600, 7)
+size = Vector2(40, 30)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bswci"]
-size = Vector2(600, 7)
+size = Vector2(30, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rus8k"]
-size = Vector2(7, 601)
+size = Vector2(60, 45)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5xbjy"]
-size = Vector2(7, 601)
+size = Vector2(15, 100)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_4nkto"]
-radius = 9.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4nkto"]
+size = Vector2(80, 30)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_fcfvj"]
-radius = 9.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fcfvj"]
+size = Vector2(80, 20)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_pa8r4"]
-radius = 9.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pa8r4"]
+size = Vector2(45, 45)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_15mv3"]
-radius = 9.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_15mv3"]
+size = Vector2(60, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e3sih"]
-size = Vector2(100, 200)
+size = Vector2(60, 12)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2y5yt"]
-size = Vector2(100, 200)
+size = Vector2(600, 7)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2os1m"]
-size = Vector2(122, 65)
+size = Vector2(600, 7)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_go7sj"]
-size = Vector2(122, 65)
+size = Vector2(7, 601)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7gny6"]
+size = Vector2(7, 601)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2aecg"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6dial"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7nomh"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1s4pk"]
+radius = 9.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x2xxo"]
+size = Vector2(100, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2cbcq"]
+size = Vector2(100, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_isj1j"]
+size = Vector2(122, 65)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_so66j"]
+size = Vector2(122, 65)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tr1x6"]
 size = Vector2(60, 48)
 
 [node name="Level" type="Node2D" unique_id=1551781726]
 script = ExtResource("1_level_script")
 build_prototype = true
 
-[node name="AlleyFloor" type="Polygon2D" parent="." unique_id=339600937]
+[node name="AlleyFloor" type="Polygon2D" parent="." unique_id=601531161]
 color = Color(0.050980393, 0.0627451, 0.08627451, 1)
 polygon = PackedVector2Array(100, 20, 540, 20, 540, 85, 100, 85)
 
-[node name="AlleyWallFace" type="Polygon2D" parent="." unique_id=132605230]
+[node name="AlleyCrack_0" type="Line2D" parent="." unique_id=89798383]
+points = PackedVector2Array(210.13556, 53.317608, 225.92665, 40.478172)
+width = 0.5
+default_color = Color(0.043333337, 0.05333334, 0.07333334, 1)
+
+[node name="AlleyCrack_1" type="Line2D" parent="." unique_id=1125998742]
+points = PackedVector2Array(157.62756, 62.84748, 166.46364, 71.02866)
+width = 0.5
+default_color = Color(0.043333337, 0.05333334, 0.07333334, 1)
+
+[node name="AlleyCrack_2" type="Line2D" parent="." unique_id=1494899531]
+points = PackedVector2Array(510.89157, 76.40373, 511.77457, 58.81801)
+width = 0.5
+default_color = Color(0.043333337, 0.05333334, 0.07333334, 1)
+
+[node name="AlleyCrack_3" type="Line2D" parent="." unique_id=174181818]
+points = PackedVector2Array(136.55443, 25.39402, 133.7021, 18.161036)
+width = 0.5
+default_color = Color(0.043333337, 0.05333334, 0.07333334, 1)
+
+[node name="AlleyCrack_4" type="Line2D" parent="." unique_id=1422207730]
+points = PackedVector2Array(168.3865, 39.176044, 167.43297, 53.88194)
+width = 0.5
+default_color = Color(0.043333337, 0.05333334, 0.07333334, 1)
+
+[node name="AlleyWallShadow" type="Polygon2D" parent="." unique_id=1446070224]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(100, 81, 540, 81, 540, 85, 100, 85)
+
+[node name="AlleyWallFace" type="Polygon2D" parent="." unique_id=353313785]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(100, 85, 540, 85, 540, 112.69231, 100, 112.69231)
 
-[node name="BackHallFloor" type="Polygon2D" parent="." unique_id=676633092]
+[node name="AlleyWestDepth" type="Polygon2D" parent="." unique_id=991574813]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(100, 20, 96, 47.692307, 96, 112.69231, 100, 85)
+
+[node name="AlleyEastDepth" type="Polygon2D" parent="." unique_id=373010477]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(540, 20, 544, 47.692307, 544, 112.69231, 540, 85)
+
+[node name="AlleyPanel_140" type="Line2D" parent="." unique_id=1086951703]
+points = PackedVector2Array(140, 85, 140, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_180" type="Line2D" parent="." unique_id=2142729758]
+points = PackedVector2Array(180, 85, 180, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_220" type="Line2D" parent="." unique_id=1360012524]
+points = PackedVector2Array(220, 85, 220, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_260" type="Line2D" parent="." unique_id=1188635707]
+points = PackedVector2Array(260, 85, 260, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_300" type="Line2D" parent="." unique_id=377917519]
+points = PackedVector2Array(300, 85, 300, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_340" type="Line2D" parent="." unique_id=298454790]
+points = PackedVector2Array(340, 85, 340, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_380" type="Line2D" parent="." unique_id=94707208]
+points = PackedVector2Array(380, 85, 380, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_420" type="Line2D" parent="." unique_id=1351016583]
+points = PackedVector2Array(420, 85, 420, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_460" type="Line2D" parent="." unique_id=676745396]
+points = PackedVector2Array(460, 85, 460, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyPanel_500" type="Line2D" parent="." unique_id=641797249]
+points = PackedVector2Array(500, 85, 500, 112.69231)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="AlleyBaseboard" type="Line2D" parent="." unique_id=337899306]
+points = PackedVector2Array(100, 112.69231, 540, 112.69231)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="AlleyWallTrim" type="Line2D" parent="." unique_id=715863842]
+points = PackedVector2Array(100, 85, 540, 85)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="BackHallFloor" type="Polygon2D" parent="." unique_id=229496889]
 color = Color(0.06666667, 0.08235294, 0.1254902, 1)
 polygon = PackedVector2Array(100, 85, 540, 85, 540, 150, 100, 150)
 
-[node name="BackHallWallFace" type="Polygon2D" parent="." unique_id=325488795]
+[node name="BackHallV_100" type="Line2D" parent="." unique_id=1200100488]
+points = PackedVector2Array(100, 85, 100, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_164" type="Line2D" parent="." unique_id=1488412991]
+points = PackedVector2Array(164, 85, 164, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_228" type="Line2D" parent="." unique_id=1211061688]
+points = PackedVector2Array(228, 85, 228, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_292" type="Line2D" parent="." unique_id=466332893]
+points = PackedVector2Array(292, 85, 292, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_356" type="Line2D" parent="." unique_id=1357574487]
+points = PackedVector2Array(356, 85, 356, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_420" type="Line2D" parent="." unique_id=614160285]
+points = PackedVector2Array(420, 85, 420, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallV_484" type="Line2D" parent="." unique_id=26860101]
+points = PackedVector2Array(484, 85, 484, 150)
+width = 1.0
+default_color = Color(0.056666672, 0.07000001, 0.10666668, 1)
+
+[node name="BackHallWallShadow" type="Polygon2D" parent="." unique_id=2093937303]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(100, 146, 540, 146, 540, 150, 100, 150)
+
+[node name="BackHallWallFace" type="Polygon2D" parent="." unique_id=1647391530]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(100, 150, 540, 150, 540, 177.6923, 100, 177.6923)
 
-[node name="WestWingFloor" type="Polygon2D" parent="." unique_id=2077492567]
+[node name="BackHallWestDepth" type="Polygon2D" parent="." unique_id=492776676]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(100, 85, 96, 112.69231, 96, 177.6923, 100, 150)
+
+[node name="BackHallEastDepth" type="Polygon2D" parent="." unique_id=174896873]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(540, 85, 544, 112.69231, 544, 177.6923, 540, 150)
+
+[node name="BackHallPanel_140" type="Line2D" parent="." unique_id=1671016283]
+points = PackedVector2Array(140, 150, 140, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_180" type="Line2D" parent="." unique_id=309966928]
+points = PackedVector2Array(180, 150, 180, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_220" type="Line2D" parent="." unique_id=1291008052]
+points = PackedVector2Array(220, 150, 220, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_260" type="Line2D" parent="." unique_id=1876979967]
+points = PackedVector2Array(260, 150, 260, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_300" type="Line2D" parent="." unique_id=1729457537]
+points = PackedVector2Array(300, 150, 300, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_340" type="Line2D" parent="." unique_id=874983884]
+points = PackedVector2Array(340, 150, 340, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_380" type="Line2D" parent="." unique_id=670849979]
+points = PackedVector2Array(380, 150, 380, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_420" type="Line2D" parent="." unique_id=2025277881]
+points = PackedVector2Array(420, 150, 420, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_460" type="Line2D" parent="." unique_id=1143121575]
+points = PackedVector2Array(460, 150, 460, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallPanel_500" type="Line2D" parent="." unique_id=1728320110]
+points = PackedVector2Array(500, 150, 500, 177.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="BackHallBaseboard" type="Line2D" parent="." unique_id=1763271621]
+points = PackedVector2Array(100, 177.6923, 540, 177.6923)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="BackHallWallTrim" type="Line2D" parent="." unique_id=884605901]
+points = PackedVector2Array(100, 150, 540, 150)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="WestWingFloor" type="Polygon2D" parent="." unique_id=200653877]
 color = Color(0.0627451, 0.05490196, 0.09411765, 1)
 polygon = PackedVector2Array(20, 150, 120, 150, 120, 350, 20, 350)
 
-[node name="WestWingWallFace" type="Polygon2D" parent="." unique_id=402005429]
+[node name="WestWingPlank_150" type="Line2D" parent="." unique_id=895372096]
+points = PackedVector2Array(20, 150, 120, 150)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_162" type="Line2D" parent="." unique_id=1825106458]
+points = PackedVector2Array(20, 162, 120, 162)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_174" type="Line2D" parent="." unique_id=1867536768]
+points = PackedVector2Array(20, 174, 120, 174)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_186" type="Line2D" parent="." unique_id=996173082]
+points = PackedVector2Array(20, 186, 120, 186)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_198" type="Line2D" parent="." unique_id=1207179129]
+points = PackedVector2Array(20, 198, 120, 198)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_210" type="Line2D" parent="." unique_id=1522869598]
+points = PackedVector2Array(20, 210, 120, 210)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_222" type="Line2D" parent="." unique_id=648847053]
+points = PackedVector2Array(20, 222, 120, 222)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_234" type="Line2D" parent="." unique_id=410315436]
+points = PackedVector2Array(20, 234, 120, 234)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_246" type="Line2D" parent="." unique_id=504370757]
+points = PackedVector2Array(20, 246, 120, 246)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_258" type="Line2D" parent="." unique_id=1941259698]
+points = PackedVector2Array(20, 258, 120, 258)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_270" type="Line2D" parent="." unique_id=85666433]
+points = PackedVector2Array(20, 270, 120, 270)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_282" type="Line2D" parent="." unique_id=169960800]
+points = PackedVector2Array(20, 282, 120, 282)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_294" type="Line2D" parent="." unique_id=1786452711]
+points = PackedVector2Array(20, 294, 120, 294)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_306" type="Line2D" parent="." unique_id=1185071206]
+points = PackedVector2Array(20, 306, 120, 306)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_318" type="Line2D" parent="." unique_id=1945264590]
+points = PackedVector2Array(20, 318, 120, 318)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_330" type="Line2D" parent="." unique_id=1056530963]
+points = PackedVector2Array(20, 330, 120, 330)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingPlank_342" type="Line2D" parent="." unique_id=30237460]
+points = PackedVector2Array(20, 342, 120, 342)
+width = 1.0
+default_color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+
+[node name="WestWingWallShadow" type="Polygon2D" parent="." unique_id=1032795223]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(20, 346, 120, 346, 120, 350, 20, 350)
+
+[node name="WestWingWallFace" type="Polygon2D" parent="." unique_id=976420455]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(20, 350, 120, 350, 120, 377.69232, 20, 377.69232)
 
-[node name="MainHallFloor" type="Polygon2D" parent="." unique_id=38277369]
+[node name="WestWingWestDepth" type="Polygon2D" parent="." unique_id=1411482526]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(20, 150, 16, 177.6923, 16, 377.69232, 20, 350)
+
+[node name="WestWingEastDepth" type="Polygon2D" parent="." unique_id=1785273759]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(120, 150, 124, 177.6923, 124, 377.69232, 120, 350)
+
+[node name="WestWingPanel_60" type="Line2D" parent="." unique_id=1845360337]
+points = PackedVector2Array(60, 350, 60, 377.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="WestWingPanel_100" type="Line2D" parent="." unique_id=990821832]
+points = PackedVector2Array(100, 350, 100, 377.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="WestWingBaseboard" type="Line2D" parent="." unique_id=370310045]
+points = PackedVector2Array(20, 377.69232, 120, 377.69232)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="WestWingWallTrim" type="Line2D" parent="." unique_id=372786711]
+points = PackedVector2Array(20, 350, 120, 350)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="MainHallFloor" type="Polygon2D" parent="." unique_id=1702589417]
 color = Color(0.101960786, 0.07058824, 0.14509805, 1)
 polygon = PackedVector2Array(120, 150, 480, 150, 480, 370, 120, 370)
 
-[node name="MainHallWallFace" type="Polygon2D" parent="." unique_id=1271410385]
+[node name="MainHallTile_120_182" type="Polygon2D" parent="." unique_id=1585802001]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(126, 186, 146, 186, 148, 188, 148, 208, 146, 210, 126, 210, 124, 208, 124, 188)
+
+[node name="MainHallTile_120_246" type="Polygon2D" parent="." unique_id=2077557047]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(126, 250, 146, 250, 148, 252, 148, 272, 146, 274, 126, 274, 124, 272, 124, 252)
+
+[node name="MainHallTile_120_310" type="Polygon2D" parent="." unique_id=1218194405]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(126, 314, 146, 314, 148, 316, 148, 336, 146, 338, 126, 338, 124, 336, 124, 316)
+
+[node name="MainHallTile_152_150" type="Polygon2D" parent="." unique_id=999027685]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(158, 154, 178, 154, 180, 156, 180, 176, 178, 178, 158, 178, 156, 176, 156, 156)
+
+[node name="MainHallTile_152_214" type="Polygon2D" parent="." unique_id=416659563]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(158, 218, 178, 218, 180, 220, 180, 240, 178, 242, 158, 242, 156, 240, 156, 220)
+
+[node name="MainHallTile_152_278" type="Polygon2D" parent="." unique_id=553106465]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(158, 282, 178, 282, 180, 284, 180, 304, 178, 306, 158, 306, 156, 304, 156, 284)
+
+[node name="MainHallTile_152_342" type="Polygon2D" parent="." unique_id=1019104328]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(158, 346, 178, 346, 180, 348, 180, 368, 178, 370, 158, 370, 156, 368, 156, 348)
+
+[node name="MainHallTile_184_182" type="Polygon2D" parent="." unique_id=1748790890]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(190, 186, 210, 186, 212, 188, 212, 208, 210, 210, 190, 210, 188, 208, 188, 188)
+
+[node name="MainHallTile_184_246" type="Polygon2D" parent="." unique_id=1324684204]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(190, 250, 210, 250, 212, 252, 212, 272, 210, 274, 190, 274, 188, 272, 188, 252)
+
+[node name="MainHallTile_184_310" type="Polygon2D" parent="." unique_id=1131927809]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(190, 314, 210, 314, 212, 316, 212, 336, 210, 338, 190, 338, 188, 336, 188, 316)
+
+[node name="MainHallTile_216_150" type="Polygon2D" parent="." unique_id=1976711583]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(222, 154, 242, 154, 244, 156, 244, 176, 242, 178, 222, 178, 220, 176, 220, 156)
+
+[node name="MainHallTile_216_214" type="Polygon2D" parent="." unique_id=748200213]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(222, 218, 242, 218, 244, 220, 244, 240, 242, 242, 222, 242, 220, 240, 220, 220)
+
+[node name="MainHallTile_216_278" type="Polygon2D" parent="." unique_id=1730258232]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(222, 282, 242, 282, 244, 284, 244, 304, 242, 306, 222, 306, 220, 304, 220, 284)
+
+[node name="MainHallTile_216_342" type="Polygon2D" parent="." unique_id=383092263]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(222, 346, 242, 346, 244, 348, 244, 368, 242, 370, 222, 370, 220, 368, 220, 348)
+
+[node name="MainHallTile_248_182" type="Polygon2D" parent="." unique_id=609820445]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(254, 186, 274, 186, 276, 188, 276, 208, 274, 210, 254, 210, 252, 208, 252, 188)
+
+[node name="MainHallTile_248_246" type="Polygon2D" parent="." unique_id=2131230068]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(254, 250, 274, 250, 276, 252, 276, 272, 274, 274, 254, 274, 252, 272, 252, 252)
+
+[node name="MainHallTile_248_310" type="Polygon2D" parent="." unique_id=878626086]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(254, 314, 274, 314, 276, 316, 276, 336, 274, 338, 254, 338, 252, 336, 252, 316)
+
+[node name="MainHallTile_280_150" type="Polygon2D" parent="." unique_id=2015206538]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(286, 154, 306, 154, 308, 156, 308, 176, 306, 178, 286, 178, 284, 176, 284, 156)
+
+[node name="MainHallTile_280_214" type="Polygon2D" parent="." unique_id=986759254]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(286, 218, 306, 218, 308, 220, 308, 240, 306, 242, 286, 242, 284, 240, 284, 220)
+
+[node name="MainHallTile_280_278" type="Polygon2D" parent="." unique_id=970270766]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(286, 282, 306, 282, 308, 284, 308, 304, 306, 306, 286, 306, 284, 304, 284, 284)
+
+[node name="MainHallTile_280_342" type="Polygon2D" parent="." unique_id=1599899052]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(286, 346, 306, 346, 308, 348, 308, 368, 306, 370, 286, 370, 284, 368, 284, 348)
+
+[node name="MainHallTile_312_182" type="Polygon2D" parent="." unique_id=201814042]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(318, 186, 338, 186, 340, 188, 340, 208, 338, 210, 318, 210, 316, 208, 316, 188)
+
+[node name="MainHallTile_312_246" type="Polygon2D" parent="." unique_id=1681989274]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(318, 250, 338, 250, 340, 252, 340, 272, 338, 274, 318, 274, 316, 272, 316, 252)
+
+[node name="MainHallTile_312_310" type="Polygon2D" parent="." unique_id=394393796]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(318, 314, 338, 314, 340, 316, 340, 336, 338, 338, 318, 338, 316, 336, 316, 316)
+
+[node name="MainHallTile_344_150" type="Polygon2D" parent="." unique_id=387476602]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(350, 154, 370, 154, 372, 156, 372, 176, 370, 178, 350, 178, 348, 176, 348, 156)
+
+[node name="MainHallTile_344_214" type="Polygon2D" parent="." unique_id=575749345]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(350, 218, 370, 218, 372, 220, 372, 240, 370, 242, 350, 242, 348, 240, 348, 220)
+
+[node name="MainHallTile_344_278" type="Polygon2D" parent="." unique_id=109929086]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(350, 282, 370, 282, 372, 284, 372, 304, 370, 306, 350, 306, 348, 304, 348, 284)
+
+[node name="MainHallTile_344_342" type="Polygon2D" parent="." unique_id=1315811985]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(350, 346, 370, 346, 372, 348, 372, 368, 370, 370, 350, 370, 348, 368, 348, 348)
+
+[node name="MainHallTile_376_182" type="Polygon2D" parent="." unique_id=1545985792]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(382, 186, 402, 186, 404, 188, 404, 208, 402, 210, 382, 210, 380, 208, 380, 188)
+
+[node name="MainHallTile_376_246" type="Polygon2D" parent="." unique_id=1061067852]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(382, 250, 402, 250, 404, 252, 404, 272, 402, 274, 382, 274, 380, 272, 380, 252)
+
+[node name="MainHallTile_376_310" type="Polygon2D" parent="." unique_id=288002564]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(382, 314, 402, 314, 404, 316, 404, 336, 402, 338, 382, 338, 380, 336, 380, 316)
+
+[node name="MainHallTile_408_150" type="Polygon2D" parent="." unique_id=1422274303]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(414, 154, 434, 154, 436, 156, 436, 176, 434, 178, 414, 178, 412, 176, 412, 156)
+
+[node name="MainHallTile_408_214" type="Polygon2D" parent="." unique_id=1418891427]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(414, 218, 434, 218, 436, 220, 436, 240, 434, 242, 414, 242, 412, 240, 412, 220)
+
+[node name="MainHallTile_408_278" type="Polygon2D" parent="." unique_id=1635363157]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(414, 282, 434, 282, 436, 284, 436, 304, 434, 306, 414, 306, 412, 304, 412, 284)
+
+[node name="MainHallTile_408_342" type="Polygon2D" parent="." unique_id=1523206558]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(414, 346, 434, 346, 436, 348, 436, 368, 434, 370, 414, 370, 412, 368, 412, 348)
+
+[node name="MainHallTile_440_182" type="Polygon2D" parent="." unique_id=1927137714]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(446, 186, 466, 186, 468, 188, 468, 208, 466, 210, 446, 210, 444, 208, 444, 188)
+
+[node name="MainHallTile_440_246" type="Polygon2D" parent="." unique_id=425053501]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(446, 250, 466, 250, 468, 252, 468, 272, 466, 274, 446, 274, 444, 272, 444, 252)
+
+[node name="MainHallTile_440_310" type="Polygon2D" parent="." unique_id=1028494499]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(446, 314, 466, 314, 468, 316, 468, 336, 466, 338, 446, 338, 444, 336, 444, 316)
+
+[node name="MainHallTile_472_150" type="Polygon2D" parent="." unique_id=825177672]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(478, 154, 498, 154, 500, 156, 500, 176, 498, 178, 478, 178, 476, 176, 476, 156)
+
+[node name="MainHallTile_472_214" type="Polygon2D" parent="." unique_id=572073118]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(478, 218, 498, 218, 500, 220, 500, 240, 498, 242, 478, 242, 476, 240, 476, 220)
+
+[node name="MainHallTile_472_278" type="Polygon2D" parent="." unique_id=1902499914]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(478, 282, 498, 282, 500, 284, 500, 304, 498, 306, 478, 306, 476, 304, 476, 284)
+
+[node name="MainHallTile_472_342" type="Polygon2D" parent="." unique_id=1668181548]
+color = Color(0.08666667, 0.060000006, 0.12333334, 1)
+polygon = PackedVector2Array(478, 346, 498, 346, 500, 348, 500, 368, 498, 370, 478, 370, 476, 368, 476, 348)
+
+[node name="MainHallWallShadow" type="Polygon2D" parent="." unique_id=1255176220]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(120, 366, 480, 366, 480, 370, 120, 370)
+
+[node name="MainHallWallFace" type="Polygon2D" parent="." unique_id=682201521]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(120, 370, 480, 370, 480, 397.69232, 120, 397.69232)
 
-[node name="EastWingFloor" type="Polygon2D" parent="." unique_id=605071444]
+[node name="MainHallWestDepth" type="Polygon2D" parent="." unique_id=667049416]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(120, 150, 116, 177.6923, 116, 397.69232, 120, 370)
+
+[node name="MainHallEastDepth" type="Polygon2D" parent="." unique_id=104833427]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(480, 150, 484, 177.6923, 484, 397.69232, 480, 370)
+
+[node name="MainHallPanel_160" type="Line2D" parent="." unique_id=1228245435]
+points = PackedVector2Array(160, 370, 160, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_200" type="Line2D" parent="." unique_id=230924304]
+points = PackedVector2Array(200, 370, 200, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_240" type="Line2D" parent="." unique_id=270317933]
+points = PackedVector2Array(240, 370, 240, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_280" type="Line2D" parent="." unique_id=597219478]
+points = PackedVector2Array(280, 370, 280, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_320" type="Line2D" parent="." unique_id=1873367434]
+points = PackedVector2Array(320, 370, 320, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_360" type="Line2D" parent="." unique_id=611784580]
+points = PackedVector2Array(360, 370, 360, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_400" type="Line2D" parent="." unique_id=160627426]
+points = PackedVector2Array(400, 370, 400, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallPanel_440" type="Line2D" parent="." unique_id=546145033]
+points = PackedVector2Array(440, 370, 440, 397.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="MainHallBaseboard" type="Line2D" parent="." unique_id=2065367203]
+points = PackedVector2Array(120, 397.69232, 480, 397.69232)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="MainHallWallTrim" type="Line2D" parent="." unique_id=795163989]
+points = PackedVector2Array(120, 370, 480, 370)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="EastWingFloor" type="Polygon2D" parent="." unique_id=508880803]
 color = Color(0.0627451, 0.05490196, 0.09411765, 1)
 polygon = PackedVector2Array(480, 150, 580, 150, 580, 350, 480, 350)
 
-[node name="EastWingWallFace" type="Polygon2D" parent="." unique_id=355258397]
+[node name="EastWingStipple_0" type="Polygon2D" parent="." unique_id=1957641532]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(531.70514, 251.91937, 533.70514, 251.91937, 533.70514, 253.91937, 531.70514, 253.91937)
+
+[node name="EastWingStipple_1" type="Polygon2D" parent="." unique_id=2090368238]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(524.8487, 304.4245, 526.8487, 304.4245, 526.8487, 306.4245, 524.8487, 306.4245)
+
+[node name="EastWingStipple_2" type="Polygon2D" parent="." unique_id=818285666]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(495.92212, 154.43515, 497.92212, 154.43515, 497.92212, 156.43515, 495.92212, 156.43515)
+
+[node name="EastWingStipple_3" type="Polygon2D" parent="." unique_id=1702417451]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(568.6145, 188.05829, 570.6145, 188.05829, 570.6145, 190.05829, 568.6145, 190.05829)
+
+[node name="EastWingStipple_4" type="Polygon2D" parent="." unique_id=224367676]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(539.8866, 265.23886, 541.8866, 265.23886, 541.8866, 267.23886, 539.8866, 267.23886)
+
+[node name="EastWingStipple_5" type="Polygon2D" parent="." unique_id=2108512505]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(569.86755, 222.72055, 571.86755, 222.72055, 571.86755, 224.72055, 569.86755, 224.72055)
+
+[node name="EastWingStipple_6" type="Polygon2D" parent="." unique_id=514910084]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(516.118, 302.82745, 518.118, 302.82745, 518.118, 304.82745, 516.118, 304.82745)
+
+[node name="EastWingStipple_7" type="Polygon2D" parent="." unique_id=38074586]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(488.5407, 271.99182, 490.5407, 271.99182, 490.5407, 273.99182, 488.5407, 273.99182)
+
+[node name="EastWingStipple_8" type="Polygon2D" parent="." unique_id=1019471896]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(503.1667, 277.6775, 505.1667, 277.6775, 505.1667, 279.6775, 503.1667, 279.6775)
+
+[node name="EastWingStipple_9" type="Polygon2D" parent="." unique_id=905827324]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(533.59406, 319.5573, 535.59406, 319.5573, 535.59406, 321.5573, 533.59406, 321.5573)
+
+[node name="EastWingStipple_10" type="Polygon2D" parent="." unique_id=1222201239]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(499.1612, 187.10558, 501.1612, 187.10558, 501.1612, 189.10558, 499.1612, 189.10558)
+
+[node name="EastWingStipple_11" type="Polygon2D" parent="." unique_id=309583820]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(539.09467, 171.62694, 541.09467, 171.62694, 541.09467, 173.62694, 539.09467, 173.62694)
+
+[node name="EastWingStipple_12" type="Polygon2D" parent="." unique_id=1757090688]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(537.5637, 177.48674, 539.5637, 177.48674, 539.5637, 179.48674, 537.5637, 179.48674)
+
+[node name="EastWingStipple_13" type="Polygon2D" parent="." unique_id=408469034]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(506.738, 152.2516, 508.738, 152.2516, 508.738, 154.2516, 506.738, 154.2516)
+
+[node name="EastWingStipple_14" type="Polygon2D" parent="." unique_id=1587444255]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(550.92365, 340.73575, 552.92365, 340.73575, 552.92365, 342.73575, 550.92365, 342.73575)
+
+[node name="EastWingStipple_15" type="Polygon2D" parent="." unique_id=2029450375]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(489.39725, 328.63428, 491.39725, 328.63428, 491.39725, 330.63428, 489.39725, 330.63428)
+
+[node name="EastWingStipple_16" type="Polygon2D" parent="." unique_id=1578103119]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(578.656, 204.8754, 580.656, 204.8754, 580.656, 206.8754, 578.656, 206.8754)
+
+[node name="EastWingStipple_17" type="Polygon2D" parent="." unique_id=63764268]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(555.86084, 239.07721, 557.86084, 239.07721, 557.86084, 241.07721, 555.86084, 241.07721)
+
+[node name="EastWingStipple_18" type="Polygon2D" parent="." unique_id=2126186549]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(536.03064, 212.87766, 538.03064, 212.87766, 538.03064, 214.87766, 536.03064, 214.87766)
+
+[node name="EastWingStipple_19" type="Polygon2D" parent="." unique_id=861870123]
+color = Color(0.05333334, 0.046666667, 0.080000006, 1)
+polygon = PackedVector2Array(576.7505, 201.39763, 578.7505, 201.39763, 578.7505, 203.39763, 576.7505, 203.39763)
+
+[node name="EastWingWallShadow" type="Polygon2D" parent="." unique_id=711742691]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(480, 346, 580, 346, 580, 350, 480, 350)
+
+[node name="EastWingWallFace" type="Polygon2D" parent="." unique_id=2001639638]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(480, 350, 580, 350, 580, 377.69232, 480, 377.69232)
 
-[node name="FoyerFloor" type="Polygon2D" parent="." unique_id=692349854]
+[node name="EastWingWestDepth" type="Polygon2D" parent="." unique_id=760832686]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(480, 150, 476, 177.6923, 476, 377.69232, 480, 350)
+
+[node name="EastWingEastDepth" type="Polygon2D" parent="." unique_id=123462184]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(580, 150, 584, 177.6923, 584, 377.69232, 580, 350)
+
+[node name="EastWingPanel_520" type="Line2D" parent="." unique_id=1925710781]
+points = PackedVector2Array(520, 350, 520, 377.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="EastWingPanel_560" type="Line2D" parent="." unique_id=1836767842]
+points = PackedVector2Array(560, 350, 560, 377.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="EastWingBaseboard" type="Line2D" parent="." unique_id=1069993031]
+points = PackedVector2Array(480, 377.69232, 580, 377.69232)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="EastWingWallTrim" type="Line2D" parent="." unique_id=2000056066]
+points = PackedVector2Array(480, 350, 580, 350)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="FoyerFloor" type="Polygon2D" parent="." unique_id=69000336]
 color = Color(0.078431375, 0.101960786, 0.14117648, 1)
 polygon = PackedVector2Array(200, 370, 440, 370, 440, 460, 200, 460)
 
-[node name="FoyerWallFace" type="Polygon2D" parent="." unique_id=1221974272]
+[node name="FoyerTile_200_402" type="Polygon2D" parent="." unique_id=565213159]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(206, 406, 226, 406, 228, 408, 228, 428, 226, 430, 206, 430, 204, 428, 204, 408)
+
+[node name="FoyerTile_232_370" type="Polygon2D" parent="." unique_id=1859498587]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(238, 374, 258, 374, 260, 376, 260, 396, 258, 398, 238, 398, 236, 396, 236, 376)
+
+[node name="FoyerTile_232_434" type="Polygon2D" parent="." unique_id=1423486704]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(238, 438, 258, 438, 260, 440, 260, 460, 258, 462, 238, 462, 236, 460, 236, 440)
+
+[node name="FoyerTile_264_402" type="Polygon2D" parent="." unique_id=1705860299]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(270, 406, 290, 406, 292, 408, 292, 428, 290, 430, 270, 430, 268, 428, 268, 408)
+
+[node name="FoyerTile_296_370" type="Polygon2D" parent="." unique_id=340641055]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(302, 374, 322, 374, 324, 376, 324, 396, 322, 398, 302, 398, 300, 396, 300, 376)
+
+[node name="FoyerTile_296_434" type="Polygon2D" parent="." unique_id=54950765]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(302, 438, 322, 438, 324, 440, 324, 460, 322, 462, 302, 462, 300, 460, 300, 440)
+
+[node name="FoyerTile_328_402" type="Polygon2D" parent="." unique_id=332340519]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(334, 406, 354, 406, 356, 408, 356, 428, 354, 430, 334, 430, 332, 428, 332, 408)
+
+[node name="FoyerTile_360_370" type="Polygon2D" parent="." unique_id=748002809]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(366, 374, 386, 374, 388, 376, 388, 396, 386, 398, 366, 398, 364, 396, 364, 376)
+
+[node name="FoyerTile_360_434" type="Polygon2D" parent="." unique_id=1097985290]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(366, 438, 386, 438, 388, 440, 388, 460, 386, 462, 366, 462, 364, 460, 364, 440)
+
+[node name="FoyerTile_392_402" type="Polygon2D" parent="." unique_id=2130940970]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(398, 406, 418, 406, 420, 408, 420, 428, 418, 430, 398, 430, 396, 428, 396, 408)
+
+[node name="FoyerTile_424_370" type="Polygon2D" parent="." unique_id=1993949504]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(430, 374, 450, 374, 452, 376, 452, 396, 450, 398, 430, 398, 428, 396, 428, 376)
+
+[node name="FoyerTile_424_434" type="Polygon2D" parent="." unique_id=1384309053]
+color = Color(0.06666667, 0.08666667, 0.12000001, 1)
+polygon = PackedVector2Array(430, 438, 450, 438, 452, 440, 452, 460, 450, 462, 430, 462, 428, 460, 428, 440)
+
+[node name="FoyerWallShadow" type="Polygon2D" parent="." unique_id=1831704114]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(200, 456, 440, 456, 440, 460, 200, 460)
+
+[node name="FoyerWallFace" type="Polygon2D" parent="." unique_id=425778550]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(200, 460, 440, 460, 440, 487.69232, 200, 487.69232)
 
-[node name="PlazaFloor" type="Polygon2D" parent="." unique_id=1218285652]
+[node name="FoyerWestDepth" type="Polygon2D" parent="." unique_id=1735526629]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(200, 370, 196, 397.69232, 196, 487.69232, 200, 460)
+
+[node name="FoyerEastDepth" type="Polygon2D" parent="." unique_id=188602136]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(440, 370, 444, 397.69232, 444, 487.69232, 440, 460)
+
+[node name="FoyerPanel_240" type="Line2D" parent="." unique_id=1664890330]
+points = PackedVector2Array(240, 460, 240, 487.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="FoyerPanel_280" type="Line2D" parent="." unique_id=739504357]
+points = PackedVector2Array(280, 460, 280, 487.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="FoyerPanel_320" type="Line2D" parent="." unique_id=1706094284]
+points = PackedVector2Array(320, 460, 320, 487.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="FoyerPanel_360" type="Line2D" parent="." unique_id=1337249027]
+points = PackedVector2Array(360, 460, 360, 487.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="FoyerPanel_400" type="Line2D" parent="." unique_id=1202546058]
+points = PackedVector2Array(400, 460, 400, 487.69232)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="FoyerBaseboard" type="Line2D" parent="." unique_id=727587333]
+points = PackedVector2Array(200, 487.69232, 440, 487.69232)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="FoyerWallTrim" type="Line2D" parent="." unique_id=1938453364]
+points = PackedVector2Array(200, 460, 440, 460)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="PlazaFloor" type="Polygon2D" parent="." unique_id=683429328]
 color = Color(0.05490196, 0.07058824, 0.09411765, 1)
 polygon = PackedVector2Array(100, 460, 540, 460, 540, 600, 100, 600)
 
-[node name="PlazaWallFace" type="Polygon2D" parent="." unique_id=1921459989]
+[node name="PlazaV_100" type="Line2D" parent="." unique_id=1084210766]
+points = PackedVector2Array(100, 460, 100, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_164" type="Line2D" parent="." unique_id=1568226631]
+points = PackedVector2Array(164, 460, 164, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_228" type="Line2D" parent="." unique_id=1811769610]
+points = PackedVector2Array(228, 460, 228, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_292" type="Line2D" parent="." unique_id=1022474740]
+points = PackedVector2Array(292, 460, 292, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_356" type="Line2D" parent="." unique_id=233601621]
+points = PackedVector2Array(356, 460, 356, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_420" type="Line2D" parent="." unique_id=405226538]
+points = PackedVector2Array(420, 460, 420, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaV_484" type="Line2D" parent="." unique_id=1469260514]
+points = PackedVector2Array(484, 460, 484, 600)
+width = 1.0
+default_color = Color(0.046666667, 0.060000006, 0.080000006, 1)
+
+[node name="PlazaWallShadow" type="Polygon2D" parent="." unique_id=153781381]
+color = Color(0, 0, 0, 0.15)
+polygon = PackedVector2Array(100, 596, 540, 596, 540, 600, 100, 600)
+
+[node name="PlazaWallFace" type="Polygon2D" parent="." unique_id=1340437831]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(100, 600, 540, 600, 540, 627.6923, 100, 627.6923)
 
-[node name="NeonPink" type="Line2D" parent="." unique_id=1374887264]
+[node name="PlazaWestDepth" type="Polygon2D" parent="." unique_id=12177119]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(100, 460, 96, 487.69232, 96, 627.6923, 100, 600)
+
+[node name="PlazaEastDepth" type="Polygon2D" parent="." unique_id=850049464]
+color = Color(0.03529412, 0.04235294, 0.06352941, 1)
+polygon = PackedVector2Array(540, 460, 544, 487.69232, 544, 627.6923, 540, 600)
+
+[node name="PlazaPanel_140" type="Line2D" parent="." unique_id=2130571080]
+points = PackedVector2Array(140, 600, 140, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_180" type="Line2D" parent="." unique_id=1463162256]
+points = PackedVector2Array(180, 600, 180, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_220" type="Line2D" parent="." unique_id=121744212]
+points = PackedVector2Array(220, 600, 220, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_260" type="Line2D" parent="." unique_id=1501251799]
+points = PackedVector2Array(260, 600, 260, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_300" type="Line2D" parent="." unique_id=2013403495]
+points = PackedVector2Array(300, 600, 300, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_340" type="Line2D" parent="." unique_id=1636896012]
+points = PackedVector2Array(340, 600, 340, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_380" type="Line2D" parent="." unique_id=1116112652]
+points = PackedVector2Array(380, 600, 380, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_420" type="Line2D" parent="." unique_id=1152073779]
+points = PackedVector2Array(420, 600, 420, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_460" type="Line2D" parent="." unique_id=1277438233]
+points = PackedVector2Array(460, 600, 460, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaPanel_500" type="Line2D" parent="." unique_id=739323888]
+points = PackedVector2Array(500, 600, 500, 627.6923)
+width = 1.0
+default_color = Color(0.033333335, 0.040000003, 0.060000006, 1)
+
+[node name="PlazaBaseboard" type="Line2D" parent="." unique_id=1082893250]
+points = PackedVector2Array(100, 627.6923, 540, 627.6923)
+width = 2.0
+default_color = Color(0.02745098, 0.032941177, 0.049411766, 1)
+
+[node name="PlazaWallTrim" type="Line2D" parent="." unique_id=550393977]
+points = PackedVector2Array(100, 600, 540, 600)
+width = 1.0
+default_color = Color(0.18333334, 0.19, 0.21000001, 1)
+
+[node name="AlleyDumpster_1" type="StaticBody2D" parent="." unique_id=356538015]
+position = Vector2(170, 35)
+
+[node name="@CollisionShape2D@57071" type="CollisionShape2D" parent="AlleyDumpster_1" unique_id=1840492874]
+shape = SubResource("RectangleShape2D_014kd")
+
+[node name="AlleyDumpster_1_Vis" type="Polygon2D" parent="." unique_id=247709448]
+color = Color(0.16470589, 0.1882353, 0.23137255, 1)
+polygon = PackedVector2Array(154, 20, 186, 20, 190, 24, 190, 46, 186, 50, 154, 50, 150, 46, 150, 24)
+
+[node name="AlleyDumpster_1_Vis_Face" type="Polygon2D" parent="." unique_id=28078965]
+color = Color(0.13176471, 0.15058824, 0.18509804, 1)
+polygon = PackedVector2Array(150, 50, 190, 50, 190, 63.846153, 150, 63.846153)
+
+[node name="AlleyDumpster_1_Vis_Bevel" type="Line2D" parent="." unique_id=1675220290]
+points = PackedVector2Array(150, 50, 190, 50)
+width = 1.0
+default_color = Color(0.2482353, 0.26941177, 0.3082353, 1)
+
+[node name="AlleyCrates" type="StaticBody2D" parent="." unique_id=1370681280]
+position = Vector2(395, 65)
+
+[node name="@CollisionShape2D@57072" type="CollisionShape2D" parent="AlleyCrates" unique_id=991675396]
+shape = SubResource("RectangleShape2D_bswci")
+
+[node name="AlleyCrates_Vis" type="Polygon2D" parent="." unique_id=416879676]
+color = Color(0.23921569, 0.18039216, 0.1254902, 1)
+polygon = PackedVector2Array(384, 45, 406, 45, 410, 49, 410, 81, 406, 85, 384, 85, 380, 81, 380, 49)
+
+[node name="AlleyCrates_Vis_Face" type="Polygon2D" parent="." unique_id=4129562]
+color = Color(0.19137256, 0.14431374, 0.10039216, 1)
+polygon = PackedVector2Array(380, 85, 410, 85, 410, 98.84615, 380, 98.84615)
+
+[node name="AlleyCrates_Vis_Bevel" type="Line2D" parent="." unique_id=129644043]
+points = PackedVector2Array(380, 85, 410, 85)
+width = 1.0
+default_color = Color(0.31529412, 0.26235294, 0.21294118, 1)
+
+[node name="ServiceAlcove" type="StaticBody2D" parent="." unique_id=1629308722]
+position = Vector2(510, 107.5)
+
+[node name="@CollisionShape2D@57073" type="CollisionShape2D" parent="ServiceAlcove" unique_id=1538678630]
+shape = SubResource("RectangleShape2D_rus8k")
+
+[node name="ServiceAlcove_Vis" type="Polygon2D" parent="." unique_id=522144842]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(484, 85, 536, 85, 540, 89, 540, 126, 536, 130, 484, 130, 480, 126, 480, 89)
+
+[node name="ServiceAlcove_Vis_Face" type="Polygon2D" parent="." unique_id=1037820768]
+color = Color(0.03137255, 0.03764706, 0.05647059, 1)
+polygon = PackedVector2Array(480, 130, 540, 130, 540, 143.84616, 480, 143.84616)
+
+[node name="ServiceAlcove_Vis_Bevel" type="Line2D" parent="." unique_id=762693774]
+points = PackedVector2Array(480, 130, 540, 130)
+width = 1.0
+default_color = Color(0.13529412, 0.14235294, 0.16352943, 1)
+
+[node name="CafeCounter" type="StaticBody2D" parent="." unique_id=36044980]
+position = Vector2(37.5, 230)
+
+[node name="@CollisionShape2D@57074" type="CollisionShape2D" parent="CafeCounter" unique_id=1528376643]
+shape = SubResource("RectangleShape2D_5xbjy")
+
+[node name="CafeCounter_Vis" type="Polygon2D" parent="." unique_id=648676554]
+color = Color(0.24313726, 0.15294118, 0.13725491, 1)
+polygon = PackedVector2Array(34, 180, 41, 180, 45, 184, 45, 276, 41, 280, 34, 280, 30, 276, 30, 184)
+
+[node name="CafeCounter_Vis_Face" type="Polygon2D" parent="." unique_id=249210618]
+color = Color(0.1945098, 0.12235295, 0.10980393, 1)
+polygon = PackedVector2Array(30, 280, 45, 280, 45, 293.84616, 30, 293.84616)
+
+[node name="CafeCounter_Vis_Bevel" type="Line2D" parent="." unique_id=1556408165]
+points = PackedVector2Array(30, 280, 45, 280)
+width = 1.0
+default_color = Color(0.31882352, 0.23764706, 0.22352943, 1)
+
+[node name="CafeTable_1" type="Polygon2D" parent="." unique_id=1136654822]
+color = Color(0.10980392, 0.078431375, 0.1254902, 1)
+polygon = PackedVector2Array(95, 210, 94.23879, 213.82683, 92.07107, 217.07108, 88.826836, 219.2388, 85, 220, 81.173164, 219.2388, 77.92893, 217.07108, 75.76121, 213.82683, 75, 210, 75.76121, 206.17317, 77.92893, 202.92892, 81.173164, 200.7612, 85, 200, 88.826836, 200.7612, 92.07107, 202.92892, 94.23879, 206.17317)
+
+[node name="CafeTable_1_Rim" type="Polygon2D" parent="." unique_id=1548368558]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(93, 210, 92.39104, 213.06146, 90.65685, 215.65686, 88.06147, 217.39104, 85, 218, 81.93853, 217.39104, 79.34315, 215.65686, 77.60896, 213.06146, 77, 210, 77.60896, 206.93854, 79.34315, 204.34314, 81.93853, 202.60896, 85, 202, 88.06147, 202.60896, 90.65685, 204.34314, 92.39104, 206.93854)
+
+[node name="CafeTable_2" type="Polygon2D" parent="." unique_id=1049924001]
+color = Color(0.10980392, 0.078431375, 0.1254902, 1)
+polygon = PackedVector2Array(95, 290, 94.23879, 293.82684, 92.07107, 297.07108, 88.826836, 299.2388, 85, 300, 81.173164, 299.2388, 77.92893, 297.07108, 75.76121, 293.82684, 75, 290, 75.76121, 286.17316, 77.92893, 282.92892, 81.173164, 280.7612, 85, 280, 88.826836, 280.7612, 92.07107, 282.92892, 94.23879, 286.17316)
+
+[node name="CafeTable_2_Rim" type="Polygon2D" parent="." unique_id=1505315441]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(93, 290, 92.39104, 293.06146, 90.65685, 295.65686, 88.06147, 297.39102, 85, 298, 81.93853, 297.39102, 79.34315, 295.65686, 77.60896, 293.06146, 77, 290, 77.60896, 286.93854, 79.34315, 284.34314, 81.93853, 282.60898, 85, 282, 88.06147, 282.60898, 90.65685, 284.34314, 92.39104, 286.93854)
+
+[node name="CentralDisplay" type="StaticBody2D" parent="." unique_id=1740948605]
+position = Vector2(320, 255)
+
+[node name="@CollisionShape2D@57075" type="CollisionShape2D" parent="CentralDisplay" unique_id=204336352]
+shape = SubResource("RectangleShape2D_4nkto")
+
+[node name="CentralDisplay_Vis" type="Polygon2D" parent="." unique_id=553812522]
+color = Color(0.27058825, 0.3529412, 0.39215687, 1)
+polygon = PackedVector2Array(284, 240, 356, 240, 360, 244, 360, 266, 356, 270, 284, 270, 280, 266, 280, 244)
+
+[node name="CentralDisplay_Vis_Face" type="Polygon2D" parent="." unique_id=1691268967]
+color = Color(0.2164706, 0.28235295, 0.3137255, 1)
+polygon = PackedVector2Array(280, 270, 360, 270, 360, 283.84616, 280, 283.84616)
+
+[node name="CentralDisplay_Vis_Bevel" type="Line2D" parent="." unique_id=2064412649]
+points = PackedVector2Array(280, 270, 360, 270)
+width = 1.0
+default_color = Color(0.34352943, 0.41764706, 0.45294118, 1)
+
+[node name="ArtPedestal_1" type="Polygon2D" parent="." unique_id=1540430789]
+color = Color(0.8117647, 0.84705883, 0.8627451, 1)
+polygon = PackedVector2Array(188, 190, 187.39104, 193.06146, 185.65686, 195.65686, 183.06146, 197.39104, 180, 198, 176.93854, 197.39104, 174.34314, 195.65686, 172.60896, 193.06146, 172, 190, 172.60896, 186.93854, 174.34314, 184.34314, 176.93854, 182.60896, 180, 182, 183.06146, 182.60896, 185.65686, 184.34314, 187.39104, 186.93854)
+
+[node name="ArtPedestal_1_Rim" type="Polygon2D" parent="." unique_id=552725519]
+color = Color(0.82117647, 0.85470587, 0.86960787, 1)
+polygon = PackedVector2Array(186.4, 190, 185.91283, 192.44917, 184.52548, 194.52548, 182.44917, 195.91283, 180, 196.4, 177.55083, 195.91283, 175.47452, 194.52548, 174.08717, 192.44917, 173.6, 190, 174.08717, 187.55083, 175.47452, 185.47452, 177.55083, 184.08717, 180, 183.6, 182.44917, 184.08717, 184.52548, 185.47452, 185.91283, 187.55083)
+
+[node name="ArtPedestal_2" type="Polygon2D" parent="." unique_id=1534638843]
+color = Color(0.8117647, 0.84705883, 0.8627451, 1)
+polygon = PackedVector2Array(468, 190, 467.39102, 193.06146, 465.65686, 195.65686, 463.06146, 197.39104, 460, 198, 456.93854, 197.39104, 454.34314, 195.65686, 452.60898, 193.06146, 452, 190, 452.60898, 186.93854, 454.34314, 184.34314, 456.93854, 182.60896, 460, 182, 463.06146, 182.60896, 465.65686, 184.34314, 467.39102, 186.93854)
+
+[node name="ArtPedestal_2_Rim" type="Polygon2D" parent="." unique_id=146804501]
+color = Color(0.82117647, 0.85470587, 0.86960787, 1)
+polygon = PackedVector2Array(466.4, 190, 465.91284, 192.44917, 464.52548, 194.52548, 462.4492, 195.91283, 460, 196.4, 457.5508, 195.91283, 455.47452, 194.52548, 454.08716, 192.44917, 453.6, 190, 454.08716, 187.55083, 455.47452, 185.47452, 457.5508, 184.08717, 460, 183.6, 462.4492, 184.08717, 464.52548, 185.47452, 465.91284, 187.55083)
+
+[node name="ReceptionDesk" type="StaticBody2D" parent="." unique_id=1208815308]
+position = Vector2(520, 230)
+
+[node name="@CollisionShape2D@57076" type="CollisionShape2D" parent="ReceptionDesk" unique_id=795345191]
+shape = SubResource("RectangleShape2D_fcfvj")
+
+[node name="ReceptionDesk_Vis" type="Polygon2D" parent="." unique_id=771661925]
+color = Color(0.14901961, 0.19607843, 0.21960784, 1)
+polygon = PackedVector2Array(484, 220, 556, 220, 560, 224, 560, 236, 556, 240, 484, 240, 480, 236, 480, 224)
+
+[node name="ReceptionDesk_Vis_Face" type="Polygon2D" parent="." unique_id=1064974215]
+color = Color(0.11921569, 0.15686275, 0.17568628, 1)
+polygon = PackedVector2Array(480, 240, 560, 240, 560, 253.84616, 480, 253.84616)
+
+[node name="ReceptionDesk_Vis_Bevel" type="Line2D" parent="." unique_id=1863972312]
+points = PackedVector2Array(480, 240, 560, 240)
+width = 1.0
+default_color = Color(0.23411766, 0.2764706, 0.29764706, 1)
+
+[node name="NewsKiosk" type="StaticBody2D" parent="." unique_id=297474317]
+position = Vector2(472.5, 522.5)
+
+[node name="@CollisionShape2D@57077" type="CollisionShape2D" parent="NewsKiosk" unique_id=433917352]
+shape = SubResource("RectangleShape2D_pa8r4")
+
+[node name="NewsKiosk_Vis" type="Polygon2D" parent="." unique_id=881096943]
+color = Color(0.101960786, 0.101960786, 0.18039216, 1)
+polygon = PackedVector2Array(454, 500, 491, 500, 495, 504, 495, 541, 491, 545, 454, 545, 450, 541, 450, 504)
+
+[node name="NewsKiosk_Vis_Face" type="Polygon2D" parent="." unique_id=1309443893]
+color = Color(0.08156863, 0.08156863, 0.14431374, 1)
+polygon = PackedVector2Array(450, 545, 495, 545, 495, 558.8461, 450, 558.8461)
+
+[node name="NewsKiosk_Vis_Bevel" type="Line2D" parent="." unique_id=25194264]
+points = PackedVector2Array(450, 545, 495, 545)
+width = 1.0
+default_color = Color(0.19176471, 0.19176471, 0.26235294, 1)
+
+[node name="PlazaBench_1" type="StaticBody2D" parent="." unique_id=1825562992]
+position = Vector2(150, 526)
+
+[node name="@CollisionShape2D@57078" type="CollisionShape2D" parent="PlazaBench_1" unique_id=1941508685]
+shape = SubResource("RectangleShape2D_15mv3")
+
+[node name="PlazaBench_1_Vis" type="Polygon2D" parent="." unique_id=1505687673]
+color = Color(0.30588236, 0.20392157, 0.18039216, 1)
+polygon = PackedVector2Array(124, 520, 176, 520, 180, 524, 180, 528, 176, 532, 124, 532, 120, 528, 120, 524)
+
+[node name="PlazaBench_1_Vis_Face" type="Polygon2D" parent="." unique_id=743701328]
+color = Color(0.2447059, 0.16313726, 0.14431374, 1)
+polygon = PackedVector2Array(120, 532, 180, 532, 180, 545.8461, 120, 545.8461)
+
+[node name="PlazaBench_1_Vis_Bevel" type="Line2D" parent="." unique_id=599615091]
+points = PackedVector2Array(120, 532, 180, 532)
+width = 1.0
+default_color = Color(0.37529415, 0.2835294, 0.26235294, 1)
+
+[node name="PlazaBench_2" type="StaticBody2D" parent="." unique_id=1781156118]
+position = Vector2(270, 526)
+
+[node name="@CollisionShape2D@57079" type="CollisionShape2D" parent="PlazaBench_2" unique_id=1550874418]
+shape = SubResource("RectangleShape2D_e3sih")
+
+[node name="PlazaBench_2_Vis" type="Polygon2D" parent="." unique_id=1878397702]
+color = Color(0.30588236, 0.20392157, 0.18039216, 1)
+polygon = PackedVector2Array(244, 520, 296, 520, 300, 524, 300, 528, 296, 532, 244, 532, 240, 528, 240, 524)
+
+[node name="PlazaBench_2_Vis_Face" type="Polygon2D" parent="." unique_id=235654936]
+color = Color(0.2447059, 0.16313726, 0.14431374, 1)
+polygon = PackedVector2Array(240, 532, 300, 532, 300, 545.8461, 240, 545.8461)
+
+[node name="PlazaBench_2_Vis_Bevel" type="Line2D" parent="." unique_id=282933574]
+points = PackedVector2Array(240, 532, 300, 532)
+width = 1.0
+default_color = Color(0.37529415, 0.2835294, 0.26235294, 1)
+
+[node name="NeonPink" type="Line2D" parent="." unique_id=1761004362]
 points = PackedVector2Array(120, 165, 480, 165)
 width = 1.5
 default_color = Color(1, 0.26666668, 0.627451, 1)
 
-[node name="NeonCyan" type="Line2D" parent="." unique_id=1475473255]
+[node name="NeonCyan" type="Line2D" parent="." unique_id=312651255]
 points = PackedVector2Array(120, 358, 480, 358)
 width = 1.5
 default_color = Color(0.26666668, 0.84705883, 1, 1)
 
-[node name="NeonAmb" type="Line2D" parent="." unique_id=1932847547]
+[node name="NeonAmb" type="Line2D" parent="." unique_id=2076260462]
 points = PackedVector2Array(100, 88, 540, 88)
 width = 1.5
 default_color = Color(1, 0.7490196, 0.26666668, 1)
 
-[node name="WallNorth" type="StaticBody2D" parent="." unique_id=289831201]
+[node name="WallNorth" type="StaticBody2D" parent="." unique_id=511872079]
 position = Vector2(320, 15.5)
 
-[node name="@CollisionShape2D@29264" type="CollisionShape2D" parent="WallNorth" unique_id=1427607908]
-shape = SubResource("RectangleShape2D_014kd")
+[node name="@CollisionShape2D@57080" type="CollisionShape2D" parent="WallNorth" unique_id=388142963]
+shape = SubResource("RectangleShape2D_2y5yt")
 
-[node name="WallSouth" type="StaticBody2D" parent="." unique_id=118897223]
+[node name="WallSouth" type="StaticBody2D" parent="." unique_id=332988806]
 position = Vector2(320, 609.5)
 
-[node name="@CollisionShape2D@29265" type="CollisionShape2D" parent="WallSouth" unique_id=1013329262]
-shape = SubResource("RectangleShape2D_bswci")
+[node name="@CollisionShape2D@57081" type="CollisionShape2D" parent="WallSouth" unique_id=659589257]
+shape = SubResource("RectangleShape2D_2os1m")
 
-[node name="WallWest" type="StaticBody2D" parent="." unique_id=1212518941]
+[node name="WallWest" type="StaticBody2D" parent="." unique_id=242163171]
 position = Vector2(15.5, 312.5)
 
-[node name="@CollisionShape2D@29266" type="CollisionShape2D" parent="WallWest" unique_id=179446132]
-shape = SubResource("RectangleShape2D_rus8k")
+[node name="@CollisionShape2D@57082" type="CollisionShape2D" parent="WallWest" unique_id=451197365]
+shape = SubResource("RectangleShape2D_go7sj")
 
-[node name="WallEast" type="StaticBody2D" parent="." unique_id=1768327810]
+[node name="WallEast" type="StaticBody2D" parent="." unique_id=1377573363]
 position = Vector2(624.5, 312.5)
 
-[node name="@CollisionShape2D@29267" type="CollisionShape2D" parent="WallEast" unique_id=174536880]
-shape = SubResource("RectangleShape2D_5xbjy")
+[node name="@CollisionShape2D@57083" type="CollisionShape2D" parent="WallEast" unique_id=1921214801]
+shape = SubResource("RectangleShape2D_7gny6")
 
-[node name="Pillar_0" type="StaticBody2D" parent="." unique_id=1522315005]
+[node name="Pillar_0" type="StaticBody2D" parent="." unique_id=110337802]
 position = Vector2(195, 210)
 
-[node name="@CollisionShape2D@29268" type="CollisionShape2D" parent="Pillar_0" unique_id=241063726]
-shape = SubResource("CircleShape2D_4nkto")
+[node name="@CollisionShape2D@57084" type="CollisionShape2D" parent="Pillar_0" unique_id=506282253]
+shape = SubResource("CircleShape2D_2aecg")
 
-[node name="PillarVis_0" type="Polygon2D" parent="." unique_id=1430117117]
+[node name="PillarVis_0" type="Polygon2D" parent="." unique_id=1808583356]
 color = Color(0.10980392, 0.1254902, 0.1882353, 1)
 polygon = PackedVector2Array(204, 210, 203.31491, 213.44415, 201.36397, 216.36397, 198.44415, 218.31491, 195, 219, 191.55585, 218.31491, 188.63603, 216.36397, 186.68509, 213.44415, 186, 210, 186.68509, 206.55585, 188.63603, 203.63603, 191.55585, 201.68509, 195, 201, 198.44415, 201.68509, 201.36397, 203.63603, 203.31491, 206.55585)
 
-[node name="PillarFace_0" type="Polygon2D" parent="." unique_id=679384878]
+[node name="PillarVis_0_Rim" type="Polygon2D" parent="." unique_id=2147364196]
+color = Color(0.15431373, 0.1692157, 0.22882354, 1)
+polygon = PackedVector2Array(202.2, 210, 201.65193, 212.75533, 200.09117, 215.09117, 197.75533, 216.65193, 195, 217.2, 192.24467, 216.65193, 189.90883, 215.09117, 188.34807, 212.75533, 187.8, 210, 188.34807, 207.24467, 189.90883, 204.90883, 192.24467, 203.34807, 195, 202.8, 197.75533, 203.34807, 200.09117, 204.90883, 201.65193, 207.24467)
+
+[node name="PillarFace_0" type="Polygon2D" parent="." unique_id=1987328421]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(186, 210, 204, 210, 204, 237.6923, 186, 237.6923)
 
-[node name="Pillar_1" type="StaticBody2D" parent="." unique_id=1453927717]
+[node name="PillarFace_0_Cap" type="Line2D" parent="." unique_id=712499374]
+points = PackedVector2Array(186, 210, 204, 210)
+width = 1.5
+default_color = Color(0.23137255, 0.23764706, 0.2564706, 1)
+
+[node name="Pillar_1" type="StaticBody2D" parent="." unique_id=1435631011]
 position = Vector2(365, 210)
 
-[node name="@CollisionShape2D@29269" type="CollisionShape2D" parent="Pillar_1" unique_id=1610574806]
-shape = SubResource("CircleShape2D_fcfvj")
+[node name="@CollisionShape2D@57085" type="CollisionShape2D" parent="Pillar_1" unique_id=422202904]
+shape = SubResource("CircleShape2D_6dial")
 
-[node name="PillarVis_1" type="Polygon2D" parent="." unique_id=295998145]
+[node name="PillarVis_1" type="Polygon2D" parent="." unique_id=434246737]
 color = Color(0.10980392, 0.1254902, 0.1882353, 1)
 polygon = PackedVector2Array(374, 210, 373.3149, 213.44415, 371.36395, 216.36397, 368.44415, 218.31491, 365, 219, 361.55585, 218.31491, 358.63605, 216.36397, 356.6851, 213.44415, 356, 210, 356.6851, 206.55585, 358.63605, 203.63603, 361.55585, 201.68509, 365, 201, 368.44415, 201.68509, 371.36395, 203.63603, 373.3149, 206.55585)
 
-[node name="PillarFace_1" type="Polygon2D" parent="." unique_id=1192830814]
+[node name="PillarVis_1_Rim" type="Polygon2D" parent="." unique_id=199551662]
+color = Color(0.15431373, 0.1692157, 0.22882354, 1)
+polygon = PackedVector2Array(372.2, 210, 371.65195, 212.75533, 370.09116, 215.09117, 367.7553, 216.65193, 365, 217.2, 362.2447, 216.65193, 359.90884, 215.09117, 358.34805, 212.75533, 357.8, 210, 358.34805, 207.24467, 359.90884, 204.90883, 362.2447, 203.34807, 365, 202.8, 367.7553, 203.34807, 370.09116, 204.90883, 371.65195, 207.24467)
+
+[node name="PillarFace_1" type="Polygon2D" parent="." unique_id=1843794867]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(356, 210, 374, 210, 374, 237.6923, 356, 237.6923)
 
-[node name="Pillar_2" type="StaticBody2D" parent="." unique_id=1775989688]
+[node name="PillarFace_1_Cap" type="Line2D" parent="." unique_id=748242759]
+points = PackedVector2Array(356, 210, 374, 210)
+width = 1.5
+default_color = Color(0.23137255, 0.23764706, 0.2564706, 1)
+
+[node name="Pillar_2" type="StaticBody2D" parent="." unique_id=1590707034]
 position = Vector2(195, 315)
 
-[node name="@CollisionShape2D@29270" type="CollisionShape2D" parent="Pillar_2" unique_id=226717959]
-shape = SubResource("CircleShape2D_pa8r4")
+[node name="@CollisionShape2D@57086" type="CollisionShape2D" parent="Pillar_2" unique_id=263272268]
+shape = SubResource("CircleShape2D_7nomh")
 
-[node name="PillarVis_2" type="Polygon2D" parent="." unique_id=945423185]
+[node name="PillarVis_2" type="Polygon2D" parent="." unique_id=1450731990]
 color = Color(0.10980392, 0.1254902, 0.1882353, 1)
 polygon = PackedVector2Array(204, 315, 203.31491, 318.44415, 201.36397, 321.36395, 198.44415, 323.3149, 195, 324, 191.55585, 323.3149, 188.63603, 321.36395, 186.68509, 318.44415, 186, 315, 186.68509, 311.55585, 188.63603, 308.63605, 191.55585, 306.6851, 195, 306, 198.44415, 306.6851, 201.36397, 308.63605, 203.31491, 311.55585)
 
-[node name="PillarFace_2" type="Polygon2D" parent="." unique_id=1810159892]
+[node name="PillarVis_2_Rim" type="Polygon2D" parent="." unique_id=888100008]
+color = Color(0.15431373, 0.1692157, 0.22882354, 1)
+polygon = PackedVector2Array(202.2, 315, 201.65193, 317.7553, 200.09117, 320.09116, 197.75533, 321.65195, 195, 322.2, 192.24467, 321.65195, 189.90883, 320.09116, 188.34807, 317.7553, 187.8, 315, 188.34807, 312.2447, 189.90883, 309.90884, 192.24467, 308.34805, 195, 307.8, 197.75533, 308.34805, 200.09117, 309.90884, 201.65193, 312.2447)
+
+[node name="PillarFace_2" type="Polygon2D" parent="." unique_id=914238424]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(186, 315, 204, 315, 204, 342.69232, 186, 342.69232)
 
-[node name="Pillar_3" type="StaticBody2D" parent="." unique_id=1009747010]
+[node name="PillarFace_2_Cap" type="Line2D" parent="." unique_id=92503856]
+points = PackedVector2Array(186, 315, 204, 315)
+width = 1.5
+default_color = Color(0.23137255, 0.23764706, 0.2564706, 1)
+
+[node name="Pillar_3" type="StaticBody2D" parent="." unique_id=895489393]
 position = Vector2(365, 315)
 
-[node name="@CollisionShape2D@29271" type="CollisionShape2D" parent="Pillar_3" unique_id=614381384]
-shape = SubResource("CircleShape2D_15mv3")
+[node name="@CollisionShape2D@57087" type="CollisionShape2D" parent="Pillar_3" unique_id=1566568523]
+shape = SubResource("CircleShape2D_1s4pk")
 
-[node name="PillarVis_3" type="Polygon2D" parent="." unique_id=382404084]
+[node name="PillarVis_3" type="Polygon2D" parent="." unique_id=593143992]
 color = Color(0.10980392, 0.1254902, 0.1882353, 1)
 polygon = PackedVector2Array(374, 315, 373.3149, 318.44415, 371.36395, 321.36395, 368.44415, 323.3149, 365, 324, 361.55585, 323.3149, 358.63605, 321.36395, 356.6851, 318.44415, 356, 315, 356.6851, 311.55585, 358.63605, 308.63605, 361.55585, 306.6851, 365, 306, 368.44415, 306.6851, 371.36395, 308.63605, 373.3149, 311.55585)
 
-[node name="PillarFace_3" type="Polygon2D" parent="." unique_id=687282730]
+[node name="PillarVis_3_Rim" type="Polygon2D" parent="." unique_id=1519956757]
+color = Color(0.15431373, 0.1692157, 0.22882354, 1)
+polygon = PackedVector2Array(372.2, 315, 371.65195, 317.7553, 370.09116, 320.09116, 367.7553, 321.65195, 365, 322.2, 362.2447, 321.65195, 359.90884, 320.09116, 358.34805, 317.7553, 357.8, 315, 358.34805, 312.2447, 359.90884, 309.90884, 362.2447, 308.34805, 365, 307.8, 367.7553, 308.34805, 370.09116, 309.90884, 371.65195, 312.2447)
+
+[node name="PillarFace_3" type="Polygon2D" parent="." unique_id=1601993481]
 color = Color(0.039215688, 0.047058824, 0.07058824, 1)
 polygon = PackedVector2Array(356, 315, 374, 315, 374, 342.69232, 356, 342.69232)
 
-[node name="Table_0" type="Polygon2D" parent="." unique_id=1182842959]
+[node name="PillarFace_3_Cap" type="Line2D" parent="." unique_id=1490440730]
+points = PackedVector2Array(356, 315, 374, 315)
+width = 1.5
+default_color = Color(0.23137255, 0.23764706, 0.2564706, 1)
+
+[node name="Table_0" type="Polygon2D" parent="." unique_id=905269775]
 color = Color(0.10980392, 0.078431375, 0.1254902, 1)
 polygon = PackedVector2Array(185, 220, 184.2388, 223.82683, 182.07108, 227.07108, 178.82683, 229.2388, 175, 230, 171.17317, 229.2388, 167.92892, 227.07108, 165.7612, 223.82683, 165, 220, 165.7612, 216.17317, 167.92892, 212.92892, 171.17317, 210.7612, 175, 210, 178.82683, 210.7612, 182.07108, 212.92892, 184.2388, 216.17317)
 
-[node name="Table_1" type="Polygon2D" parent="." unique_id=327897093]
+[node name="Table_0_Rim" type="Polygon2D" parent="." unique_id=186823360]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(183, 220, 182.39104, 223.06146, 180.65686, 225.65686, 178.06146, 227.39104, 175, 228, 171.93854, 227.39104, 169.34314, 225.65686, 167.60896, 223.06146, 167, 220, 167.60896, 216.93854, 169.34314, 214.34314, 171.93854, 212.60896, 175, 212, 178.06146, 212.60896, 180.65686, 214.34314, 182.39104, 216.93854)
+
+[node name="Table_1" type="Polygon2D" parent="." unique_id=1763783534]
 color = Color(0.10980392, 0.078431375, 0.1254902, 1)
 polygon = PackedVector2Array(185, 310, 184.2388, 313.82684, 182.07108, 317.07108, 178.82683, 319.2388, 175, 320, 171.17317, 319.2388, 167.92892, 317.07108, 165.7612, 313.82684, 165, 310, 165.7612, 306.17316, 167.92892, 302.92892, 171.17317, 300.7612, 175, 300, 178.82683, 300.7612, 182.07108, 302.92892, 184.2388, 306.17316)
 
-[node name="Table_2" type="Polygon2D" parent="." unique_id=1375140027]
+[node name="Table_1_Rim" type="Polygon2D" parent="." unique_id=1931065223]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(183, 310, 182.39104, 313.06146, 180.65686, 315.65686, 178.06146, 317.39102, 175, 318, 171.93854, 317.39102, 169.34314, 315.65686, 167.60896, 313.06146, 167, 310, 167.60896, 306.93854, 169.34314, 304.34314, 171.93854, 302.60898, 175, 302, 178.06146, 302.60898, 180.65686, 304.34314, 182.39104, 306.93854)
+
+[node name="Table_2" type="Polygon2D" parent="." unique_id=244816502]
 color = Color(0.10980392, 0.078431375, 0.1254902, 1)
 polygon = PackedVector2Array(330, 190, 329.2388, 193.82683, 327.07108, 197.07108, 323.82684, 199.2388, 320, 200, 316.17316, 199.2388, 312.92892, 197.07108, 310.7612, 193.82683, 310, 190, 310.7612, 186.17317, 312.92892, 182.92892, 316.17316, 180.7612, 320, 180, 323.82684, 180.7612, 327.07108, 182.92892, 329.2388, 186.17317)
 
-[node name="Table_3" type="Polygon2D" parent="." unique_id=612777603]
+[node name="Table_2_Rim" type="Polygon2D" parent="." unique_id=1350076645]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(328, 190, 327.39102, 193.06146, 325.65686, 195.65686, 323.06146, 197.39104, 320, 198, 316.93854, 197.39104, 314.34314, 195.65686, 312.60898, 193.06146, 312, 190, 312.60898, 186.93854, 314.34314, 184.34314, 316.93854, 182.60896, 320, 182, 323.06146, 182.60896, 325.65686, 184.34314, 327.39102, 186.93854)
+
+[node name="Table_3" type="Polygon2D" parent="." unique_id=1503174297]
 color = Color(0.10980392, 0.078431375, 0.1254902, 1)
 polygon = PackedVector2Array(330, 340, 329.2388, 343.82684, 327.07108, 347.07108, 323.82684, 349.2388, 320, 350, 316.17316, 349.2388, 312.92892, 347.07108, 310.7612, 343.82684, 310, 340, 310.7612, 336.17316, 312.92892, 332.92892, 316.17316, 330.7612, 320, 330, 323.82684, 330.7612, 327.07108, 332.92892, 329.2388, 336.17316)
 
-[node name="ShadowWest" type="Area2D" parent="." unique_id=1198929799]
+[node name="Table_3_Rim" type="Polygon2D" parent="." unique_id=2062404437]
+color = Color(0.15431373, 0.12450981, 0.1692157, 1)
+polygon = PackedVector2Array(328, 340, 327.39102, 343.06146, 325.65686, 345.65686, 323.06146, 347.39102, 320, 348, 316.93854, 347.39102, 314.34314, 345.65686, 312.60898, 343.06146, 312, 340, 312.60898, 336.93854, 314.34314, 334.34314, 316.93854, 332.60898, 320, 332, 323.06146, 332.60898, 325.65686, 334.34314, 327.39102, 336.93854)
+
+[node name="ShadowWest" type="Area2D" parent="." unique_id=2066630937]
 position = Vector2(70, 250)
 
-[node name="@CollisionShape2D@29272" type="CollisionShape2D" parent="ShadowWest" unique_id=1235836590]
-shape = SubResource("RectangleShape2D_e3sih")
+[node name="@CollisionShape2D@57088" type="CollisionShape2D" parent="ShadowWest" unique_id=179955683]
+shape = SubResource("RectangleShape2D_x2xxo")
 
-[node name="ShadowEast" type="Area2D" parent="." unique_id=274509445]
+[node name="ShadowEast" type="Area2D" parent="." unique_id=1457493764]
 position = Vector2(530, 250)
 
-[node name="@CollisionShape2D@29273" type="CollisionShape2D" parent="ShadowEast" unique_id=546881127]
-shape = SubResource("RectangleShape2D_2y5yt")
+[node name="@CollisionShape2D@57089" type="CollisionShape2D" parent="ShadowEast" unique_id=1314474823]
+shape = SubResource("RectangleShape2D_2cbcq")
 
-[node name="ShadowAlleyLeft" type="Area2D" parent="." unique_id=1849832747]
+[node name="ShadowAlleyLeft" type="Area2D" parent="." unique_id=982727184]
 position = Vector2(161, 52.5)
 
-[node name="@CollisionShape2D@29274" type="CollisionShape2D" parent="ShadowAlleyLeft" unique_id=876497269]
-shape = SubResource("RectangleShape2D_2os1m")
+[node name="@CollisionShape2D@57090" type="CollisionShape2D" parent="ShadowAlleyLeft" unique_id=639319053]
+shape = SubResource("RectangleShape2D_isj1j")
 
-[node name="ShadowAlleyRight" type="Area2D" parent="." unique_id=266082048]
+[node name="ShadowAlleyRight" type="Area2D" parent="." unique_id=98618039]
 position = Vector2(479, 52.5)
 
-[node name="@CollisionShape2D@29275" type="CollisionShape2D" parent="ShadowAlleyRight" unique_id=942673856]
-shape = SubResource("RectangleShape2D_go7sj")
+[node name="@CollisionShape2D@57091" type="CollisionShape2D" parent="ShadowAlleyRight" unique_id=1787092006]
+shape = SubResource("RectangleShape2D_so66j")
 
-[node name="ExtractionZone" type="Area2D" parent="." unique_id=1109974134]
+[node name="ExtractionZone" type="Area2D" parent="." unique_id=2024869665]
 position = Vector2(460, 46)
 
-[node name="@CollisionShape2D@29276" type="CollisionShape2D" parent="ExtractionZone" unique_id=1021955366]
-shape = SubResource("RectangleShape2D_7gny6")
+[node name="@CollisionShape2D@57092" type="CollisionShape2D" parent="ExtractionZone" unique_id=2053832861]
+shape = SubResource("RectangleShape2D_tr1x6")
 
-[node name="ExtractionMarker" type="Node2D" parent="." unique_id=1975130191]
+[node name="ExtractionMarker" type="Node2D" parent="." unique_id=431923316]
 position = Vector2(460, 46)
 
-[node name="Pulse" type="Polygon2D" parent="ExtractionMarker" unique_id=1902104670]
+[node name="Pulse" type="Polygon2D" parent="ExtractionMarker" unique_id=1724232136]
 color = Color(0.2, 1, 0.4, 0.4)
 polygon = PackedVector2Array(10, 0, 7.071068, 7.071068, 6.123032e-16, 10, -7.071068, 7.071068, -10, 1.2246064e-15, -7.071068, -7.071068, -1.8369095e-15, -10, 7.071068, -7.071068)
