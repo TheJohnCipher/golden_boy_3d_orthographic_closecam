@@ -1,6 +1,7 @@
 extends Node2D
 
 const GameConstants = preload("res://scripts/game_constants.gd")
+const MissionManager = preload("res://scripts/mission_manager.gd")
 # Constants are now handled via GameConstants class
 
 # ── Light proxy so mission_controller tweens work in 2D ──────────────────────
@@ -9,27 +10,18 @@ class LightProxy extends Node:
 	var visible      : bool  = true
 
 # ── Mission state (same contract as world_3d) ─────────────────────────────────
-var player             = null
-var phase              := "day"
-var contacts           := {"alibi": false, "guest_pass": false, "route_intel": false}
 var contact_npcs       : Array = []
 var guard_npcs         : Array = []
 var civilian_npcs      : Array = []
 var target_npc                 = null
 var extraction_area            = null
 var extraction_marker          = null
-var near_extraction    := false
-var takedown_done      := false
-var mission_failed     := false
-var level_complete     := false
-var suspicion          := 0.0
-var heat               := 8.0
-var reputation         := 30.0
-var money              := 0
-var current_objective  := ""
 var message_text       := ""
 var message_timer      := 0.0
-var night2_active      := false
+
+var mission : MissionManager
+var player             = null
+var near_extraction    := false
 var phase_transition_in_progress := false
 
 # 2D-specific: null so mission_controller's _apply_environment_profile no-ops
@@ -51,6 +43,13 @@ var night_start_position := GameConstants.NIGHT_START_POSITION
 
 # =============================================================================
 func _ready() -> void:
+	mission = MissionManager.new()
+	add_child(mission)
+	mission.state_changed.connect(_update_hud_elements)
+	mission.message_requested.connect(_show_message)
+	mission.mission_failed.connect(_fail_mission)
+	mission.difficulty_spiked.connect(_on_difficulty_spiked)
+
 	_init_input_map()
 	_init_roots()
 	_init_lights()
@@ -63,7 +62,6 @@ func _ready() -> void:
 	_configure_window()
 	_apply_iso_view()
 	_apply_phase_visibility()
-	_refresh_objective()
 	_show_message(
 		"Golden Boy. The Velvet Strip gala. Work the contacts. Execute the extraction.")
 	queue_redraw()
@@ -112,7 +110,7 @@ func _init_lights() -> void:
 
 # ── Background _draw  (painter's order: north → south) ───────────────────────
 func _draw() -> void:
-	var night := phase == "night"
+	var night := mission.phase == "night"
 	var t     := float(Time.get_ticks_msec()) * 0.001
 
 	# Solid compound fill (everything outside rooms)
@@ -453,8 +451,8 @@ func _draw_suspicion_bar() -> void:
 	var bar_x := 330.0
 	var bar_y := 252.0
 	var bar_w := 140.0
-	var fill  := (suspicion / 100.0) * bar_w
-	var bc    := Color(1.0, 0.28, 0.28) if suspicion > 60.0 else Color(0.85, 0.55, 0.30)
+	var fill  := (mission.suspicion / 100.0) * bar_w
+	var bc    := Color(1.0, 0.28, 0.28) if mission.suspicion > 60.0 else Color(0.85, 0.55, 0.30)
 	# Background track
 	draw_rect(Rect2(bar_x - 1, bar_y - 1, bar_w + 2, 8), Color(0.08, 0.04, 0.04))
 	draw_rect(Rect2(bar_x, bar_y, bar_w, 6), Color(0.14, 0.07, 0.07))
@@ -494,45 +492,27 @@ func _show_message(txt: String) -> void:
 	message_text = txt
 	message_timer = 4.0
 
-func _refresh_objective() -> void:
-	if phase == "day":
-		var count = 0
-		for k in contacts: if contacts[k]: count += 1
-		current_objective = "Day: Meet contacts (%d/3)" % count
-		if count == 3: current_objective += " - [TAB] to start Night"
-	else:
-		if not takedown_done:
-			current_objective = "Night: Eliminate Alden"
-		else:
-			current_objective = "Night: Reach Extraction (Alley)"
-
 func _apply_phase_visibility() -> void:
-	for npc in contact_npcs: npc.visible = (phase == "day")
-	for npc in civilian_npcs: npc.visible = (phase == "day")
-	if target_npc: target_npc.visible = (phase == "night")
-	for npc in guard_npcs: npc.visible = (phase == "night")
-	if extraction_marker: extraction_marker.visible = (phase == "night" and takedown_done)
-
-func _all_contacts_met() -> bool:
-	for k in contacts:
-		if not contacts[k]: return false
-	return true
+	for npc in contact_npcs: npc.visible = (mission.phase == "day")
+	for npc in civilian_npcs: npc.visible = (mission.phase == "day")
+	if target_npc: target_npc.visible = (mission.phase == "night")
+	for npc in guard_npcs: npc.visible = (mission.phase == "night")
+	if extraction_marker: extraction_marker.visible = (mission.phase == "night" and mission.takedown_done)
 
 func _fail_mission(reason: String) -> void:
-	mission_failed = true
 	_show_message("MISSION FAILED: " + reason)
 	if player: player.set_physics_process(false)
 
 # ── NPCs ──────────────────────────────────────────────────────────────────────
 func _update_prompt() -> void:
 	hud.prompt_panel.visible = false
-	if mission_failed or level_complete: return
+	if mission.is_failed or mission.is_complete: return
 	for npc in npc_root.get_children():
 		if npc.can_interact(player) or npc.is_takedown_reachable(player):
 			hud.prompt.text = "[ E ] " + ("Talk to " if npc.role == "contact" else "Takedown ") + npc.npc_name
 			hud.prompt_panel.visible = true
 			return
-	if near_extraction and takedown_done:
+	if near_extraction and mission.takedown_done:
 		hud.prompt.text = "[ E ] Extract"; hud.prompt_panel.visible = true
 
 # ── Extraction zone ───────────────────────────────────────────────────────────
@@ -614,8 +594,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_handle_interaction()
 
 	elif event.is_action_pressed("phase_switch"):
-		if phase == "day" and not phase_transition_in_progress:
-			if _all_contacts_met():
+		if mission.phase == "day" and not phase_transition_in_progress:
+			if mission.all_contacts_met():
 				phase_transition_in_progress = true
 				await _begin_night()
 				phase_transition_in_progress = false
@@ -623,7 +603,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_show_message(
 					"Talk to all three contacts before starting the night.")
 
-	elif event.is_action_pressed("restart_level") and (mission_failed or level_complete):
+	elif event.is_action_pressed("restart_level") and (mission.is_failed or mission.is_complete):
 		get_tree().reload_current_scene()
 
 	elif event.is_action_pressed("toggle_fullscreen"):
@@ -647,11 +627,9 @@ func _begin_night() -> void:
 		Color(0.0, 0.03, 0.12, 0.58), 1.2)
 	await tw.finished
 
-	phase     = "night"
-	suspicion = 0.0
+	mission.start_night()
 	player.position = night_start_position
 	_apply_phase_visibility()
-	_refresh_objective()
 	queue_redraw()
 
 	# Fade title + objective back in
@@ -662,28 +640,13 @@ func _begin_night() -> void:
 	_show_message(
 		"Night phase. Alden is in the main hall. Get behind him and strike. Extract through the alley.")
 
-# ── Mission helpers called by NPCs ────────────────────────────────────────────
-func raise_suspicion(amount: float, source_name := "") -> void:
-	if mission_failed or level_complete:
-		return
-	if takedown_done:
-		amount *= 1.6
-		if not night2_active:
-			night2_active = true
-			for npc in guard_npcs:
-				npc.detect_radius *= 1.3
-				npc.detect_rate *= 1.4
-				npc.patrol_speed *= 1.2
-			_show_message("Night 2: Guards on alert - faster, wider vision.")
-
-	var previous_suspicion: float = float(suspicion)
-	suspicion = min(suspicion + amount, 100.0)
-	var previous_bucket := int(floor(previous_suspicion / 20.0))
-	var current_bucket := int(floor(suspicion / 20.0))
-	if source_name != "" and current_bucket > previous_bucket and current_bucket >= 1 and current_bucket < 5:
-		_show_message("%s is getting a look at you." % source_name)
-	if suspicion >= 100.0:
-		_fail_mission("Cover blown. The gala turns hostile.")
+func _on_difficulty_spiked() -> void:
+	# Update all existing guard/witness NPCs with higher stats
+	for npc in guard_npcs:
+		if is_instance_valid(npc):
+			npc.detect_radius *= 1.3
+			npc.detect_rate *= 1.4
+			npc.patrol_speed *= 1.2
 
 # =============================================================================
 # CONSOLIDATED LOGIC
@@ -752,7 +715,7 @@ func _spawn_npc_nodes() -> void:
 		var npc = GameConstants.NPC_SCRIPT.new(); npc.world_ref = self
 		npc.setup(s.role, s.name, s.key, s.phase)
 		npc.position = s.pos; npc.patrol_points.assign(s.patrol)
-		npc.suspicion_detected.connect(raise_suspicion)
+		npc.suspicion_detected.connect(mission.raise_suspicion)
 		var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 		sh.radius = 5.0; cs.shape = sh; npc.add_child(cs)
 		npc_root.add_child(npc)
@@ -780,25 +743,23 @@ func _create_label(t: String, s: int, p: Vector2, c: Color) -> Label:
 	return l
 
 func _update_hud_elements() -> void:
-	hud.objective.text = current_objective
-	hud.money.text = "$" + str(money)
+	hud.objective.text = mission.current_objective
+	hud.money.text = "$" + str(mission.money)
 	hud.message.text = message_text; hud.message.visible = message_text != ""
-	hud.suspicion.text = "SUSPICION: " + str(int(suspicion)) if phase == "night" else ""
-	hud.phase_hint.visible = (phase == "day" and not mission_failed)
+	hud.suspicion.text = "SUSPICION: " + str(int(mission.suspicion)) if mission.phase == "night" else ""
+	hud.phase_hint.visible = (mission.phase == "day" and not mission.is_failed)
 
 func _handle_contact_logic(npc) -> void:
 	if npc.interaction_used: return
 	npc.interaction_used = true; npc.set_marker_visible(false)
-	contacts[npc.contact_key] = true; _refresh_objective()
-	_show_message("Contact secure: " + npc.npc_name)
+	mission.add_contact(npc.contact_key, npc.npc_name)
 
 func _handle_interaction() -> void:
-	if mission_failed or level_complete: return
+	if mission.is_failed or mission.is_complete: return
 	for npc in npc_root.get_children():
 		if npc.can_interact(player):
 			_handle_contact_logic(npc); return
 		if npc.is_takedown_reachable(player):
-			takedown_done = true; npc.visible = false; _refresh_objective()
-			_show_message("Target neutralized. Get to the extraction point!"); return
-	if near_extraction and takedown_done:
-		level_complete = true; _show_message("Extraction successful. Mission Complete!")
+			mission.set_takedown_done(); npc.visible = false; return
+	if near_extraction and mission.takedown_done:
+		mission.complete_mission()

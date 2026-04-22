@@ -72,9 +72,9 @@ func _process(_delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	_run_patrol(delta)
-	if world_ref == null or world_ref.phase != "night":
+	if world_ref == null or world_ref.mission.phase != "night":
 		return
-	if world_ref.mission_failed or world_ref.level_complete:
+	if world_ref.mission.is_failed or world_ref.mission.is_complete:
 		return
 	if world_ref != null and world_ref.player != null and role in ["guard", "witness", "target"] and can_detect_player(world_ref.player):
 		suspicion_detected.emit(detect_rate * delta, npc_name)
