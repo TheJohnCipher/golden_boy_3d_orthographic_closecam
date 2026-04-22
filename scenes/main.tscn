@@ -7,4 +7,3 @@
 script = ExtResource("1_world_script")
 
 [node name="Level" parent="." unique_id=1551781726 instance=ExtResource("2_0wfyh")]
-position = Vector2(0, 0)

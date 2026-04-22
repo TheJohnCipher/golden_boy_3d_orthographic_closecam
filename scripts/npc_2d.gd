@@ -121,11 +121,16 @@ func _draw() -> void:
 			pts.append(Vector2(cos(a), sin(a)) * detect_radius)
 		
 		# Dynamic color based on alertness
-		var calm_col = Color(1.0, 1.0, 1.0, 0.05)
-		var alert_col = Color(1.0, 0.2, 0.15, 0.15) if role == "guard" else Color(1.0, 0.6, 0.2, 0.12)
+		var calm_col = Color(1.0, 1.0, 1.0, 0.04)
+		var alert_col = Color(1.0, 0.1, 0.1, 0.25) if role == "guard" else Color(1.0, 0.7, 0.1, 0.2)
 		var cc = calm_col.lerp(alert_col, _alert_level)
 		
 		draw_polygon(pts, PackedColorArray([cc]))
+		
+		# Add a sharp outline to the cone for quality feel
+		var line_col = cc
+		line_col.a = clamp(cc.a * 2.0, 0.1, 0.4)
+		draw_polyline(pts, line_col, 1.0, true)
 
 	# Body circle + direction nub
 	draw_circle(Vector2.ZERO, 7.0, _body_color)

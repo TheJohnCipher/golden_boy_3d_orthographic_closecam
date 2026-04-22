@@ -69,7 +69,10 @@ func _configure_window() -> void:
 	# Viewport mode keeps pixels sharp; EXPAND fills non-standard aspect ratios
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
 	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
-	win.content_scale_size = Vector2i(480, 270)
+	win.content_scale_size = Vector2i(640, 360)
+	
+	# Ensure the game world textures stay blocky and sharp, not blurry
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	
 	var scr := DisplayServer.window_get_current_screen()
 	# Set window position and size to match the display before entering fullscreen
@@ -105,11 +108,20 @@ func _show_message(txt: String) -> void:
 	hud.show_temporary_message(txt)
 
 func _apply_phase_visibility() -> void:
-	for npc in contact_npcs: npc.visible = (mission.phase == "day")
-	for npc in civilian_npcs: npc.visible = (mission.phase == "day")
-	if target_npc: target_npc.visible = (mission.phase == "night")
-	for npc in guard_npcs: npc.visible = (mission.phase == "night")
-	if extraction_marker: extraction_marker.visible = (mission.phase == "night" and mission.takedown_done)
+	var is_day = (mission.phase == "day")
+	var is_night = (mission.phase == "night")
+	
+	for npc in contact_npcs: 
+		if is_instance_valid(npc): npc.visible = is_day
+	for npc in civilian_npcs: 
+		if is_instance_valid(npc): npc.visible = is_day
+	for npc in guard_npcs: 
+		if is_instance_valid(npc): npc.visible = is_night
+	
+	if is_instance_valid(target_npc): 
+		target_npc.visible = is_night
+	if is_instance_valid(extraction_marker): 
+		extraction_marker.visible = (is_night and mission.takedown_done)
 
 func _fail_mission(reason: String) -> void:
 	_show_message("MISSION FAILED: " + reason)
@@ -117,7 +129,7 @@ func _fail_mission(reason: String) -> void:
 
 # ── NPCs ──────────────────────────────────────────────────────────────────────
 func _update_prompt() -> void:
-	if mission.is_failed or mission.is_complete: return
+	if mission.is_failed or mission.is_complete or hud == null: return
 	for npc in npc_root.get_children():
 		if npc.can_interact(player) or npc.is_takedown_reachable(player):
 			hud.set_prompt("[ E ] " + ("Talk to " if npc.role == "contact" else "Takedown ") + npc.npc_name)
@@ -214,7 +226,8 @@ func _init_input_map() -> void:
 	var map = {
 		"move_left": KEY_A, "move_right": KEY_D, "move_forward": KEY_W, "move_back": KEY_S,
 		"interact": KEY_E, "phase_switch": KEY_TAB, "restart_level": KEY_R,
-		"toggle_fullscreen": KEY_F11, "pause": KEY_P, "toggle_mouse_capture": KEY_ESCAPE
+		"toggle_fullscreen": KEY_F11, "pause": KEY_P, "toggle_mouse_capture": KEY_ESCAPE,
+		"sprint": KEY_SHIFT
 	}
 	for act in map:
 		if not InputMap.has_action(act):

@@ -15,10 +15,19 @@ var mission : Node # Reference to MissionManager
 
 func setup(p_mission: Node) -> void:
 	mission = p_mission
-	mission.state_changed.connect(update_ui)
-	update_ui()
+	if not mission.is_connected("state_changed", update_ui):
+		mission.state_changed.connect(update_ui)
+	if is_node_ready():
+		update_ui()
+
+func _ready() -> void:
+	if mission:
+		update_ui()
 
 func update_ui() -> void:
+	if mission == null or not is_node_ready() or title == null:
+		return
+		
 	objective.text = mission.current_objective
 	money.text     = "$" + str(mission.money)
 	
@@ -35,6 +44,9 @@ func update_ui() -> void:
 	phase_hint.visible = (mission.phase == "day" and not mission.is_failed)
 
 func show_temporary_message(txt: String) -> void:
+	if not is_node_ready():
+		return
+		
 	message.text = txt
 	message.visible = true
 	await get_tree().create_timer(4.0).timeout
@@ -42,6 +54,9 @@ func show_temporary_message(txt: String) -> void:
 		message.visible = false
 
 func set_prompt(txt: String) -> void:
+	if not is_node_ready() or prompt_box == null:
+		return
+		
 	if txt == "":
 		prompt_box.visible = false
 	else:
