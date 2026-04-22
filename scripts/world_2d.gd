@@ -132,8 +132,16 @@ func _update_prompt() -> void:
 # We keep these callbacks so the level can trigger them.
 func _on_extract_entered(body) -> void: if body == player: near_extraction = true
 func _on_extract_exited(body) -> void: if body == player: near_extraction = false
-func _on_shadow_entered(body) -> void: if body == player: player.enter_shadow()
-func _on_shadow_exited(body) -> void: if body == player: player.exit_shadow()
+
+func _on_shadow_entered(body) -> void:
+	if body == player:
+		player.enter_shadow()
+		create_tween().tween_property(player, "modulate", Color(0.4, 0.5, 0.8), 0.2)
+
+func _on_shadow_exited(body) -> void:
+	if body == player:
+		player.exit_shadow()
+		create_tween().tween_property(player, "modulate", Color.WHITE, 0.2)
 
 # ── Game loop ─────────────────────────────────────────────────────────────────
 func _process(delta: float) -> void:

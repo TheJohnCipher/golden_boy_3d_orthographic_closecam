@@ -15,6 +15,7 @@ var detect_radius    := 100.0
 var detect_fov       := 70.0
 var detect_rate      := 22.0
 
+var _alert_level     := 0.0 # 0.0 to 1.0
 var _current_point   := 0
 var _pause_timer     := 0.0
 var _facing          := Vector2(0.0, 1.0)
@@ -72,12 +73,22 @@ func _process(_delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	_run_patrol(delta)
-	if world_ref == null or world_ref.mission.phase != "night":
+	
+	if world_ref == null or world_ref.mission.phase != "night" or world_ref.mission.is_failed or world_ref.mission.is_complete:
+		_alert_level = 0.0
 		return
-	if world_ref.mission.is_failed or world_ref.mission.is_complete:
-		return
-	if world_ref != null and world_ref.player != null and role in ["guard", "witness", "target"] and can_detect_player(world_ref.player):
-		suspicion_detected.emit(detect_rate * delta, npc_name)
+
+	var can_see = world_ref.player != null and role in ["guard", "witness", "target"] and can_detect_player(world_ref.player)
+	
+	if can_see:
+		_alert_level = min(_alert_level + delta * 2.0, 1.0) # Fill meter over 0.5s
+		if _alert_level >= 1.0:
+			suspicion_detected.emit(detect_rate * delta, npc_name)
+	else:
+		_alert_level = max(_alert_level - delta * 0.5, 0.0) # Decay slowly
+	
+	if role in ["guard", "witness"]:
+		queue_redraw()
 
 func _run_patrol(delta: float) -> void:
 	if patrol_points.size() < 2 or role not in ["guard", "witness", "civilian"]:
@@ -108,7 +119,12 @@ func _draw() -> void:
 		for i in range(11):
 			var a := base_ang - half + (half * 2.0 * float(i) / 10.0)
 			pts.append(Vector2(cos(a), sin(a)) * detect_radius)
-		var cc := Color(1.0, 0.2, 0.15, 0.12) if role == "guard" else Color(1.0, 0.6, 0.2, 0.10)
+		
+		# Dynamic color based on alertness
+		var calm_col = Color(1.0, 1.0, 1.0, 0.05)
+		var alert_col = Color(1.0, 0.2, 0.15, 0.15) if role == "guard" else Color(1.0, 0.6, 0.2, 0.12)
+		var cc = calm_col.lerp(alert_col, _alert_level)
+		
 		draw_polygon(pts, PackedColorArray([cc]))
 
 	# Body circle + direction nub
