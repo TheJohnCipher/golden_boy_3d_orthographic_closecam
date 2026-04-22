@@ -1,55 +1,7 @@
 extends Node2D
 
-# ── Night start position (Vector2) ────────────────────────────────────────────
-const NIGHT_START_POSITION := Vector2(220.0, 112.0)
-
-# ── Colour palette ────────────────────────────────────────────────────────────
-const C_ALLEY     := Color("#0d1016")
-const C_BACK_HALL := Color("#111520")
-const C_WEST      := Color("#100e18")
-const C_MAIN_HALL := Color("#1a1225")
-const C_EAST      := Color("#100e18")
-const C_FOYER     := Color("#141a24")
-const C_PLAZA     := Color("#0e1218")
-const C_TRIM      := Color("#1c2030")
-const C_GOLD      := Color("#c8a84e")
-const C_NEON_PINK := Color("#ff44a0")
-const C_NEON_CYAN := Color("#44d8ff")
-const C_NEON_AMB  := Color("#ffbf44")
-
-# ── Room rectangles (world-space pixels) ──────────────────────────────────────
-const R_ALLEY     := Rect2(100,  20, 440,  65)
-const R_BACK_HALL := Rect2(100,  85, 440,  65)
-const R_WEST      := Rect2( 20, 150, 100, 200)
-const R_MAIN_HALL := Rect2(120, 150, 360, 220)
-const R_EAST      := Rect2(480, 150, 100, 200)
-const R_FOYER     := Rect2(200, 370, 240,  90)
-const R_PLAZA     := Rect2(100, 460, 440, 140)
-
-# ── Oblique projection constants ──────────────────────────────────────────────
-const ISO_Y_SCALE  := 0.65          # how much Y is compressed on screen
-const WALL_FACE_H  := 18.0 / ISO_Y_SCALE  # local-space face height → 18 screen px
-
-# ── Wall colors ──────────────────────────────────────────────────────────────
-const C_WALL_TOP   := Color("#1c2030")
-const C_WALL_FACE  := Color("#0a0c12")  # south-facing shadow
-
-# ── NPC spawn configurations ─────────────────────────────────────────────────
-const NPC_SPAWNS := [
-	{"role": "contact", "name": "Mara", "key": "alibi", "phase": "day", "pos": Vector2(320, 412), "patrol": []},
-	{"role": "contact", "name": "Jules", "key": "guest_pass", "phase": "day", "pos": Vector2(60, 250), "patrol": []},
-	{"role": "contact", "name": "Nico", "key": "route_intel", "phase": "day", "pos": Vector2(575, 250), "patrol": []},
-	{"role": "guard", "name": "Guard1", "key": "", "phase": "night", "pos": Vector2(320, 200), "patrol": [Vector2(320, 200), Vector2(320, 300)]},
-	{"role": "witness", "name": "Witness1", "key": "", "phase": "night", "pos": Vector2(200, 250), "patrol": [Vector2(200, 250), Vector2(400, 250)]},
-	{"role": "civilian", "name": "Guest B", "key": "", "phase": "day", "pos": Vector2(165, 230), "patrol": []},
-	{"role": "target", "name": "Alden", "key": "", "phase": "night", "pos": Vector2(320, 280), "patrol": [Vector2(150, 280), Vector2(450, 280)]}
-]
-
-# ── Extraction point ─────────────────────────────────────────────────────────
-const EXTRACTION_POS := Vector2(460, 46)
-
-const PLAYER_SCRIPT = preload("res://scripts/player_2d.gd")
-const NPC_SCRIPT = preload("res://scripts/npc_2d.gd")
+const GameConstants = preload("res://scripts/game_constants.gd")
+# Constants are now handled via GameConstants class
 
 # ── Light proxy so mission_controller tweens work in 2D ──────────────────────
 class LightProxy extends Node:
@@ -95,7 +47,7 @@ var _hud_layer : CanvasLayer
 var _pillars   : Array[Vector2] = []
 var _neon_strips : Array        = []   # [ [from, to, Color], … ]
 
-var night_start_position := NIGHT_START_POSITION
+var night_start_position := GameConstants.NIGHT_START_POSITION
 
 # =============================================================================
 func _ready() -> void:
@@ -122,16 +74,16 @@ func _apply_iso_view() -> void:
 	# CanvasLayer (HUD) ignores parent transform so it stays flat.
 	transform = Transform2D(
 		Vector2(1.0, 0.0),
-		Vector2(0.0, ISO_Y_SCALE),
+		Vector2(0.0, GameConstants.ISO_Y_SCALE),
 		Vector2.ZERO
 	)
 
 # ── Wall face helper (draws visible south face of a horizontal wall) ──────────
-func _wall_face(x0: float, x1: float, y: float, h := WALL_FACE_H) -> void:
+func _wall_face(x0: float, x1: float, y: float, h := GameConstants.WALL_FACE_H) -> void:
 	draw_colored_polygon(PackedVector2Array([
 		Vector2(x0, y), Vector2(x1, y),
 		Vector2(x1, y + h), Vector2(x0, y + h)
-	]), C_WALL_FACE)
+	]), GameConstants.C_WALL_FACE)
 
 # ── Window ────────────────────────────────────────────────────────────────────
 func _configure_window() -> void:
@@ -169,8 +121,8 @@ func _draw() -> void:
 	# --- Draw Room Layout (North to South) ---
 	_draw_alley(night, t)
 	_draw_back_hall()
-	_draw_wing(R_WEST, 1)
-	_draw_wing(R_EAST, 2)
+	_draw_wing(GameConstants.R_WEST, 1)
+	_draw_wing(GameConstants.R_EAST, 2)
 	_draw_main_hall(night, t)
 	_draw_foyer()
 	_draw_plaza(night, t)
@@ -180,7 +132,7 @@ func _draw() -> void:
 		draw_line(strip[0], strip[1], strip[2], 1.5)
 	
 	for p in _pillars:
-		draw_circle(p, 9.0, C_WALL_TOP)
+		draw_circle(p, 9.0, GameConstants.C_WALL_TOP)
 
 	if night:
 		_draw_suspicion_bar()
@@ -213,7 +165,7 @@ func _draw_alley(night: bool, t: float) -> void:
 	draw_circle(Vector2(490, 60), 9.0, Color(0.06, 0.09, 0.14, 0.7))
 	draw_circle(Vector2(490, 60), 5.0, Color(0.12, 0.18, 0.28, 0.5))
 	# Neon reflection in puddle
-	draw_line(Vector2(483, 58), Vector2(498, 58), Color(C_NEON_PINK.r, C_NEON_PINK.g, C_NEON_PINK.b, 0.35), 1.2)
+	draw_line(Vector2(483, 58), Vector2(498, 58), Color(GameConstants.C_NEON_PINK.r, GameConstants.C_NEON_PINK.g, GameConstants.C_NEON_PINK.b, 0.35), 1.2)
 
 	# Manhole cover
 	draw_circle(Vector2(280, 52), 7.0, Color(0.10, 0.10, 0.11))
@@ -243,7 +195,7 @@ func _draw_alley(night: bool, t: float) -> void:
 	draw_line(Vector2(116, 26), Vector2(116, 46), Color(0.30, 0.22, 0.10, 0.5), 0.6)
 
 	# Drainpipe
-	draw_line(Vector2(432, 20), Vector2(432, 85), C_NEON_CYAN.darkened(0.6), 2.8)
+	draw_line(Vector2(432, 20), Vector2(432, 85), GameConstants.C_NEON_CYAN.darkened(0.6), 2.8)
 	draw_line(Vector2(432, 20), Vector2(432, 85), Color(0.3, 0.3, 0.35, 0.3), 1.0)
 
 	# Fire escape (east wall of alley)
@@ -264,8 +216,7 @@ func _draw_alley(night: bool, t: float) -> void:
 
 # ── Back hall detail ──────────────────────────────────────────────────────────
 func _draw_back_hall() -> void:
-	# Tile stripes
-	_draw_grid(R_BACK_HALL, 22.0, Color(0.10, 0.12, 0.16, 0.3))
+	_draw_grid(GameConstants.R_BACK_HALL, 22.0, Color(0.10, 0.12, 0.16, 0.3))
 	# Door frames at openings (alley side)
 	_draw_door_frame(Vector2(220, 85), Vector2(420, 85))
 	# Door frames at main hall side
@@ -288,48 +239,47 @@ func _draw_main_hall(night: bool, t: float) -> void:
 	var ca := Color(0.14, 0.09, 0.18)
 	var cb := Color(0.16, 0.11, 0.22)
 	var ts  := 20.0
-	var mx  := R_MAIN_HALL.position.x
-	var my  := R_MAIN_HALL.position.y
-	var cols := int(R_MAIN_HALL.size.x / ts)
-	var rows := int(R_MAIN_HALL.size.y / ts)
+	var mx  := GameConstants.R_MAIN_HALL.position.x
+	var my  := GameConstants.R_MAIN_HALL.position.y
+	var cols := int(GameConstants.R_MAIN_HALL.size.x / ts)
+	var rows := int(GameConstants.R_MAIN_HALL.size.y / ts)
 	for row in range(rows):
 		for col in range(cols):
 			var tc := ca if (row + col) % 2 == 0 else cb
 			draw_rect(Rect2(mx + col * ts, my + row * ts, ts, ts), tc)
-	# Marble grout lines
-	_draw_grid(R_MAIN_HALL, ts, Color(0.08, 0.06, 0.12, 0.6))
+	_draw_grid(GameConstants.R_MAIN_HALL, ts, Color(0.08, 0.06, 0.12, 0.6))
 
 	# Ornate border inlay around perimeter of main hall
-	draw_rect(R_MAIN_HALL.grow(-8.0), Color(0.0, 0.0, 0.0, 0.0), false)
-	draw_rect(R_MAIN_HALL.grow(-8.0), Color(C_GOLD.r, C_GOLD.g, C_GOLD.b, 0.25), false, 0.8)
-	draw_rect(R_MAIN_HALL.grow(-12.0), Color(C_GOLD.r, C_GOLD.g, C_GOLD.b, 0.15), false, 0.5)
+	draw_rect(GameConstants.R_MAIN_HALL.grow(-8.0), Color(0.0, 0.0, 0.0, 0.0), false)
+	draw_rect(GameConstants.R_MAIN_HALL.grow(-8.0), Color(GameConstants.C_GOLD.r, GameConstants.C_GOLD.g, GameConstants.C_GOLD.b, 0.25), false, 0.8)
+	draw_rect(GameConstants.R_MAIN_HALL.grow(-12.0), Color(GameConstants.C_GOLD.r, GameConstants.C_GOLD.g, GameConstants.C_GOLD.b, 0.15), false, 0.5)
 
 	# Venue sign (above neon strip, in main hall north)
 	draw_string(ThemeDB.fallback_font, Vector2(196, 174), "G O L D E N  B O Y",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, C_GOLD.lightened(0.1))
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, GameConstants.C_GOLD.lightened(0.1))
 	draw_string(ThemeDB.fallback_font, Vector2(197, 175), "G O L D E N  B O Y",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, C_GOLD.darkened(0.1))
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, GameConstants.C_GOLD.darkened(0.1))
 	draw_string(ThemeDB.fallback_font, Vector2(196, 175), "G O L D E N  B O Y",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, C_GOLD)
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 9, GameConstants.C_GOLD)
 
 	# Chandelier (ceiling feature, center of main hall)
-	var cc := R_MAIN_HALL.get_center() + Vector2(0, -20)
+	var cc := GameConstants.R_MAIN_HALL.get_center() + Vector2(0, -20)
 	draw_circle(cc, 18.0, Color(0.15, 0.12, 0.20, 0.8))
-	draw_arc(cc, 18.0, 0.0, TAU, 20, C_GOLD.darkened(0.2), 1.5)
+	draw_arc(cc, 18.0, 0.0, TAU, 20, GameConstants.C_GOLD.darkened(0.2), 1.5)
 	for i in range(8):
 		var a := TAU * float(i) / 8.0
-		draw_line(cc, cc + Vector2(cos(a), sin(a)) * 16.0, C_GOLD.darkened(0.3), 0.7)
+		draw_line(cc, cc + Vector2(cos(a), sin(a)) * 16.0, GameConstants.C_GOLD.darkened(0.3), 0.7)
 	draw_circle(cc, 7.0, Color(0.12, 0.10, 0.18))
-	draw_arc(cc, 7.0, 0.0, TAU, 12, C_GOLD, 1.2)
-	draw_circle(cc, 3.0, C_GOLD.lightened(0.2))
+	draw_arc(cc, 7.0, 0.0, TAU, 12, GameConstants.C_GOLD, 1.2)
+	draw_circle(cc, 3.0, GameConstants.C_GOLD.lightened(0.2))
 	if night:
-		draw_circle(cc, 35.0, Color(C_NEON_AMB.r, C_NEON_AMB.g, C_NEON_AMB.b, 0.07 + 0.01 * sin(t * 0.9)))
+		draw_circle(cc, 35.0, Color(GameConstants.C_NEON_AMB.r, GameConstants.C_NEON_AMB.g, GameConstants.C_NEON_AMB.b, 0.07 + 0.01 * sin(t * 0.9)))
 
 	# Bar counter (along east side of main hall, inside)
 	draw_rect(Rect2(458, 160, 16, 160), Color("#1a1018"))
 	draw_rect(Rect2(458, 160, 16, 160), Color("#2e1e28"), false, 0.8)
 	# Bar top trim
-	draw_line(Vector2(458, 160), Vector2(458, 320), C_GOLD.darkened(0.4), 1.2)
+	draw_line(Vector2(458, 160), Vector2(458, 320), GameConstants.C_GOLD.darkened(0.4), 1.2)
 	# Bar stools (circles along bar front)
 	for sy in [185.0, 215.0, 245.0, 275.0, 305.0]:
 		draw_circle(Vector2(450, sy), 5.0, Color("#241820"))
@@ -353,7 +303,7 @@ func _draw_table_with_chairs(center: Vector2) -> void:
 	# Table
 	draw_circle(center, 10.0, Color("#1c1420"))
 	draw_arc(   center, 10.0, 0.0, TAU, 14, Color("#2e2030"), 0.8)
-	draw_circle(center,  3.0, Color("#c8a84e").darkened(0.5))
+	draw_circle(center,  3.0, GameConstants.C_GOLD.darkened(0.5))
 	# Chairs (4 cardinal positions)
 	for a_deg: float in [0.0, 90.0, 180.0, 270.0]:
 		var a  := deg_to_rad(a_deg)
@@ -384,10 +334,9 @@ func _draw_wing(r: Rect2, side: int) -> void:
 		var fx := r.position.x + 6.0
 		var fw := r.size.x - 12.0
 		draw_rect(Rect2(fx, fy, fw, 20), Color("#0e0c10"))
-		draw_rect(Rect2(fx, fy, fw, 20), C_GOLD.darkened(0.5), false, 0.8)
-		# Abstract art lines inside frame
-		draw_line(Vector2(fx + 4, fy + 5), Vector2(fx + fw - 4, fy + 15), Color(C_NEON_PINK.r, C_NEON_PINK.g, C_NEON_PINK.b, 0.4), 0.7)
-		draw_line(Vector2(fx + 4, fy + 15), Vector2(fx + fw - 4, fy + 5), Color(C_NEON_CYAN.r, C_NEON_CYAN.g, C_NEON_CYAN.b, 0.3), 0.7)
+		draw_rect(Rect2(fx, fy, fw, 20), GameConstants.C_GOLD.darkened(0.5), false, 0.8)
+		draw_line(Vector2(fx + 4, fy + 5), Vector2(fx + fw - 4, fy + 15), Color(GameConstants.C_NEON_PINK.r, GameConstants.C_NEON_PINK.g, GameConstants.C_NEON_PINK.b, 0.4), 0.7)
+		draw_line(Vector2(fx + 4, fy + 15), Vector2(fx + fw - 4, fy + 5), Color(GameConstants.C_NEON_CYAN.r, GameConstants.C_NEON_CYAN.g, GameConstants.C_NEON_CYAN.b, 0.3), 0.7)
 
 	# Corner plants
 	for ppy: float in [158.0, 340.0]:
@@ -402,13 +351,13 @@ func _draw_foyer() -> void:
 	# Concentric inlay rectangles
 	for i in range(4):
 		var shrink := float(i) * 8.0
-		var col    := Color(C_GOLD.r, C_GOLD.g, C_GOLD.b, 0.06 + float(i) * 0.03)
-		draw_rect(R_FOYER.grow(-shrink), col, false, 0.7)
+		var col    := Color(GameConstants.C_GOLD.r, GameConstants.C_GOLD.g, GameConstants.C_GOLD.b, 0.06 + float(i) * 0.03)
+		draw_rect(GameConstants.R_FOYER.grow(-shrink), col, false, 0.7)
 
 	# Reception desk
 	draw_rect(Rect2(248, 380, 96, 20), Color("#1a1318"))
 	draw_rect(Rect2(248, 380, 96, 20), Color("#2a1f28"), false, 0.7)
-	draw_line(Vector2(248, 380), Vector2(344, 380), C_GOLD.darkened(0.4), 0.8)
+	draw_line(Vector2(248, 380), Vector2(344, 380), GameConstants.C_GOLD.darkened(0.4), 0.8)
 
 	# Foyer lamps (two floor lamps)
 	for lx: float in [215.0, 425.0]:
@@ -417,7 +366,7 @@ func _draw_foyer() -> void:
 		draw_circle(Vector2(lx, 380), 3.0, Color(0.9, 0.78, 0.5, 0.7))
 
 	# Stone tile grid
-	_draw_grid(R_FOYER, 16.0, Color(0.10, 0.12, 0.16, 0.3))
+	_draw_grid(GameConstants.R_FOYER, 16.0, Color(0.10, 0.12, 0.16, 0.3))
 
 	# Door frames
 	_draw_door_frame(Vector2(260, 460), Vector2(380, 460))
@@ -425,7 +374,7 @@ func _draw_foyer() -> void:
 # ── Plaza outdoor detail ──────────────────────────────────────────────────────
 func _draw_plaza(night: bool, t: float) -> void:
 	# Stone paver grid
-	_draw_grid(R_PLAZA, 20.0, Color(0.11, 0.13, 0.17, 0.4))
+	_draw_grid(GameConstants.R_PLAZA, 20.0, Color(0.11, 0.13, 0.17, 0.4))
 
 	# Central fountain
 	var fc := Vector2(320, 530)
@@ -494,10 +443,10 @@ func _draw_fire_escape(top: Vector2, bottom: Vector2) -> void:
 
 # ── Door frame marker ─────────────────────────────────────────────────────────
 func _draw_door_frame(a: Vector2, b: Vector2) -> void:
-	var fc := Color(C_GOLD.r, C_GOLD.g, C_GOLD.b, 0.5)
+	var fc := Color(GameConstants.C_GOLD.r, GameConstants.C_GOLD.g, GameConstants.C_GOLD.b, 0.5)
 	draw_circle(a, 2.0, fc)
 	draw_circle(b, 2.0, fc)
-	draw_line(a, b, Color(C_GOLD.r, C_GOLD.g, C_GOLD.b, 0.18), 0.8)
+	draw_line(a, b, Color(GameConstants.C_GOLD.r, GameConstants.C_GOLD.g, GameConstants.C_GOLD.b, 0.18), 0.8)
 
 # ── Suspicion bar ─────────────────────────────────────────────────────────────
 func _draw_suspicion_bar() -> void:
@@ -597,7 +546,7 @@ func _create_extraction() -> void:
 	sh.size = Vector2(60.0, 48.0)
 	cs.shape = sh
 	area.add_child(cs)
-	area.position = EXTRACTION_POS
+	area.position = GameConstants.EXTRACTION_POS
 	area.body_entered.connect(_on_extract_entered)
 	area.body_exited.connect(_on_extract_exited)
 	add_child(area)
@@ -606,7 +555,7 @@ func _create_extraction() -> void:
 	# Visual marker (visibility toggled by mission_controller)
 	extraction_marker          = Node2D.new()
 	extraction_marker.name     = "ExtractionMarker"
-	extraction_marker.position = EXTRACTION_POS
+	extraction_marker.position = GameConstants.EXTRACTION_POS
 	extraction_marker.visible  = false
 	add_child(extraction_marker)
 
@@ -621,8 +570,8 @@ func _on_extract_exited(body) -> void:
 # ── Shadow zones ──────────────────────────────────────────────────────────────
 func _create_shadow_zones() -> void:
 	for data: Array in [
-		[R_WEST,                              "ShadowWest"],
-		[R_EAST,                              "ShadowEast"],
+		[GameConstants.R_WEST,                              "ShadowWest"],
+		[GameConstants.R_EAST,                              "ShadowEast"],
 		[Rect2(100, 20, 122, 65),                         "ShadowAlleyLeft"],
 		[Rect2(418, 20, 122, 65),                         "ShadowAlleyRight"],
 		[Rect2(120, 150, 40, 220),                        "ShadowMainLeft"],
@@ -769,9 +718,9 @@ func _build_level_geometry() -> void:
 		_add_phys_circle(p, 9.0)
 		
 	_neon_strips = [
-		[Vector2(120, 165), Vector2(480, 165), C_NEON_PINK],
-		[Vector2(120, 358), Vector2(480, 358), C_NEON_CYAN],
-		[Vector2(100, 88), Vector2(540, 88), C_NEON_AMB]
+		[Vector2(120, 165), Vector2(480, 165), GameConstants.C_NEON_PINK],
+		[Vector2(120, 358), Vector2(480, 358), GameConstants.C_NEON_CYAN],
+		[Vector2(100, 88), Vector2(540, 88), GameConstants.C_NEON_AMB]
 	]
 	
 	var wall_rects = [
@@ -792,17 +741,18 @@ func _add_phys_circle(pos: Vector2, r: float) -> void:
 	sh.radius = r; cs.shape = sh; b.add_child(cs); add_child(b)
 
 func _spawn_player_node() -> void:
-	player = PLAYER_SCRIPT.new(); player.world_ref = self
+	player = GameConstants.PLAYER_SCRIPT.new(); player.world_ref = self
 	var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 	sh.radius = 6.0; cs.shape = sh; player.add_child(cs)
 	player.position = Vector2(320.0, 530.0); add_child(player)
 	_camera.reparent(player); _camera.position = Vector2.ZERO
 
 func _spawn_npc_nodes() -> void:
-	for s in NPC_SPAWNS:
-		var npc = NPC_SCRIPT.new(); npc.world_ref = self
+	for s in GameConstants.NPC_SPAWNS:
+		var npc = GameConstants.NPC_SCRIPT.new(); npc.world_ref = self
 		npc.setup(s.role, s.name, s.key, s.phase)
 		npc.position = s.pos; npc.patrol_points.assign(s.patrol)
+		npc.suspicion_detected.connect(raise_suspicion)
 		var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 		sh.radius = 5.0; cs.shape = sh; npc.add_child(cs)
 		npc_root.add_child(npc)
@@ -813,7 +763,7 @@ func _spawn_npc_nodes() -> void:
 			"target": target_npc = npc
 
 func _setup_hud() -> void:
-	hud.title = _create_label("GOLDEN BOY", 16, Vector2(150, 6), C_GOLD)
+	hud.title = _create_label("GOLDEN BOY", 16, Vector2(150, 6), GameConstants.C_GOLD)
 	hud.objective = _create_label("", 7, Vector2(6, 256), Color("#aabbcc"))
 	hud.money = _create_label("$0", 7, Vector2(6, 8), Color("#44bb66"))
 	hud.message = _create_label("", 8, Vector2(70, 128), Color("#ffffff"))

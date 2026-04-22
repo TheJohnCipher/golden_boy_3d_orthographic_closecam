@@ -1,5 +1,8 @@
 extends CharacterBody2D
 
+signal suspicion_detected(amount: float, npc_name: String)
+signal interaction_started(npc)
+
 var world_ref        = null
 var npc_name         := "NPC"
 var role             := "civilian"
@@ -74,7 +77,7 @@ func _physics_process(delta: float) -> void:
 	if world_ref.mission_failed or world_ref.level_complete:
 		return
 	if world_ref != null and world_ref.player != null and role in ["guard", "witness", "target"] and can_detect_player(world_ref.player):
-		world_ref.raise_suspicion(detect_rate * delta, npc_name)
+		suspicion_detected.emit(detect_rate * delta, npc_name)
 
 func _run_patrol(delta: float) -> void:
 	if patrol_points.size() < 2 or role not in ["guard", "witness", "civilian"]:
