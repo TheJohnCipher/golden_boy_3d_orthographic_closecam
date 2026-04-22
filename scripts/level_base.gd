@@ -6,9 +6,17 @@ const GameConstants = preload("res://scripts/game_constants.gd")
 ## Click this in the Inspector to instantly restore the map as nodes
 @export var build_prototype : bool = false : set = _set_build
 
-func _set_build(_v: bool) -> void:
-	for c in get_children(): c.free()
-	_generate_geometry()
+func _set_build(v: bool) -> void:
+	build_prototype = v
+	# Prevent running setter logic if we are just loading the scene
+	if not is_inside_tree(): return
+	
+	# Safe way to clear children in tool scripts: iterate over a copy of the list
+	for c in get_children():
+		c.free()
+	
+	if v:
+		_generate_geometry()
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
@@ -43,6 +51,11 @@ func _generate_geometry() -> void:
 	
 	for data in rooms:
 		_create_room_nodes(data[0], data[1], data[2])
+	
+	# Restore Neon Strips
+	_create_neon_strip("NeonPink", Vector2(120, 165), Vector2(480, 165), GameConstants.C_NEON_PINK)
+	_create_neon_strip("NeonCyan", Vector2(120, 358), Vector2(480, 358), GameConstants.C_NEON_CYAN)
+	_create_neon_strip("NeonAmb",  Vector2(100, 88),  Vector2(540, 88),  GameConstants.C_NEON_AMB)
 
 	# Create Perimeter Walls (North, South, West, East)
 	_create_collision_rect("WallNorth", Rect2(20, 12, 600, 7))
@@ -54,6 +67,13 @@ func _generate_geometry() -> void:
 	var pillars = [Vector2(195, 210), Vector2(365, 210), Vector2(195, 315), Vector2(365, 315)]
 	for i in range(pillars.size()):
 		_create_collision_circle("Pillar_" + str(i), pillars[i], 9.0)
+		_create_visual_circle("PillarVis_" + str(i), pillars[i], 9.0, Color("#1c2030"))
+		_create_pillar_face("PillarFace_" + str(i), pillars[i], 9.0)
+
+	# Create some furniture props (Tables in Main Hall)
+	var tables = [Vector2(175, 220), Vector2(175, 310), Vector2(320, 190), Vector2(320, 340)]
+	for i in range(tables.size()):
+		_create_visual_circle("Table_" + str(i), tables[i], 10.0, Color("#1c1420"))
 	
 	# Create Stealth/Shadow Zones
 	_create_logic_area("ShadowWest", GameConstants.R_WEST)
@@ -63,6 +83,7 @@ func _generate_geometry() -> void:
 	
 	# Create Extraction Zone
 	_create_logic_area("ExtractionZone", Rect2(GameConstants.EXTRACTION_POS - Vector2(30,24), Vector2(60, 48)))
+	_create_visual_marker("ExtractionMarker", GameConstants.EXTRACTION_POS)
 
 func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	var poly = Polygon2D.new()
@@ -85,6 +106,57 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	face.color = GameConstants.C_WALL_FACE
 	add_child(face)
 	if Engine.is_editor_hint(): face.owner = self
+
+func _create_neon_strip(l_name: String, from: Vector2, to: Vector2, color: Color) -> void:
+	var line = Line2D.new()
+	line.name = l_name
+	line.points = PackedVector2Array([from, to])
+	line.width = 1.5
+	line.default_color = color
+	add_child(line)
+	if Engine.is_editor_hint(): line.owner = self
+
+func _create_visual_circle(v_name: String, pos: Vector2, radius: float, color: Color) -> void:
+	var poly = Polygon2D.new()
+	poly.name = v_name
+	var pts = PackedVector2Array()
+	for i in range(16):
+		var a = TAU * i / 16.0
+		pts.append(pos + Vector2(cos(a), sin(a)) * radius)
+	poly.polygon = pts
+	poly.color = color
+	add_child(poly)
+	if Engine.is_editor_hint(): poly.owner = self
+
+func _create_pillar_face(f_name: String, pos: Vector2, radius: float) -> void:
+	var face = Polygon2D.new()
+	face.name = f_name
+	var h = GameConstants.WALL_FACE_H
+	# A simple vertical face representing the "front" of the pillar
+	face.polygon = PackedVector2Array([
+		Vector2(pos.x - radius, pos.y), Vector2(pos.x + radius, pos.y),
+		Vector2(pos.x + radius, pos.y + h), Vector2(pos.x - radius, pos.y + h)
+	])
+	face.color = GameConstants.C_WALL_FACE
+	add_child(face)
+	if Engine.is_editor_hint(): face.owner = self
+
+func _create_visual_marker(m_name: String, pos: Vector2) -> void:
+	var marker = Node2D.new()
+	marker.name = m_name
+	marker.position = pos
+	# Add a small pulse visual
+	var pulse = Polygon2D.new()
+	pulse.name = "Pulse"
+	var pts = PackedVector2Array()
+	for i in range(8):
+		var a = TAU * i / 8.0
+		pts.append(Vector2(cos(a), sin(a)) * 10.0)
+	pulse.polygon = pts
+	pulse.color = Color(0.2, 1.0, 0.4, 0.4)
+	marker.add_child(pulse)
+	add_child(marker)
+	if Engine.is_editor_hint(): marker.owner = self; pulse.owner = self
 
 func _create_collision_rect(p_name: String, rect: Rect2) -> void:
 	var body = StaticBody2D.new()

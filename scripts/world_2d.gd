@@ -5,6 +5,8 @@ const MissionManager = preload("res://scripts/mission_manager.gd")
 # Constants are now handled via GameConstants class
 
 # ── Light proxy so mission_controller tweens work in 2D ──────────────────────
+const HUD_SCENE = preload("res://scenes/hud_2d.tscn")
+
 class LightProxy extends Node:
 	var light_energy : float = 0.0
 	var visible      : bool  = true
@@ -16,8 +18,6 @@ var civilian_npcs      : Array = []
 var target_npc                 = null
 var extraction_area            = null
 var extraction_marker          = null
-var message_text       := ""
-var message_timer      := 0.0
 
 var mission : MissionManager
 var player             = null
@@ -31,11 +31,10 @@ var moon_light : LightProxy
 var point_lights       : Array = []
 var npc_root   : Node2D
 var marker_root : Node2D
-var hud                := {}
+var hud                : CanvasLayer
 
 var _camera    : Camera2D
 var _night_tint : ColorRect
-var _hud_layer : CanvasLayer
 
 var night_start_position := GameConstants.NIGHT_START_POSITION
 var level_node : Node2D
@@ -44,19 +43,19 @@ var level_node : Node2D
 func _ready() -> void:
 	mission = MissionManager.new()
 	add_child(mission)
-	mission.state_changed.connect(_update_hud_elements)
+
+	_init_input_map()
+	_setup_hud() # Initialize HUD early so other nodes can reference it
 	mission.message_requested.connect(_show_message)
 	mission.mission_failed.connect(_fail_mission)
 	mission.difficulty_spiked.connect(_on_difficulty_spiked)
 
-	_init_input_map()
 	_init_roots()
 	_init_lights()
 	_setup_camera()
 	_setup_environment_layers()
 	_spawn_player_node()
 	_spawn_npc_nodes()
-	_setup_hud()
 	_configure_window()
 	_find_level_node()
 	_apply_phase_visibility()
@@ -91,35 +90,11 @@ func _init_lights() -> void:
 
 # ── Runtime Overlays ─────────────────────────────────────────────────────────
 func _draw() -> void:
-	# We only draw dynamic mission overlays now. 
-	# Room geometry should be handled by Polygon2D nodes in the level scene.
-	var night := mission.phase == "night"
-	if night:
-		_draw_suspicion_bar()
-
-# ── Suspicion bar ─────────────────────────────────────────────────────────────
-func _draw_suspicion_bar() -> void:
-	var bar_x := 330.0
-	var bar_y := 252.0
-	var bar_w := 140.0
-	var fill  := (mission.suspicion / 100.0) * bar_w
-	var bc    := Color(1.0, 0.28, 0.28) if mission.suspicion > 60.0 else Color(0.85, 0.55, 0.30)
-	# Background track
-	draw_rect(Rect2(bar_x - 1, bar_y - 1, bar_w + 2, 8), Color(0.08, 0.04, 0.04))
-	draw_rect(Rect2(bar_x, bar_y, bar_w, 6), Color(0.14, 0.07, 0.07))
-	# Fill
-	if fill > 0.0:
-		draw_rect(Rect2(bar_x, bar_y, fill, 6), bc)
-		# Shimmer on bar
-		draw_rect(Rect2(bar_x, bar_y, fill, 2), Color(bc.r, bc.g, bc.b, 0.4))
-	# Border
-	draw_rect(Rect2(bar_x - 1, bar_y - 1, bar_w + 2, 8), Color(0.35, 0.12, 0.12), false, 0.8)
+	pass # All drawing is now handled by nodes!
 
 # ── Player ────────────────────────────────────────────────────────────────────
 func _show_message(txt: String) -> void:
-	message_text = txt
-	message_timer = 4.0
-	_update_hud_elements()
+	hud.show_temporary_message(txt)
 
 func _apply_phase_visibility() -> void:
 	for npc in contact_npcs: npc.visible = (mission.phase == "day")
@@ -134,15 +109,15 @@ func _fail_mission(reason: String) -> void:
 
 # ── NPCs ──────────────────────────────────────────────────────────────────────
 func _update_prompt() -> void:
-	hud.prompt_panel.visible = false
 	if mission.is_failed or mission.is_complete: return
 	for npc in npc_root.get_children():
 		if npc.can_interact(player) or npc.is_takedown_reachable(player):
-			hud.prompt.text = "[ E ] " + ("Talk to " if npc.role == "contact" else "Takedown ") + npc.npc_name
-			hud.prompt_panel.visible = true
+			hud.set_prompt("[ E ] " + ("Talk to " if npc.role == "contact" else "Takedown ") + npc.npc_name)
 			return
 	if near_extraction and mission.takedown_done:
-		hud.prompt.text = "[ E ] Extract"; hud.prompt_panel.visible = true
+		hud.set_prompt("[ E ] Extract")
+	else:
+		hud.set_prompt("")
 
 # ── Extraction zone ───────────────────────────────────────────────────────────
 # Extraction and Shadows should now be Area2D nodes inside your Level scene.
@@ -154,14 +129,8 @@ func _on_shadow_exited(body) -> void: if body == player: player.exit_shadow()
 
 # ── Game loop ─────────────────────────────────────────────────────────────────
 func _process(delta: float) -> void:
-	if message_timer > 0.0:
-		message_timer -= delta
-		if message_timer <= 0.0:
-			message_text = ""
-			_update_hud_elements() # Only update when message clears
-
 	_update_prompt()
-	queue_redraw()
+	# queue_redraw() no longer needed for UI
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
@@ -195,8 +164,8 @@ func _begin_night() -> void:
 	# Fade out title + objective, fade in night tint
 	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(hud["title"],     "modulate:a", 0.0, 0.5).set_delay(0.4)
-	tw.tween_property(hud["objective"], "modulate:a", 0.0, 0.5).set_delay(0.4)
+	tw.tween_property(hud.title,     "modulate:a", 0.0, 0.5).set_delay(0.4)
+	tw.tween_property(hud.objective, "modulate:a", 0.0, 0.5).set_delay(0.4)
 	tw.tween_property(_night_tint,      "color",
 		Color(0.0, 0.03, 0.12, 0.58), 1.2)
 	await tw.finished
@@ -209,8 +178,8 @@ func _begin_night() -> void:
 	# Fade title + objective back in
 	var tw2 := create_tween()
 	tw2.set_parallel(true)
-	tw2.tween_property(hud["title"],     "modulate:a", 1.0, 0.5)
-	tw2.tween_property(hud["objective"], "modulate:a", 1.0, 0.5)
+	tw2.tween_property(hud.title,     "modulate:a", 1.0, 0.5)
+	tw2.tween_property(hud.objective, "modulate:a", 1.0, 0.5)
 	_show_message(
 		"Night phase. Alden is in the main hall. Get behind him and strike. Extract through the alley.")
 
@@ -258,7 +227,6 @@ func _setup_environment_layers() -> void:
 	_night_tint = ColorRect.new(); _night_tint.size = Vector2(1000, 1000)
 	_night_tint.position = Vector2(-500, -500); _night_tint.color = Color(0,0,0,0)
 	tint_layer.add_child(_night_tint)
-	_hud_layer = CanvasLayer.new(); _hud_layer.layer = 1; add_child(_hud_layer)
 
 func _spawn_player_node() -> void:
 	player = GameConstants.PLAYER_SCRIPT.new(); player.world_ref = self
@@ -283,28 +251,10 @@ func _spawn_npc_nodes() -> void:
 			"target": target_npc = npc
 
 func _setup_hud() -> void:
-	hud.title = _create_label("GOLDEN BOY", 16, Vector2(150, 6), GameConstants.C_GOLD)
-	hud.objective = _create_label("", 7, Vector2(6, 256), Color("#aabbcc"))
-	hud.money = _create_label("$0", 7, Vector2(6, 8), Color("#44bb66"))
-	hud.message = _create_label("", 8, Vector2(70, 128), Color("#ffffff"))
-	hud.suspicion = _create_label("", 7, Vector2(330, 248), Color("#ff8866"))
-	hud.prompt_panel = Control.new(); hud.prompt = _create_label("", 8, Vector2(90, 228), Color("#ffdd88"))
-	hud.prompt_panel.add_child(hud.prompt); hud.prompt_panel.visible = false
-	hud.phase_hint = _create_label("[ TAB ] Start Night", 6, Vector2(6, 264), Color(0.4, 0.4, 0.5))
-	for node in [hud.title, hud.objective, hud.money, hud.message, hud.suspicion, hud.prompt_panel, hud.phase_hint]: 
-		_hud_layer.add_child(node)
-
-func _create_label(t: String, s: int, p: Vector2, c: Color) -> Label:
-	var l = Label.new(); l.text = t; l.position = p
-	l.add_theme_font_size_override("font_size", s); l.add_theme_color_override("font_color", c)
-	return l
-
-func _update_hud_elements() -> void:
-	hud.objective.text = mission.current_objective
-	hud.money.text = "$" + str(mission.money)
-	hud.message.text = message_text; hud.message.visible = message_text != ""
-	hud.suspicion.text = "SUSPICION: " + str(int(mission.suspicion)) if mission.phase == "night" else ""
-	hud.phase_hint.visible = (mission.phase == "day" and not mission.is_failed)
+	# We now use the visual scene instead of building it in code
+	hud = HUD_SCENE.instantiate()
+	add_child(hud)
+	hud.setup(mission)
 
 func _handle_contact_logic(npc) -> void:
 	if npc.interaction_used: return
