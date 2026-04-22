@@ -1,0 +1,179 @@
+[gd_scene format=3 uid="uid://d1is5yrlhrxfh"]
+
+[ext_resource type="Script" uid="uid://mncb6wnsikyy" path="res://scripts/level_base.gd" id="1_014kd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_014kd"]
+size = Vector2(600, 7)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bswci"]
+size = Vector2(600, 7)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rus8k"]
+size = Vector2(7, 601)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5xbjy"]
+size = Vector2(7, 601)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4nkto"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fcfvj"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pa8r4"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_15mv3"]
+radius = 9.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e3sih"]
+size = Vector2(100, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2y5yt"]
+size = Vector2(100, 200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2os1m"]
+size = Vector2(122, 65)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_go7sj"]
+size = Vector2(122, 65)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7gny6"]
+size = Vector2(60, 48)
+
+[node name="Level" type="Node2D" unique_id=1551781726]
+script = ExtResource("1_014kd")
+
+[node name="AlleyFloor" type="Polygon2D" parent="." unique_id=1305775730]
+color = Color(0.050980393, 0.0627451, 0.08627451, 1)
+polygon = PackedVector2Array(100, 20, 540, 20, 540, 85, 100, 85)
+
+[node name="AlleyWallFace" type="Polygon2D" parent="." unique_id=417267259]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(100, 85, 540, 85, 540, 112.69231, 100, 112.69231)
+
+[node name="BackHallFloor" type="Polygon2D" parent="." unique_id=1221191858]
+color = Color(0.06666667, 0.08235294, 0.1254902, 1)
+polygon = PackedVector2Array(100, 85, 540, 85, 540, 150, 100, 150)
+
+[node name="BackHallWallFace" type="Polygon2D" parent="." unique_id=616225540]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(100, 150, 540, 150, 540, 177.6923, 100, 177.6923)
+
+[node name="WestWingFloor" type="Polygon2D" parent="." unique_id=1048570763]
+color = Color(0.0627451, 0.05490196, 0.09411765, 1)
+polygon = PackedVector2Array(20, 150, 120, 150, 120, 350, 20, 350)
+
+[node name="WestWingWallFace" type="Polygon2D" parent="." unique_id=1892437196]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(20, 350, 120, 350, 120, 377.69232, 20, 377.69232)
+
+[node name="MainHallFloor" type="Polygon2D" parent="." unique_id=376183170]
+color = Color(0.101960786, 0.07058824, 0.14509805, 1)
+polygon = PackedVector2Array(120, 150, 480, 150, 480, 370, 120, 370)
+
+[node name="MainHallWallFace" type="Polygon2D" parent="." unique_id=1805875622]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(120, 370, 480, 370, 480, 397.69232, 120, 397.69232)
+
+[node name="EastWingFloor" type="Polygon2D" parent="." unique_id=373310347]
+color = Color(0.0627451, 0.05490196, 0.09411765, 1)
+polygon = PackedVector2Array(480, 150, 580, 150, 580, 350, 480, 350)
+
+[node name="EastWingWallFace" type="Polygon2D" parent="." unique_id=942381699]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(480, 350, 580, 350, 580, 377.69232, 480, 377.69232)
+
+[node name="FoyerFloor" type="Polygon2D" parent="." unique_id=1688808896]
+color = Color(0.078431375, 0.101960786, 0.14117648, 1)
+polygon = PackedVector2Array(200, 370, 440, 370, 440, 460, 200, 460)
+
+[node name="FoyerWallFace" type="Polygon2D" parent="." unique_id=564756662]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(200, 460, 440, 460, 440, 487.69232, 200, 487.69232)
+
+[node name="PlazaFloor" type="Polygon2D" parent="." unique_id=1935090122]
+color = Color(0.05490196, 0.07058824, 0.09411765, 1)
+polygon = PackedVector2Array(100, 460, 540, 460, 540, 600, 100, 600)
+
+[node name="PlazaWallFace" type="Polygon2D" parent="." unique_id=361642805]
+color = Color(0.039215688, 0.047058824, 0.07058824, 1)
+polygon = PackedVector2Array(100, 600, 540, 600, 540, 627.6923, 100, 627.6923)
+
+[node name="WallNorth" type="StaticBody2D" parent="." unique_id=1946477027]
+position = Vector2(320, 15.5)
+
+[node name="@CollisionShape2D@25780" type="CollisionShape2D" parent="WallNorth" unique_id=2127980649]
+shape = SubResource("RectangleShape2D_014kd")
+
+[node name="WallSouth" type="StaticBody2D" parent="." unique_id=1457099764]
+position = Vector2(320, 609.5)
+
+[node name="@CollisionShape2D@25781" type="CollisionShape2D" parent="WallSouth" unique_id=1725603366]
+shape = SubResource("RectangleShape2D_bswci")
+
+[node name="WallWest" type="StaticBody2D" parent="." unique_id=738085548]
+position = Vector2(15.5, 312.5)
+
+[node name="@CollisionShape2D@25782" type="CollisionShape2D" parent="WallWest" unique_id=2139992288]
+shape = SubResource("RectangleShape2D_rus8k")
+
+[node name="WallEast" type="StaticBody2D" parent="." unique_id=1276595473]
+position = Vector2(624.5, 312.5)
+
+[node name="@CollisionShape2D@25783" type="CollisionShape2D" parent="WallEast" unique_id=2030771051]
+shape = SubResource("RectangleShape2D_5xbjy")
+
+[node name="Pillar_0" type="StaticBody2D" parent="." unique_id=483979522]
+position = Vector2(195, 210)
+
+[node name="@CollisionShape2D@25784" type="CollisionShape2D" parent="Pillar_0" unique_id=1674899489]
+shape = SubResource("CircleShape2D_4nkto")
+
+[node name="Pillar_1" type="StaticBody2D" parent="." unique_id=645201804]
+position = Vector2(365, 210)
+
+[node name="@CollisionShape2D@25785" type="CollisionShape2D" parent="Pillar_1" unique_id=1965623238]
+shape = SubResource("CircleShape2D_fcfvj")
+
+[node name="Pillar_2" type="StaticBody2D" parent="." unique_id=1108680598]
+position = Vector2(195, 315)
+
+[node name="@CollisionShape2D@25786" type="CollisionShape2D" parent="Pillar_2" unique_id=430879415]
+shape = SubResource("CircleShape2D_pa8r4")
+
+[node name="Pillar_3" type="StaticBody2D" parent="." unique_id=1220837519]
+position = Vector2(365, 315)
+
+[node name="@CollisionShape2D@25787" type="CollisionShape2D" parent="Pillar_3" unique_id=2129134213]
+shape = SubResource("CircleShape2D_15mv3")
+
+[node name="ShadowWest" type="Area2D" parent="." unique_id=472279120]
+position = Vector2(70, 250)
+
+[node name="@CollisionShape2D@25788" type="CollisionShape2D" parent="ShadowWest" unique_id=860842935]
+shape = SubResource("RectangleShape2D_e3sih")
+
+[node name="ShadowEast" type="Area2D" parent="." unique_id=1410499603]
+position = Vector2(530, 250)
+
+[node name="@CollisionShape2D@25789" type="CollisionShape2D" parent="ShadowEast" unique_id=1121998311]
+shape = SubResource("RectangleShape2D_2y5yt")
+
+[node name="ShadowAlleyLeft" type="Area2D" parent="." unique_id=2038096095]
+position = Vector2(161, 52.5)
+
+[node name="@CollisionShape2D@25790" type="CollisionShape2D" parent="ShadowAlleyLeft" unique_id=533439932]
+shape = SubResource("RectangleShape2D_2os1m")
+
+[node name="ShadowAlleyRight" type="Area2D" parent="." unique_id=1305723956]
+position = Vector2(479, 52.5)
+
+[node name="@CollisionShape2D@25791" type="CollisionShape2D" parent="ShadowAlleyRight" unique_id=1920941027]
+shape = SubResource("RectangleShape2D_go7sj")
+
+[node name="ExtractionZone" type="Area2D" parent="." unique_id=2130740331]
+position = Vector2(460, 46)
+
+[node name="@CollisionShape2D@25792" type="CollisionShape2D" parent="ExtractionZone" unique_id=2055763072]
+shape = SubResource("RectangleShape2D_7gny6")

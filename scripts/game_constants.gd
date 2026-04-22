@@ -9,10 +9,15 @@ const C_EAST      := Color("#100e18")
 const C_FOYER     := Color("#141a24")
 const C_PLAZA     := Color("#0e1218")
 const C_TRIM      := Color("#1c2030")
+const C_WALL_FACE  := Color("#0a0c12")
 const C_GOLD      := Color("#c8a84e")
 const C_NEON_PINK := Color("#ff44a0")
 const C_NEON_CYAN := Color("#44d8ff")
 const C_NEON_AMB  := Color("#ffbf44")
+
+# -- Projection --
+const ISO_Y_SCALE  := 0.65
+const WALL_FACE_H  := 18.0 / ISO_Y_SCALE
 
 # -- Room rectangles --
 const R_ALLEY     := Rect2(100,  20, 440,  65)
@@ -22,14 +27,6 @@ const R_MAIN_HALL := Rect2(120, 150, 360, 220)
 const R_EAST      := Rect2(480, 150, 100, 200)
 const R_FOYER     := Rect2(200, 370, 240,  90)
 const R_PLAZA     := Rect2(100, 460, 440, 140)
-
-# -- Wall colors --
-const C_WALL_TOP   := Color("#1c2030")
-const C_WALL_FACE  := Color("#0a0c12")
-
-# -- Projection --
-const ISO_Y_SCALE  := 0.65
-const WALL_FACE_H  := 18.0 / ISO_Y_SCALE
 
 # -- NPC spawns --
 const NPC_SPAWNS := [
