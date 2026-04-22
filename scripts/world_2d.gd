@@ -36,7 +36,7 @@ func _ready() -> void:
 	mission.mission_failed.connect(_fail_mission)
 	mission.difficulty_spiked.connect(_on_difficulty_spiked)
 
-	RenderingServer.set_default_clear_color(Color("#0d0d12")) # Dark, moody background
+	RenderingServer.set_default_clear_color(Color("#050508")) # Deep Noir Black
 	_init_input_map()
 	y_sort_enabled = true # Enable depth sorting for the whole world
 	_init_roots()

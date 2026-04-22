@@ -52,6 +52,11 @@ func _generate_geometry() -> void:
 	for data in rooms:
 		_create_room_nodes(data[0], data[1], data[2])
 	
+	# --- ARCHITECTURAL HEADERS (Lintels) ---
+	# These connect room tops over openings to create "doorways"
+	_create_lintel("FoyerEntrance", Rect2(260, 370, 120, 10))
+	_create_lintel("MainHallEntrance", Rect2(200, 150, 240, 10))
+
 	# --- MAP DESIGN REFINEMENT: INTERIOR & COVER ---
 	
 	# 1. Alley: Industrial Clutter (Hiding Spots)
@@ -160,6 +165,29 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 	add_child(face)
 	if Engine.is_editor_hint(): face.owner = self
 	
+	# --- NORTH WINDOW LIGHT SHAFTS ---
+	if n_name != "Alley" and n_name != "Plaza":
+		for i in range(2):
+			var wx = rect.position.x + (rect.size.x * (0.3 + i * 0.4))
+			var w_rect = Rect2(wx - 20, rect.position.y, 40, rect.size.y * 0.4)
+			var shaft = Polygon2D.new()
+			shaft.polygon = PackedVector2Array([w_rect.position, Vector2(w_rect.end.x, w_rect.position.y), Vector2(w_rect.end.x + 20, w_rect.end.y), Vector2(w_rect.position.x - 20, w_rect.end.y)])
+			shaft.color = Color(1, 1, 1, 0.03) # Very subtle dust/light
+			add_child(shaft)
+			if Engine.is_editor_hint(): shaft.owner = self
+	
+	# Wall Top (The thickness/rim of the wall)
+	var top = Polygon2D.new()
+	top.name = n_name + "WallTop"
+	var t_h = 4.0
+	top.polygon = PackedVector2Array([
+		rect.position, Vector2(rect.end.x, rect.position.y),
+		Vector2(rect.end.x, rect.position.y - t_h), Vector2(rect.position.x, rect.position.y - t_h)
+	])
+	top.color = GameConstants.C_WALL_FACE.lightened(0.1)
+	add_child(top)
+	if Engine.is_editor_hint(): top.owner = self
+	
 	# --- SIDE WALLS (Depth for West/East boundaries) ---
 	var side_w = 4.0
 	# West Wall Depth
@@ -205,9 +233,17 @@ func _create_room_nodes(n_name: String, rect: Rect2, color: Color) -> void:
 
 func _create_visual_rect(v_name: String, rect: Rect2, color: Color, add_face: bool = false) -> void:
 	var chamfer = 4.0
+	
+	# Floor Shadow (Cast North-West to ground the object)
+	var sh = Polygon2D.new()
+	sh.name = v_name + "_Shadow"
+	sh.polygon = _get_chamfered_rect_pts(Rect2(rect.position + Vector2(-2, -2), rect.size), chamfer)
+	sh.color = Color(0, 0, 0, 0.25)
+	add_child(sh)
+	if Engine.is_editor_hint(): sh.owner = self
+
 	var poly = Polygon2D.new()
 	poly.name = v_name
-	# Soften the "blocky" look with an 8-point chamfered rectangle
 	poly.polygon = _get_chamfered_rect_pts(rect, chamfer)
 	poly.color = color
 	add_child(poly)
@@ -237,13 +273,36 @@ func _create_visual_rect(v_name: String, rect: Rect2, color: Color, add_face: bo
 		if Engine.is_editor_hint(): bevel.owner = self
 
 func _create_neon_strip(l_name: String, from: Vector2, to: Vector2, color: Color) -> void:
+	var container = Node2D.new()
+	container.name = l_name
+	add_child(container)
+	if Engine.is_editor_hint(): container.owner = self
+
 	var line = Line2D.new()
-	line.name = l_name
 	line.points = PackedVector2Array([from, to])
-	line.width = 1.5
+	line.width = 2.0
 	line.default_color = color
-	add_child(line)
+	container.add_child(line)
 	if Engine.is_editor_hint(): line.owner = self
+
+	# Add a glow/light effect using a PointLight2D
+	var light = PointLight2D.new()
+	light.color = color
+	light.energy = 0.8
+	light.blend_mode = Light2D.BLEND_MODE_ADD
+	light.position = (from + to) / 2.0
+	
+	# Create a procedural glow texture
+	var tex = GradientTexture2D.new()
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.gradient = Gradient.new()
+	tex.gradient.set_color(0, Color(1, 1, 1, 1))
+	tex.gradient.set_color(1, Color(1, 1, 1, 0))
+	light.texture = tex
+	light.texture_scale = (from.distance_to(to) / 64.0)
+	container.add_child(light)
+	if Engine.is_editor_hint(): light.owner = self
 
 func _create_visual_circle(v_name: String, pos: Vector2, radius: float, color: Color) -> void:
 	var poly = Polygon2D.new()
@@ -290,6 +349,20 @@ func _create_pillar_face(f_name: String, pos: Vector2, radius: float) -> void:
 	cap.default_color = GameConstants.C_WALL_FACE.lightened(0.2)
 	add_child(cap)
 	if Engine.is_editor_hint(): cap.owner = self
+
+# --- ARCHITECTURAL HELPERS ---
+
+func _create_lintel(l_name: String, rect: Rect2) -> void:
+	var h = GameConstants.WALL_FACE_H * 0.4 # Lintel is shorter than full wall
+	var poly = Polygon2D.new()
+	poly.name = l_name + "_Face"
+	poly.polygon = PackedVector2Array([
+		rect.position, Vector2(rect.end.x, rect.position.y),
+		Vector2(rect.end.x, rect.position.y + h), Vector2(rect.position.x, rect.position.y + h)
+	])
+	poly.color = GameConstants.C_WALL_FACE.darkened(0.05)
+	add_child(poly)
+	if Engine.is_editor_hint(): poly.owner = self
 
 # --- NEW HELPER FUNCTIONS FOR SHAPE & TEXTURE ---
 

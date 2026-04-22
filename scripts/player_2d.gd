@@ -32,6 +32,7 @@ func _draw() -> void:
 	var hidden := is_hidden()
 	var moving := _move_time > 0.0
 	var step   := sin(_move_time * 12.0)
+	var breath := sin(Time.get_ticks_msec() * 0.003) * 0.2
 	var sprint := InputMap.has_action("sprint") and Input.is_action_pressed("sprint")
 
 	var c_suit := Color("#16121e") if not hidden else Color("#0a080f")
@@ -42,9 +43,12 @@ func _draw() -> void:
 	var c_shoe := Color("#0c0a08") if not hidden else Color("#060504")
 
 	var perp := Vector2(-facing.y, facing.x)
+	# Dynamic Lean: Lean into the direction of movement
+	var lean := facing * (4.0 if sprint else 2.0) if moving else Vector2.ZERO
 
 	# ── Oblique ground shadow (offset south = larger Y, reads as depth) ───────
-	draw_circle(Vector2(0.0, 7.0), 9.0, Color(0.0, 0.0, 0.0, 0.32))
+	var sh_size := 9.0 + (absf(step) * 1.5 if moving else 0.0)
+	draw_circle(Vector2(0.0, 7.0), sh_size, Color(0.0, 0.0, 0.0, 0.32))
 
 	# ── Feet / legs at bottom of figure (south = ground level in oblique) ─────
 	var swing   := step * 3.0 if moving else 0.0
@@ -62,7 +66,7 @@ func _draw() -> void:
 	draw_circle(rl + Vector2(facing.x, facing.y) * 3.2, 1.8, c_shoe)
 
 	# ── Torso (raised above feet) ─────────────────────────────────────────────
-	var body := Vector2(0.0, body_y)
+	var body := Vector2(0.0, body_y + breath) + (lean * 0.4)
 	draw_circle(body, 5.5, c_mid)
 	draw_circle(body + perp * 2.2,  3.2, c_suit)
 	draw_circle(body - perp * 2.2,  3.2, c_suit)
@@ -77,7 +81,7 @@ func _draw() -> void:
 	draw_circle(Vector2(0.0, head_y + 3.5), 2.0, c_skin)
 
 	# ── Head (highest point — clearly "above" body in oblique) ───────────────
-	var head := Vector2(facing.x * 1.5, head_y)
+	var head := Vector2(facing.x * 1.5, head_y + breath) + lean
 	draw_circle(head, 4.0, c_skin)
 	draw_circle(head - Vector2(facing.x, facing.y) * 1.6, 3.4, c_hair)
 	draw_circle(head + Vector2(facing.x, facing.y) * 1.4 + perp * 0.7, 0.8, c_skin.lightened(0.18))
