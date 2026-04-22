@@ -8,7 +8,8 @@ Complete playable stealth blockout prototype.
 3. `godot project.godot` (or drag project.godot to Godot.exe).
 
 ## Controls
-- WASD: Move (camera-relative)
+- WASD: Move
+- Shift: Sprint
 - Mouse: Aim / Look direction
 - E: Interact/takedown/extract
 - Tab: Day->Night (after 3 contacts)
@@ -17,13 +18,15 @@ Complete playable stealth blockout prototype.
 - F11: Fullscreen
 
 ## Flow
-**Day**: E-talk Mara (bench), Jules (podium), Nico (bar). Tab for night.
-**Night**: Shadow-hide (blue zones), takedown target (behind), extract green door.
+**Day**: Talk to Mara (Plaza), Jules (West Wing), Nico (East Wing). Press Tab to start the night.
+**Night**: Navigate the gallery, neutralize Alden (target), and reach the extraction point in the Alley.
 
 **Win**: Victory screen!
 
 ## Core Scripts
 - `scripts/world_2d.gd` (world orchestration)
 - `scripts/player_2d.gd` / `scripts/npc_2d.gd` (characters)
+- `scripts/mission_manager.gd` (game state and rules)
+- `scripts/game_constants.gd` (centralized configuration)
 
-All core logic and data are now consolidated within `scripts/world_2d.gd`.
+The project uses a modular architecture; see `docs/project_summary.md` for details.

@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 signal suspicion_detected(amount: float, npc_name: String)
-signal interaction_started(npc)
 
 var world_ref        = null
 var npc_name         := "NPC"

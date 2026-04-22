@@ -25,8 +25,11 @@ This project is a 2D procedural stealth prototype where the world is drawn using
   - Active NPC controller (patrols, detection, interactions).
 
 ## Active Modules
+*   **MissionManager**: Tracks the current phase, suspicion, and objective. It is the single source of truth for the game rules.
+*   **LevelBase**: Uses `@tool` scripting to build the physical world in the editor.
+*   **HUD**: A reactive `CanvasLayer` that listens for signals from the `MissionManager`.
 
 ## Maintainer Conventions
-
 - Keep `scripts/world_2d.gd` orchestration-focused.
-- Preserve generated metadata (`intent_note`, `authored_name`, `authored_size`, `build_mode`).
+- Prefer **Signals** over direct variable access when communicating between NPCs and the MissionManager.
+- Use `GameConstants.gd` for any value that needs to be balanced (speeds, radii, colors).

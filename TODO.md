@@ -1,16 +1,12 @@
-# Fix GDScript Syntax Errors in world_2d.gd
+# Golden Boy 2D: Development TODO
 
-## Steps:
-1. [x] **Read current world_2d.gd** - Confirmed.
-2. [x] **Edit world_2d.gd** - All syntax fixes applied:
-   - Methods moved/defined.
-   - _draw() and loops indented.
-   - Indents standardized.
-   - Strings fixed.
-   - Missing stubs added.
-3. [ ] **Verify no parse errors** - Check VSCode/Godot.
-4. [ ] **Test run** - Run project.
-5. [ ] **attempt_completion** - Done.
+## Current Tasks
+- [ ] **Environment Detail**: Add wall face polygons to structural pillars in `level_base.gd`.
+- [ ] **Audio System**: Create a `SoundManager` singleton to handle 2D positional audio for footsteps and alerts.
+- [ ] **NPC AI Polish**: Implement a "Searching" state where NPCs move to the player's last known position if they lose sight at high alertness.
+- [ ] **Save System**: Implement JSON serialization for the `MissionManager` state.
 
-Current progress: Step 3.
-
+## Completed Milestones
+- [x] Modular Architecture (World / Level / Mission).
+- [x] Responsive Anchor-based HUD.
+- [x] Individual NPC Alertness Logic.

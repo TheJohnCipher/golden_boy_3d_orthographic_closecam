@@ -4,12 +4,7 @@ const GameConstants = preload("res://scripts/game_constants.gd")
 const MissionManager = preload("res://scripts/mission_manager.gd")
 # Constants are now handled via GameConstants class
 
-# ── Light proxy so mission_controller tweens work in 2D ──────────────────────
 const HUD_SCENE = preload("res://scenes/hud_2d.tscn")
-
-class LightProxy extends Node:
-	var light_energy : float = 0.0
-	var visible      : bool  = true
 
 # ── Mission state (same contract as world_3d) ─────────────────────────────────
 var contact_npcs       : Array = []
@@ -24,13 +19,7 @@ var player             = null
 var near_extraction    := false
 var phase_transition_in_progress := false
 
-# 2D-specific: null so mission_controller's _apply_environment_profile no-ops
-var environment        = null
-var day_sun  : LightProxy
-var moon_light : LightProxy
-var point_lights       : Array = []
 var npc_root   : Node2D
-var marker_root : Node2D
 var hud                : CanvasLayer
 
 var _camera    : Camera2D
@@ -43,19 +32,17 @@ var level_node : Node2D
 func _ready() -> void:
 	mission = MissionManager.new()
 	add_child(mission)
-
-	_init_input_map()
-	_setup_hud() # Initialize HUD early so other nodes can reference it
 	mission.message_requested.connect(_show_message)
 	mission.mission_failed.connect(_fail_mission)
 	mission.difficulty_spiked.connect(_on_difficulty_spiked)
 
+	_init_input_map()
 	_init_roots()
-	_init_lights()
 	_setup_camera()
 	_setup_environment_layers()
 	_spawn_player_node()
 	_spawn_npc_nodes()
+	_setup_hud()
 	_configure_window()
 	_find_level_node()
 	_apply_phase_visibility()
@@ -66,38 +53,16 @@ func _ready() -> void:
 # ── Window ────────────────────────────────────────────────────────────────────
 func _configure_window() -> void:
 	var win := get_viewport().get_window()
-	# Viewport mode keeps pixels sharp; EXPAND fills non-standard aspect ratios
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
-	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
-	win.content_scale_size = Vector2i(640, 360)
-	
-	# Ensure the game world textures stay blocky and sharp, not blurry
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	
+	win.content_scale_size = Vector2i(480, 270)
 	var scr := DisplayServer.window_get_current_screen()
-	# Set window position and size to match the display before entering fullscreen
+	win.size     = DisplayServer.screen_get_size(scr)
 	win.position = DisplayServer.screen_get_position(scr)
-	win.size = DisplayServer.screen_get_size(scr)
-
-	if OS.get_name() != "Web":
-		win.mode = Window.MODE_FULLSCREEN
-	else:
-		win.mode = Window.MODE_WINDOWED
+	win.mode     = Window.MODE_FULLSCREEN
 
 # ── Roots & lights ────────────────────────────────────────────────────────────
 func _init_roots() -> void:
 	npc_root    = Node2D.new(); npc_root.name    = "NPCs";    add_child(npc_root)
-	marker_root = Node2D.new(); marker_root.name = "Markers"; add_child(marker_root)
-
-func _init_lights() -> void:
-	day_sun    = LightProxy.new()
-	moon_light = LightProxy.new()
-	day_sun.light_energy    = 1.8;  day_sun.set_meta("base_energy", 1.8)
-	moon_light.light_energy = 0.0;  moon_light.set_meta("base_energy", 0.32)
-	day_sun.visible    = true
-	moon_light.visible = false
-	add_child(day_sun)
-	add_child(moon_light)
 
 # ── Runtime Overlays ─────────────────────────────────────────────────────────
 func _draw() -> void:
@@ -108,20 +73,11 @@ func _show_message(txt: String) -> void:
 	hud.show_temporary_message(txt)
 
 func _apply_phase_visibility() -> void:
-	var is_day = (mission.phase == "day")
-	var is_night = (mission.phase == "night")
-	
-	for npc in contact_npcs: 
-		if is_instance_valid(npc): npc.visible = is_day
-	for npc in civilian_npcs: 
-		if is_instance_valid(npc): npc.visible = is_day
-	for npc in guard_npcs: 
-		if is_instance_valid(npc): npc.visible = is_night
-	
-	if is_instance_valid(target_npc): 
-		target_npc.visible = is_night
-	if is_instance_valid(extraction_marker): 
-		extraction_marker.visible = (is_night and mission.takedown_done)
+	for npc in contact_npcs: npc.visible = (mission.phase == "day")
+	for npc in civilian_npcs: npc.visible = (mission.phase == "day")
+	if target_npc: target_npc.visible = (mission.phase == "night")
+	for npc in guard_npcs: npc.visible = (mission.phase == "night")
+	if extraction_marker: extraction_marker.visible = (mission.phase == "night" and mission.takedown_done)
 
 func _fail_mission(reason: String) -> void:
 	_show_message("MISSION FAILED: " + reason)
@@ -129,7 +85,7 @@ func _fail_mission(reason: String) -> void:
 
 # ── NPCs ──────────────────────────────────────────────────────────────────────
 func _update_prompt() -> void:
-	if mission.is_failed or mission.is_complete or hud == null: return
+	if mission.is_failed or mission.is_complete: return
 	for npc in npc_root.get_children():
 		if npc.can_interact(player) or npc.is_takedown_reachable(player):
 			hud.set_prompt("[ E ] " + ("Talk to " if npc.role == "contact" else "Takedown ") + npc.npc_name)
@@ -144,16 +100,8 @@ func _update_prompt() -> void:
 # We keep these callbacks so the level can trigger them.
 func _on_extract_entered(body) -> void: if body == player: near_extraction = true
 func _on_extract_exited(body) -> void: if body == player: near_extraction = false
-
-func _on_shadow_entered(body) -> void:
-	if body == player:
-		player.enter_shadow()
-		create_tween().tween_property(player, "modulate", Color(0.4, 0.5, 0.8), 0.2)
-
-func _on_shadow_exited(body) -> void:
-	if body == player:
-		player.exit_shadow()
-		create_tween().tween_property(player, "modulate", Color.WHITE, 0.2)
+func _on_shadow_entered(body) -> void: if body == player: player.enter_shadow()
+func _on_shadow_exited(body) -> void: if body == player: player.exit_shadow()
 
 # ── Game loop ─────────────────────────────────────────────────────────────────
 func _process(delta: float) -> void:
@@ -226,8 +174,7 @@ func _init_input_map() -> void:
 	var map = {
 		"move_left": KEY_A, "move_right": KEY_D, "move_forward": KEY_W, "move_back": KEY_S,
 		"interact": KEY_E, "phase_switch": KEY_TAB, "restart_level": KEY_R,
-		"toggle_fullscreen": KEY_F11, "pause": KEY_P, "toggle_mouse_capture": KEY_ESCAPE,
-		"sprint": KEY_SHIFT
+		"toggle_fullscreen": KEY_F11, "pause": KEY_P, "toggle_mouse_capture": KEY_ESCAPE
 	}
 	for act in map:
 		if not InputMap.has_action(act):
@@ -262,8 +209,7 @@ func _spawn_player_node() -> void:
 	var cs = CollisionShape2D.new(); var sh = CircleShape2D.new()
 	sh.radius = 6.0; cs.shape = sh; player.add_child(cs)
 	player.position = Vector2(320.0, 530.0); add_child(player)
-	_camera.get_parent().remove_child(_camera)
-	player.add_child(_camera); _camera.position = Vector2.ZERO
+	_camera.reparent(player); _camera.position = Vector2.ZERO
 
 func _spawn_npc_nodes() -> void:
 	for s in GameConstants.NPC_SPAWNS:
