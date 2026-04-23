@@ -44,13 +44,22 @@ func update_ui() -> void:
 	phase_hint.visible = (mission.phase == "day" and not mission.is_failed)
 
 func show_temporary_message(txt: String) -> void:
-	if not is_node_ready():
+	if not is_node_ready() or not is_inside_tree():
 		return
-		
+
+	var tree = get_tree()
+	if tree == null:
+		return
+
 	message.text = txt
 	message.visible = true
-	await get_tree().create_timer(4.0).timeout
-	if message.text == txt: # Only hide if no newer message overrode it
+
+	var timer = tree.create_timer(4.0)
+	if timer == null:
+		return
+
+	await timer.timeout
+	if is_instance_valid(message) and message.text == txt:
 		message.visible = false
 
 func set_prompt(txt: String) -> void:

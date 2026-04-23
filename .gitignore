@@ -3,3 +3,5 @@
 Thumbs.db
 .DS_Store
 
+scenes/props/level_1.tscn
+scenes/level_1.tscn

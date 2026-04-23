@@ -1,0 +1,27 @@
+[gd_scene type="Node2D"]
+
+[node name="Table" type="Node2D"]
+y_sort_origin = 48
+
+[node name="Shadow" type="Polygon2D" parent="."]
+position = Vector2(0, 48)
+polygon = PackedVector2Array(0, 0, 96, 0, 92, 4, 4, 4)
+color = Color(0, 0, 0, 0.25)
+
+[node name="Body" type="Sprite2D" parent="."]
+position = Vector2(0, 0)
+centered = false
+texture_filter = 1
+
+[node name="Top" type="Sprite2D" parent="."]
+position = Vector2(0, -2)
+centered = false
+texture_filter = 1
+
+[node name="Collision" type="StaticBody2D" parent="."]
+position = Vector2(0, 48)
+
+[node name="Shape" type="CollisionShape2D" parent="Collision"]
+shape = RectangleShape2D()
+shape.size = Vector2(96, 10)
+position = Vector2(48, 5)

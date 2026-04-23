@@ -1,12 +1,12 @@
 # Golden Boy 2D: Development TODO
 
 ## Current Tasks
-- [ ] **Environment Detail**: Add wall face polygons to structural pillars in `level_base.gd`.
-- [ ] **Audio System**: Create a `SoundManager` singleton to handle 2D positional audio for footsteps and alerts.
-- [ ] **NPC AI Polish**: Implement a "Searching" state where NPCs move to the player's last known position if they lose sight at high alertness.
-- [ ] **Save System**: Implement JSON serialization for the `MissionManager` state.
+- [x] **Audio System**: Created `audio_manager.gd` singleton for standardized playback.
+- [x] **NPC AI Polish**: Implemented "Searching" state behavior for lost targets.
+- [x] **Save System**: Implemented JSON serialization and file I/O for game state.
 
 ## Completed Milestones
 - [x] Modular Architecture (World / Level / Mission).
 - [x] Responsive Anchor-based HUD.
+- [x] Data-Driven Sprite Engine & Y-Sorting.
 - [x] Individual NPC Alertness Logic.

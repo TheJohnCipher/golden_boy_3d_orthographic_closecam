@@ -82,3 +82,43 @@ func complete_mission() -> void:
 	message_requested.emit("Extraction successful. Mission Complete!")
 	state_changed.emit()
 	mission_completed.emit()
+
+# ── 6. Save/Load System (JSON Serialization) ──
+func get_save_data() -> Dictionary:
+	return {
+		"phase": phase,
+		"contacts": contacts,
+		"suspicion": suspicion,
+		"takedown_done": takedown_done,
+		"night2_active": night2_active,
+		"is_failed": is_failed,
+		"is_complete": is_complete
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	if data.has("phase"): phase = data["phase"]
+	if data.has("contacts"): contacts = data["contacts"]
+	if data.has("suspicion"): suspicion = data["suspicion"]
+	if data.has("takedown_done"): takedown_done = data["takedown_done"]
+	if data.has("night2_active"): night2_active = data["night2_active"]
+	if data.has("is_failed"): is_failed = data["is_failed"]
+	if data.has("is_complete"): is_complete = data["is_complete"]
+	refresh_objective()
+	state_changed.emit()
+
+func save_to_file(path: String = "user://save_game.json") -> void:
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	if file:
+		var json_string = JSON.stringify(get_save_data())
+		file.store_string(json_string)
+		file.close()
+
+func load_from_file(path: String = "user://save_game.json") -> void:
+	if not FileAccess.file_exists(path): return
+	var file = FileAccess.open(path, FileAccess.READ)
+	if file:
+		var json_string = file.get_as_text()
+		file.close()
+		var data = JSON.parse_string(json_string)
+		if data is Dictionary:
+			load_save_data(data)

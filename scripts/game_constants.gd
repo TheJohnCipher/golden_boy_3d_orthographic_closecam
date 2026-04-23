@@ -1,48 +1,54 @@
 extends Node
 
-# -- Colour palette --
-const C_ALLEY     := Color("#0d1016")
-const C_BACK_HALL := Color("#111520")
-const C_WEST      := Color("#100e18")
-const C_MAIN_HALL := Color("#1a1225")
-const C_EAST      := Color("#100e18")
-const C_FOYER     := Color("#141a24")
-const C_PLAZA     := Color("#0e1218")
-const C_TRIM      := Color("#1c2030")
-const C_WALL_FACE  := Color("#0a0c12")
-const C_GOLD      := Color("#c8a84e")
-const C_NEON_PINK := Color("#ff44a0")
-const C_NEON_CYAN := Color("#44d8ff")
-const C_NEON_AMB  := Color("#ffbf44")
+# ── 1. Sprite Asset Paths (res://assets/sprites/) ──
+const T_FLOOR_WOOD      = "res://assets/sprites/floor_wood.png"
+const T_FLOOR_CARPET    = "res://assets/sprites/floor_carpet.png"
+const T_SKYSCRAPER      = "res://assets/sprites/arch_skyscraper_base_cyber_01.png.png"
+const T_WALL_TEXTURE    = "res://assets/sprites/wall_architecture.png"
+const T_PLAYER_SPRITE   = "res://assets/sprites/player.png"
+const T_NPC_SPRITE      = "res://assets/sprites/npc_base.png"
 
-# -- Projection --
-const ISO_Y_SCALE  := 0.65
-const WALL_FACE_H  := 18.0 / ISO_Y_SCALE
+# ── 2. Prefab Registry (res://scenes/prefabs/) ──
+const P_FRIDGE          = "res://scenes/prefabs/fridge.tscn"
+const P_STOVE           = "res://scenes/prefabs/stove.tscn"
+const P_TABLE           = "res://scenes/prefabs/table.tscn"
+const P_STOOL           = "res://scenes/prefabs/stool.tscn"
+const P_WALL_SECTION    = "res://scenes/prefabs/wall_architecture.tscn"
 
-# -- Room rectangles --
-const R_ALLEY     := Rect2(100,  20, 440,  65)
-const R_BACK_HALL := Rect2(100,  85, 440,  65)
-const R_WEST      := Rect2( 20, 150, 100, 200)
-const R_MAIN_HALL := Rect2(120, 150, 360, 220)
-const R_EAST      := Rect2(480, 150, 100, 200)
-const R_FOYER     := Rect2(200, 370, 240,  90)
-const R_PLAZA     := Rect2(100, 460, 440, 140)
+# ── 3. Professional Lighting & Palettes ──
+const COLOR_WARM_TINT   = Color("#fff4e0", 0.6) # Low-intensity warm tint
+const COLOR_SHADOW      = Color("#2a1a3a", 0.4)
 
-# -- NPC spawns --
-const NPC_SPAWNS := [
-	{"role": "contact", "name": "Mara", "key": "alibi", "phase": "day", "pos": Vector2(320, 412), "patrol": []},
-	{"role": "contact", "name": "Jules", "key": "guest_pass", "phase": "day", "pos": Vector2(60, 250), "patrol": []},
-	{"role": "contact", "name": "Nico", "key": "route_intel", "phase": "day", "pos": Vector2(575, 250), "patrol": []},
-	{"role": "guard", "name": "Guard1", "key": "", "phase": "night", "pos": Vector2(320, 200), "patrol": [Vector2(320, 200), Vector2(320, 300)]},
-	{"role": "witness", "name": "Witness1", "key": "", "phase": "night", "pos": Vector2(200, 250), "patrol": [Vector2(200, 250), Vector2(400, 250)]},
-	{"role": "civilian", "name": "Guest B", "key": "", "phase": "day", "pos": Vector2(165, 230), "patrol": []},
-	{"role": "target", "name": "Alden", "key": "", "phase": "night", "pos": Vector2(320, 280), "patrol": [Vector2(150, 280), Vector2(450, 280)]}
+# ── 4. World Streaming Config ──
+const CHUNK_SIZE     := 1024.0
+const LOAD_THRESHOLD := 512.0
+const CITY_BOUNDS    := Rect2i(-5, -5, 10, 10) # 10x10 total chunks
+
+
+# ── 5. Audio Registry ──
+const S_FOOTSTEP    = "res://assets/audio/step_concrete.wav"
+const S_ALERT       = "res://assets/audio/alert_stinger.wav"
+
+const ISO_Y_SCALE  := 0.7
+
+# Cottage interior: single room 1088×512
+const R_COTTAGE   := Rect2(0, 0, 1088, 512)
+
+const ARCHITECTURE_DATA := [
+	# ── THE HERO BUILDING ──
+	{"chunk_coord": Vector2i(0, 0),  "local_pos": Vector2(512, 512), "asset_id": "skyscraper_cyber_01", "scale": Vector2(0.4, 0.4)},
+	# ── NEIGHBORING BRICK BUILDING ──
+	{"chunk_coord": Vector2i(1, 0),  "local_pos": Vector2(200, 512), "asset_id": "brick_building_01",   "scale": Vector2(0.4, 0.4)},
 ]
 
-# -- Extraction --
-const EXTRACTION_POS := Vector2(460, 46)
-const NIGHT_START_POSITION := Vector2(220.0, 112.0)
+const PROP_DATA := []
 
-# -- Visual Assets --
+const ZONE_DATA := []
+
+const NPC_SPAWNS := []
+
+const EXTRACTION_POS := Vector2(100, 60)
+const NIGHT_START_POSITION := Vector2(544.0, 300.0)
+
 const PLAYER_SCRIPT = preload("res://scripts/player_2d.gd")
 const NPC_SCRIPT = preload("res://scripts/npc_2d.gd")

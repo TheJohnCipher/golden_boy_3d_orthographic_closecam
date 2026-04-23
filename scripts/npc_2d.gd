@@ -1,5 +1,8 @@
 extends CharacterBody2D
 
+const GameConstants = preload("res://scripts/game_constants.gd")
+const AssetGenerator = preload("res://scripts/asset_generator.gd")
+
 signal suspicion_detected(amount: float, npc_name: String)
 
 var world_ref        = null
@@ -17,9 +20,26 @@ var detect_rate      := 22.0
 var _alert_level     := 0.0 # 0.0 to 1.0
 var _current_point   := 0
 var _pause_timer     := 0.0
+var _is_searching    := false
 var _facing          := Vector2(0.0, 1.0)
 var _body_color      := Color("#7a8a9a")
 var _marker_visible  := false
+
+var sprite : Sprite2D
+
+func _ready() -> void:
+	sprite = Sprite2D.new()
+	var path := GameConstants.T_NPC_SPRITE
+	var tex = load(path)
+	if not tex:
+		push_warning("NPC sprite %s missing. Generating procedural base actor." % path)
+		tex = AssetGenerator.create_actor_texture(Color("#7a8a9a"))
+
+	sprite.texture = tex
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# Physics Footprint Protocol: Origin at feet
+	sprite.offset = Vector2(0, -sprite.texture.get_height() * 0.5) if sprite.texture else Vector2.ZERO
+	add_child(sprite)
 
 func setup(p_role: String, p_name: String, p_key: String, p_phase: String) -> void:
 	role         = p_role
@@ -32,10 +52,11 @@ func setup(p_role: String, p_name: String, p_key: String, p_phase: String) -> vo
 		"witness":  _body_color = Color("#c87050")
 		"target":   _body_color = Color("#d8cfc0")
 		_:          _body_color = Color("#7a8a9a")
+	if sprite:
+		sprite.modulate = _body_color
 
 func set_marker_visible(show: bool) -> void:
 	_marker_visible = show
-	queue_redraw()
 
 func can_interact(player) -> bool:
 	if interaction_used or role != "contact" or not visible:
@@ -83,11 +104,16 @@ func _physics_process(delta: float) -> void:
 		_alert_level = min(_alert_level + delta * 2.0, 1.0) # Fill meter over 0.5s
 		if _alert_level >= 1.0:
 			suspicion_detected.emit(detect_rate * delta, npc_name)
+			_is_searching = true
 	else:
-		_alert_level = max(_alert_level - delta * 0.5, 0.0) # Decay slowly
-	
-	if role in ["guard", "witness"]:
-		queue_redraw()
+		if _is_searching and _alert_level > 0.5:
+			# Stay in search mode if they were very alert
+			_pause_timer = 2.0
+			_is_searching = false
+		_alert_level = max(_alert_level - delta * 0.3, 0.0)
+
+	# Always redraw vision cones to match new facing/alertness
+	queue_redraw()
 
 func _run_patrol(delta: float) -> void:
 	if patrol_points.size() < 2 or role not in ["guard", "witness", "civilian"]:
@@ -130,10 +156,6 @@ func _draw() -> void:
 		var line_col = cc
 		line_col.a = clamp(cc.a * 2.0, 0.1, 0.4)
 		draw_polyline(pts, line_col, 1.0, true)
-
-	# Body circle + direction nub
-	draw_circle(Vector2.ZERO, 7.0, _body_color)
-	draw_circle(_facing * 8.5, 2.5, _body_color.lightened(0.35))
 
 	# Floating marker with name
 	if _marker_visible:

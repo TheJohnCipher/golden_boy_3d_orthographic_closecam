@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const GameConstants = preload("res://scripts/game_constants.gd")
+
 const WALK_SPEED   = 85.0
 const SPRINT_SPEED = 155.0
 
@@ -7,6 +9,19 @@ var world_ref      = null
 var shadow_count   := 0
 var facing         := Vector2(0.0, 1.0)
 var _move_time     := 0.0
+var _step_timer    := 0.0
+
+var sprite : Sprite2D
+
+func _ready() -> void:
+	sprite = Sprite2D.new()
+	var path := GameConstants.T_PLAYER_SPRITE
+	var tex = load(path)
+	if tex: sprite.texture = tex
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# Physics Footprint Protocol: Origin at feet
+	sprite.offset = Vector2(0, -sprite.texture.get_height() * 0.5) if sprite.texture else Vector2.ZERO
+	add_child(sprite)
 
 func _physics_process(delta: float) -> void:
 	var has_sprint = InputMap.has_action("sprint")
@@ -26,81 +41,53 @@ func _physics_process(delta: float) -> void:
 	var is_sprinting = has_sprint and Input.is_action_pressed("sprint")
 	velocity = dir * (SPRINT_SPEED if is_sprinting else WALK_SPEED)
 	move_and_slide()
-	queue_redraw()
+	
+	if dir.length() > 0.1:
+		_step_timer += delta
+		if _step_timer >= (0.3 if is_sprinting else 0.5):
+			_step_timer = 0.0
+			_play_footstep()
 
-func _draw() -> void:
+func _process(delta: float) -> void:
 	var hidden := is_hidden()
 	var moving := _move_time > 0.0
-	var step   := sin(_move_time * 12.0)
-	var breath := sin(Time.get_ticks_msec() * 0.003) * 0.2
 	var sprint := InputMap.has_action("sprint") and Input.is_action_pressed("sprint")
 
-	var c_suit := Color("#16121e") if not hidden else Color("#0a080f")
-	var c_mid  := Color("#221b30") if not hidden else Color("#110f18")
-	var c_gold := Color("#c8a84e") if not hidden else Color("#3a2c0e")
-	var c_skin := Color("#c49a72") if not hidden else Color("#5a4030")
-	var c_hair := Color("#120e0c") if not hidden else Color("#080706")
-	var c_shoe := Color("#0c0a08") if not hidden else Color("#060504")
+	# Update visual state
+	if sprite:
+		sprite.modulate = Color(0.5, 0.6, 1.0, 0.7) if hidden else Color.WHITE
+		# Professional procedural lean: Rotates based on velocity, snaps back to 0 when idle
+		var target_rot = (velocity.x / SPRINT_SPEED) * 0.12 if moving else 0.0
+		sprite.rotation = lerp(sprite.rotation, target_rot, delta * 10.0)
+	
+	_update_occlusion(delta)
 
-	var perp := Vector2(-facing.y, facing.x)
-	# Dynamic Lean: Lean into the direction of movement
-	var lean := facing * (4.0 if sprint else 2.0) if moving else Vector2.ZERO
+func _update_occlusion(delta: float) -> void:
+	# Check for buildings in the YSort container that are north of the player
+	# but whose sprites might overlap the player's screen position.
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(global_position, global_position + Vector2(0, -60))
+	query.collision_mask = 1 # Architecture layer
+	var result = space_state.intersect_ray(query)
 
-	# ── Oblique ground shadow (offset south = larger Y, reads as depth) ───────
-	var sh_size := 9.0 + (absf(step) * 1.5 if moving else 0.0)
-	draw_circle(Vector2(0.0, 7.0), sh_size, Color(0.0, 0.0, 0.0, 0.32))
+	if world_ref and world_ref.world_manager:
+		for chunk in world_ref.world_manager.active_chunks.values():
+			if not chunk: continue
+			for b in chunk.get_node("Architecture_YSort").get_children():
+				if b is Sprite2D and b.global_position.distance_to(global_position) < 180:
+					var is_above = b.global_position.y < global_position.y
+					b.modulate.a = lerp(b.modulate.a, 0.75 if is_above else 1.0, delta * 5.0)
 
-	# ── Feet / legs at bottom of figure (south = ground level in oblique) ─────
-	var swing   := step * 3.0 if moving else 0.0
-	# In oblique view, "ground level" is south (larger local Y).
-	# Feet sit at the base; body rises upward (smaller Y) to imply height.
-	var feet_y  := 4.0   # feet below body center
-	var body_y  := -2.0  # body center slightly raised
-	var head_y  := -10.0 # head clearly above body
-
-	var ll := Vector2(-perp.x * 2.8 + facing.x * swing, feet_y + perp.y * 2.8 + facing.y * swing)
-	var rl := Vector2( perp.x * 2.8 - facing.x * swing, feet_y - perp.y * 2.8 - facing.y * swing)
-	draw_circle(ll, 2.4, c_suit)
-	draw_circle(ll + Vector2(facing.x, facing.y) * 3.2, 1.8, c_shoe)
-	draw_circle(rl, 2.4, c_suit)
-	draw_circle(rl + Vector2(facing.x, facing.y) * 3.2, 1.8, c_shoe)
-
-	# ── Torso (raised above feet) ─────────────────────────────────────────────
-	var body := Vector2(0.0, body_y + breath) + (lean * 0.4)
-	draw_circle(body, 5.5, c_mid)
-	draw_circle(body + perp * 2.2,  3.2, c_suit)
-	draw_circle(body - perp * 2.2,  3.2, c_suit)
-	# Gold tie
-	draw_circle(body + Vector2(facing.x, facing.y) * 2.0, 1.4, c_gold)
-
-	# ── Shoulders ─────────────────────────────────────────────────────────────
-	draw_circle(body + perp * 5.0, 2.8, c_suit)
-	draw_circle(body - perp * 5.0, 2.8, c_suit)
-
-	# ── Neck ──────────────────────────────────────────────────────────────────
-	draw_circle(Vector2(0.0, head_y + 3.5), 2.0, c_skin)
-
-	# ── Head (highest point — clearly "above" body in oblique) ───────────────
-	var head := Vector2(facing.x * 1.5, head_y + breath) + lean
-	draw_circle(head, 4.0, c_skin)
-	draw_circle(head - Vector2(facing.x, facing.y) * 1.6, 3.4, c_hair)
-	draw_circle(head + Vector2(facing.x, facing.y) * 1.4 + perp * 0.7, 0.8, c_skin.lightened(0.18))
-
-	# ── Sprint: coat flap ─────────────────────────────────────────────────────
-	if sprint and moving:
-		draw_circle(body - Vector2(facing.x, facing.y) + perp * absf(step), 1.1, c_gold.darkened(0.1))
-
-	# ── Hidden ring ───────────────────────────────────────────────────────────
-	if hidden:
-		draw_arc(body, 12.0, 0.0, TAU, 24, Color(0.35, 0.42, 0.9, 0.6), 1.5)
+func _play_footstep() -> void:
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sound_2d(GameConstants.S_FOOTSTEP, global_position, -15.0, randf_range(0.9, 1.1))
 
 func enter_shadow() -> void:
 	shadow_count += 1
-	queue_redraw()
 
 func exit_shadow() -> void:
 	shadow_count = max(shadow_count - 1, 0)
-	queue_redraw()
 
 func is_hidden() -> bool:
 	return shadow_count > 0

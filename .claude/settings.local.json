@@ -7,7 +7,12 @@
       "Bash(rm -f scripts/player_3d.gd scripts/player_3d.gd.uid scripts/npc_3d.gd scripts/npc_3d.gd.uid scripts/shadow_zone_3d.gd scripts/shadow_zone_3d.gd.uid scripts/world_3d.gd scripts/world_3d.gd.uid scripts/velvet_strip_builder.gd scripts/velvet_strip_builder.gd.uid Walking.fbx Walking.fbx.import shaders/window.gdshader shaders/window.gdshader.uid)",
       "Bash(rm -rf scripts/world/)",
       "Bash(mkdir -p c:/Users/3john/Downloads/golden_boy_3d_orthographic_closecam/golden_boy_3d_orthographic_closecam/scripts/world)",
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(godot --script scripts/world_2d.gd --headless)",
+      "WebSearch",
+      "Bash(python3 -m py_compile scripts/*.gd)",
+      "Bash(godot --headless --script-run-tests)",
+      "Bash(xargs grep *)"
     ]
   }
 }
